@@ -6,7 +6,7 @@ const currentYear = new Date().getFullYear()
   <footer>
     <Divider class="mt-12 mb-4" />
     <p class="small">
-      Copyright © {{ currentYear }} Heavy Petting. All Rights Reserved.
+      Copyright © {{ currentYear }} papnj.com. All Rights Reserved.
     </p>
   </footer>
 </template>
