@@ -37,7 +37,7 @@ export default defineNuxtConfig({
     }
   },
 
-  css: ['primeicons/primeicons.css', '~/assets/scss/main.scss', 'tailwindcss-primeui'],
+  css: ['primeicons/primeicons.css', '~/assets/scss/main.scss'],
 
   modules: ['@primevue/nuxt-module', '@nuxtjs/tailwindcss'],
 

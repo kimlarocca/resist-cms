@@ -1,5 +1,5 @@
 import type { Config } from 'tailwindcss'
-import primeui from 'tailwindcss-primeui'
+// import primeui from 'tailwindcss-primeui'
 
 export default <Partial<Config>>{
   darkMode: ['class', '.dark-mode'], // This is the key change
@@ -15,5 +15,5 @@ export default <Partial<Config>>{
       'xxl': '1920px',
     },
   },
-  plugins: [primeui],
+  // plugins: [primeui],
 }
