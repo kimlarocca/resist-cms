@@ -31,12 +31,12 @@ const currentYear = new Date().getFullYear()
 
       <Divider class="my-6 border-gray-700" />
 
-      <div class="text-center text-gray-400">
-        <p class="mb-2">
+      <div class="text-center">
+        <p class="mb-2 text-white">
           Copyright © {{ currentYear }} People Are People NJ. All Rights
           Reserved.
         </p>
-        <p class="italic text-sm">
+        <p class="italic text-sm text-white">
           Paid for by People Are People NJ. Because New Jersey deserves a
           governor with backbone—not a weathervane.
         </p>

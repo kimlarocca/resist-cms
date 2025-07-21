@@ -576,7 +576,7 @@
         <h2 class="text-4xl font-bold mb-12">Take Action Now</h2>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-4xl mx-auto">
           <Button label="Request a Yard Sign" severity="secondary" size="large"
-            class="bg-white text-red-800 hover:bg-gray-100 font-semibold py-3" />
+            class="bg-white text-red-800 hover:bg-gray-100 font-semibold py-3" @click="requestYardSign" />
           <Button label="Volunteer for the Resistance" severity="secondary" size="large"
             class="bg-white text-red-800 hover:bg-gray-100 font-semibold py-3" @click="openVolunteerLink" />
           <Button label="Share This Site" severity="secondary" size="large"
@@ -586,16 +586,6 @@
         </div>
       </div>
     </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8">
-      <div class="container mx-auto px-4 text-center">
-        <p class="italic">
-          Paid for by People Are People NJ. Because New Jersey deserves a
-          governor with backbone—not a weathervane.
-        </p>
-      </div>
-    </footer>
   </div>
 </template>
 
@@ -720,6 +710,12 @@ const openDonateLink = () => {
 
 const openVolunteerLink = () => {
   window.open('https://papnj.com/#volunteer', '_blank')
+}
+
+const requestYardSign = () => {
+  const subject = encodeURIComponent('Yard Sign Request - Jack Can\'t Millions')
+  const body = encodeURIComponent('Hi,\n\nI would like to request a yard sign for the Jack Can\'t Millions campaign.\n\nPlease let me know what information you need from me.\n\nThanks!')
+  window.location.href = `mailto:info@papnj.com?subject=${subject}&body=${body}`
 }
 
 const shareWebsite = async () => {
