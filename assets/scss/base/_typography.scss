@@ -56,11 +56,11 @@
 
   h2,
   .like-h2 {
-    @include typeface(header, 12);
+    @include typeface(header, 10);
     font-weight: 400;
     letter-spacing: 0.5px;
-    font-size: 40px;
-      line-height: 50px;
+    font-size: 30px;
+      line-height: 40px;
 
     @screen md {
       font-size: 55px;
