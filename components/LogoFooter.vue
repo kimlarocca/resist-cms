@@ -1,28 +1,28 @@
 <template>
-  <div class="bg-white p-4 w-fit">
+  <div class="bg-white px-8 pb-6 w-fit">
     <svg
-      width="132"
-      height="95"
-      viewBox="0 0 132 95"
+      width="185"
+      height="133"
+      viewBox="0 0 185 133"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink"
     >
-      <rect width="132" height="95" fill="url(#pattern0_70_114)" />
+      <rect width="185" height="133" fill="url(#pattern0_126_56)" />
       <defs>
         <pattern
-          id="pattern0_70_114"
+          id="pattern0_126_56"
           patternContentUnits="objectBoundingBox"
           width="1"
           height="1"
         >
           <use
-            xlink:href="#image0_70_114"
-            transform="matrix(0.000280365 0 0 0.00038956 -0.00199354 0)"
+            xlink:href="#image0_126_56"
+            transform="matrix(0.000280062 0 0 0.00038956 -0.00145085 0)"
           />
         </pattern>
         <image
-          id="image0_70_114"
+          id="image0_126_56"
           width="3581"
           height="2567"
           preserveAspectRatio="none"

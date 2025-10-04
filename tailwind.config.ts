@@ -26,7 +26,7 @@ export default <Partial<Config>>{
       'sm': '375px',
       'md': '768px',
       'lg': '1024px',
-      'xl': '1366px',
+      'xl': '1440px',
       'xxl': '1920px',
     },
   },

@@ -61,6 +61,7 @@ const valueNumber = ref(12345)
     <Button label="Call To Action" severity="secondary" class="mr-2" />
     <Button icon="pi pi-plus" class="mr-2" />
     <Button icon="pi pi-plus" severity="secondary" class="mr-2" />
+    <Button size="small" label="Volunteer" class="mr-2" />
     <divider class="my-7" />
 
     <!-- <div class="mb-3">
