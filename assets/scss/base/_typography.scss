@@ -41,10 +41,14 @@
   h2,
   .like-h2 {
     font-family: 'Merriweather';
-    font-weight: 700;
-    font-size: 34px;
-    line-height: 43px;
+    font-weight: 900;
+    font-size: 21px;
+    line-height: 26px;
     color: #193b59;
+    @screen lg {
+      font-size: 34px;
+      line-height: 43px;
+    }
   }
 
   h3,

@@ -6,7 +6,7 @@ const currentYear = new Date().getFullYear()
   <footer class="blue-section pb-20">
     <div class="bg-red" style="height: 56px" />
     <div
-      class="relative container grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-24"
+      class="relative container px-4 xl:px-12 grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-24"
     >
       <div class="lg:col-span-2 order-2 lg:order-1 pt-12">
         <p class="mb-6">

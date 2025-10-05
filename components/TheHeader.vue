@@ -56,7 +56,7 @@ const navItems = [
 
 <template>
   <header>
-    <div class="container flex justify-between xl:justify-start">
+    <div class="container px-4 xl:px-0 flex justify-between xl:justify-start">
       <NuxtLink to="/">
         <Logo />
       </NuxtLink>

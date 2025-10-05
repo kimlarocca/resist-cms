@@ -41,10 +41,6 @@ a {
     width: 100%;
     max-width: var(--max-container-width) !important;
     margin: auto;
-    padding: 0 30px;
-    @screen lg {
-        padding: 0 150px;
-    }
 }
 
 .text-white {

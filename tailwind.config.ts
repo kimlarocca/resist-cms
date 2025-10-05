@@ -23,7 +23,7 @@ export default <Partial<Config>>{
       // Custom breakpoints: 
       // Make sure these are matching the values in the scss vars in the assets/scss/breakpoints.scss file
       'xs': '320px',
-      'sm': '375px',
+      'sm': '430px',
       'md': '768px',
       'lg': '1024px',
       'xl': '1440px',
