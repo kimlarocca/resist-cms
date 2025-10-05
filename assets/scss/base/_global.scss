@@ -95,6 +95,7 @@ a {
 
 .p-menubar {
     border: none !important;
+    padding: 0 !important;
     background: var(--red) !important;
     @screen xl {
         background: var(--white) !important;
@@ -103,6 +104,7 @@ a {
 .p-menubar-item-link {
     color: var(--white) !important;
     overflow: visible !important;
+    padding: 0 !important;
     @screen xl {
         color: var(--blue) !important;
     }
