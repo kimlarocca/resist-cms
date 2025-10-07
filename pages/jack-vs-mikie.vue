@@ -33,7 +33,7 @@ const topics = [
   { jack: 'Supports', topic: 'School Voucher Programs', mikie: 'Opposes' },
   { jack: '[crickets]', topic: 'FEMA Funding', mikie: 'Supports' },
   { jack: '[crickets]', topic: 'Masked ICE Agents', mikie: 'Opposes' },
-  { jack: '[For Gun Owners Only', topic: 'Due Process', mikie: 'For All' },
+  { jack: 'For Gun Owners Only', topic: 'Due Process', mikie: 'For All' },
   {
     jack: 'Republicans Only',
     topic: 'Government by Executive Order',
