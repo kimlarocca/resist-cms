@@ -78,7 +78,11 @@ const navItems = [
           >
             <Button size="small" label="Volunteer" class="mr-2" />
           </a>
-          <a href="https://secure.papnj.com/donate" target="_blank">
+          <a
+            href="https://secure.papnj.com/donate"
+            target="_blank"
+            class="hidden md:block"
+          >
             <Button size="small" label="Donate" />
           </a>
           <div class="xl:hidden ml-3" @click="visible = true">
