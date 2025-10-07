@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <div class="container">
+  <div class="container px-4 xl:px-0">
     <h1 class="mb-4">Issues Affecting New Jersey</h1>
     <p>Coming soon!</p>
   </div>
