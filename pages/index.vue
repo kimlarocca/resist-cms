@@ -65,7 +65,7 @@
         </div>
         <div class="self-center">
           <img
-            src="/images/JAckTheFlipper.jpg"
+            src="/images/JackTheFlipper.jpg"
             alt="Are Jack's policies dangerous for New Jersey? - Jack The Flipper"
             class="w-full lg:w-fit"
           />
