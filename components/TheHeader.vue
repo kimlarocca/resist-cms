@@ -1,57 +1,30 @@
 <script setup>
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
 const visible = ref(false)
-
 const navItems = [
   {
-    label: 'Jack playing politics',
-    to: '/',
-    command: () => {
-      router.push('/jack-playing-politics')
-    }
+    label: 'Playing Politics',
+    to: '/#playing-politics'
   },
   {
-    label: "Jack's dangerous policies",
-    to: '/jacks-dangerous-policies',
-    command: () => {
-      router.push('/jacks-dangerous-policies')
-    }
+    label: "We Don't Know Jack",
+    to: '/we-dont-know-jack'
   },
   {
-    label: 'Jack the flipper',
-    to: '/jack-the-flipper',
-    command: () => {
-      router.push('/jack-the-flipper')
-    }
+    label: 'The Issues',
+    to: '/#issues'
   },
+  { label: 'Compare Candidates', to: '/jack-vs-mikie' },
   {
     label: 'Key dates',
-    to: '/key-dates',
-    command: () => {
-      router.push('/key-dates')
-    }
+    to: '/key-dates'
   },
   {
-    label: 'DYOR',
-    to: '/dyor',
-    command: () => {
-      router.push('/dyor')
-    }
+    label: 'Do Your Own Research',
+    to: '/dyor'
   },
   {
-    label: 'Take action',
-    command: () => {
-      window.open('https://papnj.com/#volunteer', '_blank')
-    }
-  },
-  {
-    label: 'Issues affecting NJ',
-    to: '/issues-affecting-nj',
-    command: () => {
-      router.push('/issues-affecting-nj')
-    }
+    label: 'Request a Sign',
+    to: '/request-a-sign'
   }
 ]
 </script>
@@ -64,13 +37,13 @@ const navItems = [
       </NuxtLink>
       <div>
         <div class="flex items-center ml-12" style="height: 56px">
-          <p
+          <!-- <p
             class="text-white small hidden xl:flex mr-6"
             style="line-height: 56px"
           >
             <strong>It's time to take action!</strong>&nbsp;Contribute to the
             cause and stop NJ from turning red.
-          </p>
+          </p> -->
           <a
             href="https://papnj.com/#volunteer"
             target="_blank"
@@ -90,7 +63,11 @@ const navItems = [
           </div>
         </div>
         <nav class="hidden xl:flex justify-between ml-12 mt-4">
-          <Menubar :model="navItems" />
+          <p v-for="item in navItems" :key="item.label" class="small mr-4">
+            <NuxtLink :to="item.to" @click="visible = false" class="plain">
+              {{ item.label }}
+            </NuxtLink>
+          </p>
         </nav>
       </div>
     </div>

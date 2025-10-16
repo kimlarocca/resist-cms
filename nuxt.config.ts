@@ -8,12 +8,12 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: `CantFixJack.com - Exposing Jack Ciattarelli`,
+      title: `CantFixJack.com | Jack Ciattarelli: Opioids, Taxes, Ambition`,
       htmlAttrs: {
         lang: 'en',
       },
       meta: [
-        { name: 'description', content: 'Unpacking Jack Ciattarelli\'s flip-flops, MAGA ties, and authoritarian agenda. Join People Are People NJ to stop him.' },
+        { name: 'description', content: 'CantFixJack.com exposes Jack Ciattarelli\'s shady opioid-pushing businesses, political flip-flops, and relentless self-serving bids for NJ power.' },
         { name: 'keywords', content: 'Jack Ciattarelli, NJ politics, MAGA, Stop the Steal, Super PAC, Trump ties, authoritarianism' },
         { name: 'msapplication-TileColor', content: '#0a84ff' },
         { name: 'theme-color', content: '#0a84ff' }

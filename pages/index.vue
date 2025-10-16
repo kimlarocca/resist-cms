@@ -25,17 +25,17 @@ const showFEMA = ref(false)
           to Trump.
         </p>
         <h2 class="mb-9">
-          Can we trust Jack's values, <br class="hidden sm:block" />or will he
-          say anything to win?
+          Does Jack share our values, <br class="hidden sm:block" />
+          or will he say anything to win?
         </h2>
-        <NuxtLink to="https://papnj.com/#volunteer" target="_blank">
-          <Button label="Take Action!" severity="secondary" class="mr-2 mb-9" />
+        <NuxtLink to="#issues">
+          <Button label="Learn More" severity="secondary" class="mr-2 mb-9" />
         </NuxtLink>
         <div class="hidden lg:block">
           <iframe
             width="560"
             height="315"
-            src="https://www.youtube.com/embed/2TnsMJn1pU0?si=2Us-4DKzCBsWVpu_"
+            src="https://www.youtube.com/embed/ZW0S74-4b68?si=CkoQ2lKMcHOQt2-K"
             title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -59,12 +59,14 @@ const showFEMA = ref(false)
       />
     </div>
     <!-- jack playing politics -->
-    <div class="lg:px-24">
+    <div id="playing-politics" class="lg:px-24">
       <div class="grid grid-cols-1 lg:grid-cols-2 lg:gap-12 mt-4 xl:mt-0">
         <div class="px-6 lg:px-0">
           <h2 class="mb-4">Jack Playing Politics</h2>
           <p class="mb-8">
-            Even when caught being dishonest Jack doubles down on hypocrisy.
+            Jack the Flipper was asked about voting for somebody he said brings
+            out our worst instincts and fears, he just smirks his way to
+            hypocrisy. How can NJ trust him on anything?
           </p>
           <img
             src="/images/JackAndDonny.png"
@@ -72,7 +74,7 @@ const showFEMA = ref(false)
           />
         </div>
         <div class="self-center">
-          <NuxtLink to="/jacks-dangerous-policies" class="plain">
+          <NuxtLink to="/we-dont-know-jack" class="plain">
             <img
               src="/images/JackTheFlipper.jpg"
               alt="Are Jack's policies dangerous for New Jersey? - Jack The Flipper"
@@ -80,9 +82,10 @@ const showFEMA = ref(false)
             />
           </NuxtLink>
           <p class="mt-4 px-6 mx-auto lg:w-5/6">
-            Jack the Flipper has been all over the map, from Sussex to Cape May,
-            on some of the most important issues facing New Jersey and the
-            country.
+            He's been running for Governor forever, but we still don't know
+            Jack. Get to know Jack's history publishing Opioid propaganda,
+            accessing Mikie's personal information, and the horrific act
+            committed by one of his supporters.
           </p>
         </div>
       </div>
@@ -132,7 +135,7 @@ const showFEMA = ref(false)
       </div>
     </div>
     <!-- important issues -->
-    <div class="p-12 text-center">
+    <div id="issues" class="p-12 text-center">
       <h2 class="like-h1 mb-8">
         Issues important to the people of New Jersey:
       </h2>
