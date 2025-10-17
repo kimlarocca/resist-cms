@@ -7,6 +7,7 @@
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink"
+      class="logo-svg"
     >
       <rect width="132" height="95" fill="url(#pattern0_70_114)" />
       <defs>
@@ -32,3 +33,13 @@
     </svg>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.logo-svg {
+  width: 90px;
+  height: auto;
+  @screen lg {
+    width: 132px;
+  }
+}
+</style>
