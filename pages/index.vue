@@ -194,7 +194,7 @@ const showDialog = topic => {
 .jack-vs-mikie {
   background: url('/images/JackVsMikie-Mobile.jpg') no-repeat bottom center;
   background-size: cover;
-  height: 600px;
+  height: 500px;
   @media (min-width: 768px) {
     background: url('/images/JackVsMikie-Desktop.jpg') no-repeat top center;
     background-size: cover;

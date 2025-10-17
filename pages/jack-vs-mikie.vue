@@ -331,44 +331,40 @@ const topics = [
 </script>
 
 <template>
-  <div>
+  <div
+    class="jack-vs-mikie text-white flex md:items-center justify-center mt-0 relative"
+  >
+    <div class="px-8 py-12 text-center">
+      <h1 class="text-white mb-1">Jack vs. Mikie</h1>
+      <h2 class="mb-6 text-white">the tale of the tape</h2>
+      <p class="pb-8">How does Jack compare to his opponent, Mikie Sherrill?</p>
+    </div>
+    <div class="container grid grid-cols-3 absolute px-4 bottom-4">
+      <h3>JACK</h3>
+      <h3 class="text-center">TOPIC</h3>
+      <h3 class="text-right">MIKIE</h3>
+    </div>
+  </div>
+  <div class="container p-4">
+    <div v-for="(topic, index) in topics" :key="index">
+      <div class="flex w-full my-3">
+        <div class="flex-1 topic text-red" v-html="topic.jack" />
+        <div class="flex-1 topic text-center" v-html="topic.topic" />
+        <div class="flex-1 topic text-blue text-right" v-html="topic.mikie" />
+      </div>
+      <hr />
+    </div>
+  </div>
+  <!-- key dates / DYOR -->
+  <div class="container p-8 lg:pt-10 lg:pb-24 lg:px-24">
     <div
-      class="jack-vs-mikie text-white flex md:items-center justify-center mt-12 lg:mt-0 relative"
+      class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-4 lg:gap-16 xl:gap-32 mt-12"
     >
-      <div class="px-8 py-12 text-center">
-        <h1 class="text-white mb-1">Jack vs. Mikie</h1>
-        <h2 class="mb-6 text-white">the tale of the tape</h2>
-        <p class="pb-8">
-          How does Jack compare to his opponent, Mikie Sherrill?
-        </p>
+      <div class="px-6 lg:px-0 text-center">
+        <img src="/images/KeyDates.jpg" alt="Key Dates" />
       </div>
-      <div class="container grid grid-cols-3 absolute px-4 bottom-4">
-        <h3>JACK</h3>
-        <h3 class="text-center">TOPIC</h3>
-        <h3 class="text-right">MIKIE</h3>
-      </div>
-    </div>
-    <div class="container p-4">
-      <div v-for="(topic, index) in topics" :key="index">
-        <div class="flex w-full my-3">
-          <div class="flex-1 topic text-red" v-html="topic.jack" />
-          <div class="flex-1 topic text-center" v-html="topic.topic" />
-          <div class="flex-1 topic text-blue text-right" v-html="topic.mikie" />
-        </div>
-        <hr />
-      </div>
-    </div>
-    <!-- key dates / DYOR -->
-    <div class="container p-8 lg:pt-10 lg:pb-24 lg:px-24">
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-4 lg:gap-16 xl:gap-32 mt-12"
-      >
-        <div class="px-6 lg:px-0 text-center">
-          <img src="/images/KeyDates.jpg" alt="Key Dates" />
-        </div>
-        <div class="px-6 lg:px-0 text-center">
-          <img src="/images/DYOR.jpg" alt="DYOR - Do Your Own Research" />
-        </div>
+      <div class="px-6 lg:px-0 text-center">
+        <img src="/images/DYOR.jpg" alt="DYOR - Do Your Own Research" />
       </div>
     </div>
   </div>
