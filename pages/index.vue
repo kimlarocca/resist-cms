@@ -30,6 +30,7 @@ const showDialog = topic => {
         <NuxtLink to="#issues">
           <Button label="Learn More" severity="secondary" class="mr-2 mb-9" />
         </NuxtLink>
+        <div id="playing-politics" />
         <div class="hidden lg:block">
           <iframe
             width="560"
@@ -58,7 +59,7 @@ const showDialog = topic => {
       />
     </div>
     <!-- jack playing politics -->
-    <div id="playing-politics" class="lg:px-24">
+    <div class="lg:px-24">
       <div class="grid grid-cols-1 lg:grid-cols-2 lg:gap-12 mt-4 xl:mt-0">
         <div class="px-6 lg:px-0">
           <h2 class="mb-4">Jack Playing Politics</h2>

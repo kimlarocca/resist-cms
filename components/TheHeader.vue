@@ -15,7 +15,7 @@ const navItems = [
   },
   { label: 'Compare Candidates', to: '/jack-vs-mikie' },
   {
-    label: 'Key dates',
+    label: 'Key Dates',
     to: '/key-dates'
   },
   {
