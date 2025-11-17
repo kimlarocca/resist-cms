@@ -1,4 +1,4 @@
-# Nuxt 4 PrimeVue TailwindCSS Boilerplate
+# ResistCMS
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
