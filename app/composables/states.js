@@ -1,0 +1,1 @@
+export const useCurrentUserProfile = () => useState('useCurrentUserProfile', () => null)

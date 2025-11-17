@@ -94,7 +94,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-10-26',
   devtools: { enabled: true },
   modules: [
-    '@primevue/nuxt-module'
+    '@primevue/nuxt-module', '@nuxtjs/supabase'
   ],
 
   css: [
@@ -131,7 +131,7 @@ export default defineNuxtConfig({
       mode: "out-in",
     },
     head: {
-      title: 'Nuxt 4 Boilerplate', // default fallback title
+      title: 'Resist CMS', // default fallback title
       htmlAttrs: {
         lang: 'en',
       },
@@ -156,5 +156,20 @@ export default defineNuxtConfig({
       //   { src: 'https://www.googletagmanager.com/gtag/js?id=G-7GDC05EZKE' }
       // ]
     }
+  },
+  supabase: {
+    key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkc3l4dG5ieWVqbnd3dmJpZmpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2MDE1NzYsImV4cCI6MjA3ODE3NzU3Nn0.LsRpAl_DD9aOM18wM8_dI2nKhsqI3twU_0l0WSHRaeA',
+    url: 'https://udsyxtnbyejnwwvbifjr.supabase.co',
+    redirect: false,
+  },
+  runtimeConfig: {
+    public: {
+      environment: process.env.environment || 'prod',
+      supabaseAuthSignInRedirectTo: 'http://localhost:3000/',
+      supabaseAuthTokenName: 'udsyxtnbyejnwwvbifjr',
+      supabaseUrl: 'https://udsyxtnbyejnwwvbifjr.supabase.co',
+      supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkc3l4dG5ieWVqbnd3dmJpZmpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2MDE1NzYsImV4cCI6MjA3ODE3NzU3Nn0.LsRpAl_DD9aOM18wM8_dI2nKhsqI3twU_0l0WSHRaeA',
+
+    },
   },
 })

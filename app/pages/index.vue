@@ -1,30 +1,47 @@
+<script setup>
+definePageMeta({
+  layout: "blank",
+})
+
+const currentUser = useSupabaseUser()
+const client = useSupabaseClient()
+const user = await client.auth.getUser()
+const session = useSupabaseSession()
+const currentUserProfile = useCurrentUserProfile()
+
+console.log("Current session:", session.value)
+
+// check supabase session for a logged in user
+if (user?.data?.user) {
+  currentUser.value = user?.data?.user
+} else if (session?.data?.session?.user) {
+  currentUser.value = session?.data?.session?.user
+}
+
+onMounted(async () => {
+  if (!currentUserProfile.value) {
+    try {
+      currentUserProfile.value = await waitForCurrentUserProfile()
+    } catch (err) {
+      console.error("waiting aborted or failed", err)
+    }
+  }
+  // redirect to the dashboard if the user is already logged in
+  if (currentUser.value && currentUserProfile.value?.is_active) {
+    window.location.href = "/dashboard"
+  }
+  if (currentUser.value && !currentUserProfile.value?.is_active) {
+    window.location.href = "/setup"
+  }
+})
+</script>
+
 <template>
-  <div>
-    <section class="hero flex flex-col items-center justify-center mb-12">
-      <div class="container p-4">
-        <h1 class="mb-6">Welcome to the homepage</h1>
-        <p class="mb-8 text-xl">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua.
-        </p>
-        <NuxtLink to="/" class="mr-3">
-          <Button label="Call To Action" />
-        </NuxtLink>
-      </div>
-    </section>
-    <section class="container p-4">
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-        incididunt ut labore et dolore magna aliqua.
-      </p>
-    </section>
+  <div class="p-4 text-center">
+    <h1 class="mb-4">Welcome</h1>
+    <SupabaseLoginWithEmail class="mb-6" />
+    <p class="small">
+      <NuxtLink to="/forgot-password">Forgot Password?</NuxtLink>
+    </p>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.hero {
-  background: url("/images/hero.jpg") no-repeat center center;
-  background-size: cover;
-  min-height: 500px;
-}
-</style>

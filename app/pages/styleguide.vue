@@ -1,4 +1,8 @@
 <script setup>
+definePageMeta({
+  layout: "blank",
+})
+
 const { setDarkMode, setLightMode, isDarkMode } = useDarkMode()
 const checked = ref(false)
 const cities = ref([
@@ -27,23 +31,11 @@ const ingredient = ref("Cheese")
         <Title>Styleguide</Title>
       </Head>
     </Html>
-    <h1 class="visibility-brigade mb-8">
-      <span>S</span>
-      <span>t</span>
-      <span>y</span>
-      <span>l</span>
-      <span>e</span>
-      <span>g</span>
-      <span>u</span>
-      <span>i</span>
-      <span>d</span>
-      <span>e</span>
-    </h1>
     <i v-if="isDarkMode" @click="setLightMode" class="pi pi-sun clickable" />
     <i v-else @click="setDarkMode" class="pi pi-moon clickable mr-2" />
     <Divider class="my-7" />
-    <h1 class="mb-5">H3 Lorem Ipsum Dolor Sit Amet, consectetur adipisicing elit.</h1>
-    <h2 class="mb-5">H3 Lorem Ipsum Dolor Sit Amet, consectetur adipisicing elit.</h2>
+    <h1 class="mb-5">H1 Lorem Ipsum Dolor Sit Amet, consectetur adipisicing elit.</h1>
+    <h2 class="mb-5">H2 Lorem Ipsum Dolor Sit Amet, consectetur adipisicing elit.</h2>
     <h3 class="mb-5">H3 Lorem Ipsum Dolor Sit Amet, consectetur adipisicing elit.</h3>
     <h4 class="mb-5">H4 Lorem Ipsum Dolor Sit Amet, consectetur adipisicing elit.</h4>
     <p class="mb-3">
