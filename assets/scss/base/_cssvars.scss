@@ -3,8 +3,8 @@
 .light-mode,
 [data-style-mode='dark'],
 .dark-mode {
-    --font-family: 'Lato', sans-serif;
-    --font-family-header: 'Merriweather', serif;
+    --font-family: 'Roboto', sans-serif;
+    --font-family-header: 'Roboto', serif;
     --font-size: 1rem;
     --font-ratio: 1.125;
     --font-size-1: calc(var(--font-size-2) / var(--font-ratio));
@@ -41,9 +41,9 @@
     --dark-gray: #1f1f1f;
     --white: #ffffff;
     --black: #000000;
-    --red: #a62f03;
-    --blue: #193b59;
-    --orange: #f28705;
+    --red: #920000;
+    --blue: #3b82f6;
+    --purple: #a855f7;
 
     --opacity-on-hover: 0.7;
     --transition: all var(--p-transition-duration) ease-out;

@@ -2,73 +2,53 @@
 const visible = ref(false)
 const navItems = [
   {
-    label: 'Playing Politics',
-    to: '/#playing-politics'
+    label: "Home",
+    to: "/",
   },
   {
-    label: "We Don't Know Jack",
-    to: '/we-dont-know-jack'
+    label: "Candidates",
+    to: "/",
   },
   {
-    label: 'The Issues',
-    to: '/#issues'
+    label: "Issues",
+    to: "/",
   },
-  { label: 'Compare Candidates', to: '/jack-vs-mikie' },
-  {
-    label: 'Key Dates',
-    to: '/key-dates'
-  },
-  {
-    label: 'Do Your Own Research',
-    to: '/dyor'
-  },
-  {
-    label: 'Request a Sign',
-    to: '/request-a-sign'
-  }
+  { label: "News", to: "/" },
 ]
 </script>
 
 <template>
-  <header>
-    <div class="container px-4 xl:px-0 flex justify-between xl:justify-start">
-      <NuxtLink to="/">
-        <Logo />
-      </NuxtLink>
-      <div>
-        <div class="flex items-center justify-end" style="height: 56px">
-          <!-- <p
-            class="text-white small hidden xl:flex mr-6"
-            style="line-height: 56px"
-          >
-            <strong>It's time to take action!</strong>&nbsp;Contribute to the
-            cause and stop NJ from turning red.
-          </p> -->
-          <a
-            href="https://papnj.com/#volunteer"
-            target="_blank"
-            class="hidden md:block"
-          >
-            <Button size="small" label="Volunteer" class="mr-2" />
-          </a>
-          <a
-            href="https://secure.papnj.com/donate"
-            target="_blank"
-            class="hidden md:block"
-          >
-            <Button size="small" label="Donate" />
-          </a>
-          <div class="xl:hidden ml-3" @click="visible = true">
-            <i class="pi pi-bars text-4xl text-white cursor-pointer" />
-          </div>
-        </div>
-        <nav class="hidden w-full xl:flex justify-end mt-4">
-          <p v-for="item in navItems" :key="item.label" class="small ml-4">
+  <header class="mb-16">
+    <div class="container p-4 flex justify-between">
+      <div class="flex flex-col">
+        <NuxtLink to="/" class="plain">
+          <Logo />
+        </NuxtLink>
+      </div>
+      <div class="flex flex-col">
+        <nav class="hidden w-full xl:flex justify-end mt-4 gap-8">
+          <p v-for="item in navItems" :key="item.label" class="small">
             <NuxtLink :to="item.to" @click="visible = false" class="plain">
               {{ item.label }}
             </NuxtLink>
           </p>
+          <div class="xl:hidden ml-3" @click="visible = true">
+            <i class="pi pi-bars text-4xl text-white cursor-pointer" />
+          </div>
         </nav>
+      </div>
+      <div class="flex flex-col">
+        <InputGroup>
+          <InputText placeholder="Keyword" />
+          <InputGroupAddon>
+            <Button
+              icon="pi pi-search"
+              severity="secondary"
+              variant="text"
+              @click="toggle"
+            />
+          </InputGroupAddon>
+        </InputGroup>
       </div>
     </div>
     <Drawer v-model:visible="visible" position="right" header=" ">
@@ -87,14 +67,4 @@ const navItems = [
   </header>
 </template>
 
-<style lang="scss" scoped>
-header {
-  background: linear-gradient(
-    to bottom,
-    var(--red) 0px,
-    var(--red) 56px,
-    transparent 56px
-  );
-  width: 100%;
-}
-</style>
+<style lang="scss" scoped></style>

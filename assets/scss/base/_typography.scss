@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @tailwind base;
 
 @layer base {
@@ -15,7 +15,7 @@
   }
 
   p {
-    font-family: 'Lato';
+    font-family: 'Roboto';
     font-weight: 400;
     font-size: 18px;
     line-height: 22px;
@@ -27,28 +27,19 @@
 
   h1,
   .like-h1 {
-    font-family: 'Merriweather';
-    font-weight: 900;
-    font-size: 34px;
-    line-height: 43px;
-    color: #193b59;
+    font-family: 'Roboto';
+    font-weight: 500;
+    font-size: 60px;
+    line-height: 60px;
     @screen lg {
-      font-size: 55px;
-      line-height: 69px;
+      font-size: 60px;
+      line-height: 60px;
     }
-  }
-
-  .h1-static {
-    font-family: 'Merriweather';
-    font-weight: 900;
-    font-size: 55px;
-    line-height: 69px;
-    color: #193b59;
   }
 
   h2,
   .like-h2 {
-    font-family: 'Merriweather';
+    font-family: 'Roboto';
     font-weight: 900;
     font-size: 21px;
     line-height: 26px;
@@ -61,17 +52,16 @@
 
   h3,
   .like-h3 {
-    font-family: 'Lato';
+    font-family: 'Roboto';
     font-style: normal;
-    font-weight: 700;
+    font-weight: 500;
     font-size: 34px;
     line-height: 41px;
-    text-transform: uppercase;
   }
 
   h4,
   .like-h4 {
-    font-family: 'Lato';
+    font-family: 'Roboto';
     font-style: normal;
     font-weight: 700;
     font-size: 22px;
@@ -86,11 +76,11 @@
 
   label,
   .small {
-    font-size: 16px;
-    line-height: 20px;
+    font-size: 14px;
+    line-height: 18px;
     @screen lg {
-      font-size: 18px;
-      line-height: 22px;
+      font-size: 16px;
+      line-height: 20px;
     }
   }
 

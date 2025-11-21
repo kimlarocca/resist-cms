@@ -8,7 +8,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: `CantFixJack.com | Jack Ciattarelli: Opioids, Taxes, Ambition`,
+      title: `NJ 11th Special Election`,
       htmlAttrs: {
         lang: 'en',
       },

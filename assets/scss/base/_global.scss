@@ -65,6 +65,19 @@ a {
 .bg-red {
     background-color: var(--red) !important;
 }
+.bg-purple {
+    background-color: var(--purple) !important;
+}
+
+.border-blue {
+    border: solid 1px var(--blue) !important;
+}
+.border-red {
+    border: solid 1px var(--red) !important;
+}
+.border-purple {
+    border: solid 1px var(--purple) !important;
+}
 
 .blue-section {
     background-color: var(--blue);
@@ -77,11 +90,11 @@ a {
 // primevue overrides
 .p-button {
     border-width: 2px !important;
-    color: var(--blue) !important;
-    background: var(--orange) !important;
+    color: var(--white) !important;
+    background: var(--black) !important;
     border: 2px solid var(--blue) !important;
     border-radius: 0 !important;
-    padding: 0.7rem 3.5rem !important;
+    // padding: 0.7rem 3.5rem !important;
     transition: var(--transition) !important;
     &:hover {
         opacity: var(--opacity-on-hover) !important;
