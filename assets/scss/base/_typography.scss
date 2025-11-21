@@ -17,11 +17,11 @@
   p {
     font-family: 'Roboto';
     font-weight: 400;
-    font-size: 18px;
-    line-height: 22px;
+    font-size: 16px;
+    line-height: 20px;
     @screen lg {
-      font-size: 21px;
-      line-height: 28px;
+      font-size: 18px;
+      line-height: 22px;
     }
   }
 
@@ -29,8 +29,8 @@
   .like-h1 {
     font-family: 'Roboto';
     font-weight: 500;
-    font-size: 60px;
-    line-height: 60px;
+    font-size: 45px;
+    line-height: 45px;
     @screen lg {
       font-size: 60px;
       line-height: 60px;
@@ -40,13 +40,12 @@
   h2,
   .like-h2 {
     font-family: 'Roboto';
-    font-weight: 900;
-    font-size: 21px;
-    line-height: 26px;
-    color: #193b59;
+    font-weight: 400;
+    font-size: 25px;
+    line-height: 25px;
     @screen lg {
-      font-size: 34px;
-      line-height: 43px;
+      font-size: 30px;
+      line-height: 30px;
     }
   }
 
@@ -55,23 +54,18 @@
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 500;
-    font-size: 34px;
-    line-height: 41px;
+    font-size: 22px;
+    line-height: 22px;
   }
 
   h4,
   .like-h4 {
     font-family: 'Roboto';
     font-style: normal;
-    font-weight: 700;
-    font-size: 22px;
-    line-height: 22px;
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 19px;
     text-transform: uppercase;
-    background: #468384;
-    color: var(--white);
-    padding: 12px;
-    // width: fit-content;
-    margin: 18px auto 0;
   }
 
   label,

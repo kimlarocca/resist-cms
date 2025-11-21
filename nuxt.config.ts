@@ -39,7 +39,13 @@ export default defineNuxtConfig({
 
   css: ['primeicons/primeicons.css', '~/assets/scss/main.scss'],
 
-  modules: ['@primevue/nuxt-module', '@nuxtjs/tailwindcss'],
+  modules: ['@primevue/nuxt-module', '@nuxtjs/tailwindcss', '@nuxtjs/supabase'],
+
+  supabase: {
+    key: 'sb_publishable_hfb4cBZp-dppxuSEFkidtw_XdBFGbK2',
+    url: 'https://udsyxtnbyejnwwvbifjr.supabase.co',
+    redirect: false,
+  },
 
   tailwindcss: {
     exposeConfig: true,
@@ -61,6 +67,8 @@ export default defineNuxtConfig({
     public: {
       environment: process.env.environment ?? 'local',
       gtagId: 'G-SP8M8PRXCD',
+      supabaseKey: 'sb_publishable_hfb4cBZp-dppxuSEFkidtw_XdBFGbK2',
+      supabaseUrl: 'https://udsyxtnbyejnwwvbifjr.supabase.co',
     }
   }
 })

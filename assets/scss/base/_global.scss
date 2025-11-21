@@ -26,12 +26,12 @@ img {
 }
 
 a {
-    color: var(--blue);
+    color: var(--black);
     text-decoration: underline;
     transition: var(--transition);
     &:hover {
         text-decoration: underline;
-        color: var(--red);
+        color: var(--blue);
     }
 }
 .plain {
@@ -59,6 +59,10 @@ a {
     color: var(--red) !important;
 }
 
+.bg-white-opacity-70 {
+    background-color: rgba(255, 255, 255, 0.7) !important;
+}
+
 .bg-blue {
     background-color: var(--blue) !important;
 }
@@ -68,15 +72,18 @@ a {
 .bg-purple {
     background-color: var(--purple) !important;
 }
+.bg-gray {
+    background-color: var(--gray) !important;
+}
 
 .border-blue {
-    border: solid 1px var(--blue) !important;
+    border: solid 2px var(--blue) !important;
 }
 .border-red {
-    border: solid 1px var(--red) !important;
+    border: solid 2px var(--red) !important;
 }
 .border-purple {
-    border: solid 1px var(--purple) !important;
+    border: solid 2px var(--purple) !important;
 }
 
 .blue-section {
@@ -92,18 +99,15 @@ a {
     border-width: 2px !important;
     color: var(--white) !important;
     background: var(--black) !important;
-    border: 2px solid var(--blue) !important;
-    border-radius: 0 !important;
-    // padding: 0.7rem 3.5rem !important;
+    border: 2px solid var(--black) !important;
+    border-radius: 0.75rem !important;
     transition: var(--transition) !important;
     &:hover {
         opacity: var(--opacity-on-hover) !important;
     }
 }
 .p-button .p-button-label {
-    font-weight: 900 !important;
-    font-size: 21px !important;
-    line-height: 21px !important;
+    font-weight: 500 !important;
     text-transform: uppercase !important;
 }
 .p-button.p-button-sm .p-button-label {

@@ -19,10 +19,12 @@
     "@primeuix/themes": "^1.0.0",
     "@primevue/forms": "^4.3.2",
     "nuxt": "^3.16.0",
-    "tailwindcss-primeui": "^0.5.1"
+    "tailwindcss-primeui": "^0.5.1",
+    "@nuxtjs/supabase": "^2.0.1"
   },
   "devDependencies": {
     "@primevue/nuxt-module": "^4.3.2",
+    "@supabase/supabase-js": "^2.84.0",
     "primeicons": "^7.0.0",
     "sass": "^1.85.1"
   }

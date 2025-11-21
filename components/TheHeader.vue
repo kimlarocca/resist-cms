@@ -18,38 +18,24 @@ const navItems = [
 </script>
 
 <template>
-  <header class="mb-16">
+  <header>
     <div class="container p-4 flex justify-between">
-      <div class="flex flex-col">
-        <NuxtLink to="/" class="plain">
-          <Logo />
-        </NuxtLink>
-      </div>
-      <div class="flex flex-col">
-        <nav class="hidden w-full xl:flex justify-end mt-4 gap-8">
+      <NuxtLink to="/" class="plain">
+        <Logo />
+      </NuxtLink>
+      <!-- <div>
+        <nav class="hidden w-full lg:flex justify-end gap-4 mt-4">
           <p v-for="item in navItems" :key="item.label" class="small">
             <NuxtLink :to="item.to" @click="visible = false" class="plain">
               {{ item.label }}
             </NuxtLink>
           </p>
-          <div class="xl:hidden ml-3" @click="visible = true">
-            <i class="pi pi-bars text-4xl text-white cursor-pointer" />
+          <div>
+            <i class="pi pi-filter text-xl cursor-pointer mr-3" />
+            <i class="pi pi-bars text-xl cursor-pointer" />
           </div>
         </nav>
-      </div>
-      <div class="flex flex-col">
-        <InputGroup>
-          <InputText placeholder="Keyword" />
-          <InputGroupAddon>
-            <Button
-              icon="pi pi-search"
-              severity="secondary"
-              variant="text"
-              @click="toggle"
-            />
-          </InputGroupAddon>
-        </InputGroup>
-      </div>
+      </div> -->
     </div>
     <Drawer v-model:visible="visible" position="right" header=" ">
       <p v-for="item in navItems" :key="item.label" class="mb-5">
