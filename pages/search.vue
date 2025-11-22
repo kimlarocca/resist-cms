@@ -79,8 +79,8 @@ onMounted(() => {
     </div>
 
     <!-- No Results -->
-    <div v-else class="bg-white rounded-xl p-8 text-center">
-      <i class="pi pi-search text-6xl text-gray-400 mb-4"></i>
+    <div v-else class="bg-white rounded-xl pt-6">
+      <i class="pi pi-search text-6xl mb-4"></i>
       <h2 class="mb-4">No Results Found</h2>
       <p class="mb-6">Please try a different search term.</p>
     </div>
@@ -88,7 +88,7 @@ onMounted(() => {
     <!-- Back Button -->
     <div class="mt-12">
       <NuxtLink to="/">
-        <Button label="Back to All Candidates" icon="pi pi-arrow-left" />
+        <Button label="View All Candidates" icon="pi pi-arrow-left" />
       </NuxtLink>
     </div>
   </div>
