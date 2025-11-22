@@ -1,5 +1,6 @@
 <script setup>
 const visible = ref(false)
+const searchExpanded = ref(false)
 const navItems = [
   {
     label: "Home",
@@ -24,15 +25,21 @@ const keywordSearch = () => {
     navigateTo(`/search?query=${encodeURIComponent(query)}`)
   }
 }
+
+const toggleSearch = () => {
+  searchExpanded.value = !searchExpanded.value
+}
 </script>
 
 <template>
   <header>
-    <div class="container p-4 flex justify-between">
+    <div class="container p-4 flex justify-between items-center">
       <NuxtLink to="/" class="plain">
         <Logo />
       </NuxtLink>
-      <div>
+
+      <!-- Desktop Search - Always Visible -->
+      <div class="hidden md:block">
         <InputGroup>
           <InputText
             v-model="keyword"
@@ -48,17 +55,46 @@ const keywordSearch = () => {
             />
           </InputGroupAddon>
         </InputGroup>
-        <!-- <nav class="hidden w-full lg:flex justify-end gap-4 mt-4">
-          <p v-for="item in navItems" :key="item.label" class="small">
-            <NuxtLink :to="item.to" @click="visible = false" class="plain">
-              {{ item.label }}
-            </NuxtLink>
-          </p>
-          <div>
-            <i class="pi pi-filter text-xl cursor-pointer mr-3" />
-            <i class="pi pi-bars text-xl cursor-pointer" />
-          </div>
-        </nav> -->
+      </div>
+
+      <!-- Mobile Search - Button that Expands -->
+      <div class="md:hidden">
+        <!-- Search Button -->
+        <Button
+          v-if="!searchExpanded"
+          icon="pi pi-search"
+          severity="secondary"
+          variant="text"
+          @click="toggleSearch"
+        />
+
+        <!-- Expanded Search Input -->
+        <div v-else class="fixed top-0 left-0 right-0 bg-white z-50 p-4 shadow-lg">
+          <InputGroup>
+            <InputText
+              v-model="keyword"
+              placeholder="Search Candidates"
+              @keyup.enter="keywordSearch()"
+              autofocus
+            />
+            <InputGroupAddon>
+              <Button
+                icon="pi pi-search"
+                severity="secondary"
+                variant="text"
+                @click="keywordSearch()"
+              />
+            </InputGroupAddon>
+            <InputGroupAddon>
+              <Button
+                icon="pi pi-times"
+                severity="secondary"
+                variant="text"
+                @click="toggleSearch"
+              />
+            </InputGroupAddon>
+          </InputGroup>
+        </div>
       </div>
     </div>
     <Drawer v-model:visible="visible" position="right" header=" ">
