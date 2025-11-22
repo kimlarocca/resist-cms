@@ -18,7 +18,9 @@ const searchCandidates = async () => {
   const { data, error } = await supabase
     .from("candidates")
     .select("*")
-    .ilike("name", `%${searchQuery.value}%`)
+    .or(
+      `name.ilike.%${searchQuery.value}%,micro_bio.ilike.%${searchQuery.value}%,bio.ilike.%${searchQuery.value}%,experience.ilike.%${searchQuery.value}%`
+    )
     .order("party")
     .order("name")
   if (error) {
