@@ -50,7 +50,16 @@ onMounted(async () => {
           <div class="mb-4">
             <p
               v-if="candidate.party"
-              class="inline-block bg-blue text-white px-4 py-1 rounded text-sm font-bold uppercase"
+              :class="[
+                'inline-block text-white px-4 py-1 rounded text-sm font-bold uppercase',
+                candidate.party === 'Democrat'
+                  ? 'bg-blue'
+                  : candidate.party === 'Republican'
+                  ? 'bg-red'
+                  : candidate.party === 'Independent'
+                  ? 'bg-purple'
+                  : 'bg-gray',
+              ]"
             >
               {{ candidate.party }}
             </p>
