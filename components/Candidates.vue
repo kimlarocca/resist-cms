@@ -11,6 +11,7 @@ const props = defineProps({
 })
 
 const selectedParties = ref([])
+const selectedCandidates = ref([])
 const filterDialogVisible = ref(false)
 
 const parties = computed(() => {
@@ -24,26 +25,42 @@ const parties = computed(() => {
 })
 
 const filteredCandidates = computed(() => {
-  if (selectedParties.value.length === 0) {
-    return props.candidates
+  let filtered = props.candidates
+
+  // Filter by party
+  if (selectedParties.value.length > 0) {
+    filtered = filtered.filter((candidate) =>
+      selectedParties.value.includes(candidate.party)
+    )
   }
-  return props.candidates.filter((candidate) =>
-    selectedParties.value.includes(candidate.party)
-  )
+
+  // Filter by specific candidates
+  if (selectedCandidates.value.length > 0) {
+    filtered = filtered.filter((candidate) =>
+      selectedCandidates.value.includes(candidate.id)
+    )
+  }
+
+  return filtered
 })
 
 const filterLabel = computed(() => {
-  if (selectedParties.value.length === 0) {
+  const totalFilters = selectedParties.value.length + selectedCandidates.value.length
+  if (totalFilters === 0) {
     return "Filter"
   }
-  if (selectedParties.value.length === 1) {
-    return `Filter (${selectedParties.value[0]})`
-  }
-  return `Filter (${selectedParties.value.length} selected)`
+  return `Clear (${totalFilters} Filter${totalFilters > 1 ? "s" : ""}`
 })
 
 const clearFilters = () => {
   selectedParties.value = []
+  selectedCandidates.value = []
+}
+
+const truncateText = (text, maxLength) => {
+  if (!text) return ""
+  if (text.length <= maxLength) return text
+  return text.substring(0, maxLength) + "..."
 }
 </script>
 
@@ -51,30 +68,71 @@ const clearFilters = () => {
   <CandidatesSkeleton v-if="loading" />
   <section v-else-if="candidates.length" class="candidates">
     <!-- Filter Button -->
-    <div
-      class="filter-section mb-4 flex items-center justify-end gap-2 cursor-pointer"
-      @click="filterDialogVisible = true"
-    >
-      <i class="pi pi-filter text-2xl" />
-      <p class="like-h4">{{ filterLabel }}</p>
+    <div class="filter-section mb-4 flex items-center justify-end gap-2">
+      <div
+        class="flex items-center gap-2 cursor-pointer"
+        @click="filterDialogVisible = true"
+      >
+        <i class="pi pi-filter text-2xl" />
+      </div>
+      <Button
+        v-if="selectedParties.length > 0 || selectedCandidates.length > 0"
+        icon="pi pi-times"
+        severity="secondary"
+        variant="text"
+        @click="clearFilters"
+        size="small"
+        aria-label="Clear filters"
+        :label="filterLabel"
+      />
     </div>
 
     <!-- Filter Dialog -->
     <Dialog
       v-model:visible="filterDialogVisible"
       modal
-      header="Filter by Party"
-      :style="{ width: '90vw', maxWidth: '500px' }"
+      header="Filter Candidates"
+      :style="{ width: '90vw', maxWidth: '600px' }"
     >
       <div class="flex flex-col gap-4">
-        <div v-for="party in parties" :key="party" class="flex items-center gap-3">
-          <Checkbox
-            v-model="selectedParties"
-            :inputId="party"
-            :value="party"
-            name="party"
-          />
-          <label :for="party" class="cursor-pointer text-lg">{{ party }}</label>
+        <!-- Filter by Party Section -->
+        <div>
+          <h3 class="mb-3 font-bold">By Party</h3>
+          <div class="flex flex-col gap-3">
+            <div v-for="party in parties" :key="party" class="flex items-center gap-3">
+              <Checkbox
+                v-model="selectedParties"
+                :inputId="`party-${party}`"
+                :value="party"
+                name="party"
+              />
+              <label :for="`party-${party}`" class="cursor-pointer">{{ party }}</label>
+            </div>
+          </div>
+        </div>
+
+        <Divider />
+
+        <!-- Filter by Candidate Section -->
+        <div>
+          <h3 class="mb-3 font-bold">By Candidate</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto">
+            <div
+              v-for="candidate in candidates"
+              :key="candidate.id"
+              class="flex items-center gap-3"
+            >
+              <Checkbox
+                v-model="selectedCandidates"
+                :inputId="`candidate-${candidate.id}`"
+                :value="candidate.id"
+                name="candidate"
+              />
+              <label :for="`candidate-${candidate.id}`" class="cursor-pointer">
+                {{ candidate.name }}
+              </label>
+            </div>
+          </div>
         </div>
 
         <Divider />
