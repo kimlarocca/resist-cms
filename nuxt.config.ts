@@ -66,7 +66,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       environment: process.env.environment ?? 'local',
-      gtagId: 'G-SP8M8PRXCD',
+      gtagId: 'G-2YMMJJ5HJM',
       supabaseKey: 'sb_publishable_hfb4cBZp-dppxuSEFkidtw_XdBFGbK2',
       supabaseUrl: 'https://udsyxtnbyejnwwvbifjr.supabase.co',
     }
