@@ -26,12 +26,14 @@ img {
 }
 
 a {
-    color: var(--black);
+    color: var(--red);
     text-decoration: underline;
     transition: var(--transition);
+    opacity: 1;
     &:hover {
         text-decoration: underline;
-        color: var(--blue);
+        color: var(--red);
+        opacity: var(--opacity-on-hover);
     }
 }
 .plain {
@@ -72,37 +74,16 @@ a {
 .bg-red {
     background-color: var(--red) !important;
 }
-.bg-purple {
-    background-color: var(--purple) !important;
-}
 .bg-gray {
     background-color: var(--gray) !important;
-}
-
-.border-blue {
-    border: solid 2px var(--blue) !important;
-}
-.border-red {
-    border: solid 2px var(--red) !important;
-}
-.border-purple {
-    border: solid 2px var(--purple) !important;
-}
-
-.blue-section {
-    background-color: var(--blue);
-    color: var(--white);
-    a {
-        color: var(--orange);
-    }
 }
 
 // primevue overrides
 .p-button {
     border-width: 2px !important;
     color: var(--white) !important;
-    background: var(--black) !important;
-    border: 2px solid var(--black) !important;
+    background: var(--red) !important;
+    border: 2px solid var(--red) !important;
     border-radius: 0.25rem !important;
     transition: var(--transition) !important;
     &:hover {
@@ -131,18 +112,12 @@ a {
 .p-menubar {
     border: none !important;
     padding: 0 !important;
-    background: var(--red) !important;
-    @screen xl {
-        background: var(--white) !important;
-    }
+    background: var(--blue) !important;
 }
 .p-menubar-item-link {
     color: var(--white) !important;
     overflow: visible !important;
     padding: 0 !important;
-    @screen xl {
-        color: var(--blue) !important;
-    }
 }
 
 // accessibility

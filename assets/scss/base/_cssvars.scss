@@ -3,47 +3,14 @@
 .light-mode,
 [data-style-mode='dark'],
 .dark-mode {
-    --font-family: 'Roboto', sans-serif;
-    --font-family-header: 'Roboto', serif;
-    --font-size: 1rem;
-    --font-ratio: 1.125;
-    --font-size-1: calc(var(--font-size-2) / var(--font-ratio));
-    --font-size-2: calc(var(--font-size-3) / var(--font-ratio));
-    --font-size-3: calc(var(--font-size-4) / var(--font-ratio));
-    --font-size-4: calc(var(--font-size-5) / var(--font-ratio));
-    --font-size-5: calc(var(--font-size-6) / var(--font-ratio));
-    --font-size-6: var(--font-size);
-    --font-size-7: calc(var(--font-size-6) * var(--font-ratio));
-    --font-size-8: calc(var(--font-size-7) * var(--font-ratio));
-    --font-size-9: calc(var(--font-size-8) * var(--font-ratio));
-    --font-size-10: calc(var(--font-size-9) * var(--font-ratio));
-    --font-size-11: calc(var(--font-size-10) * var(--font-ratio));
-    --font-size-12: calc(var(--font-size-11) * var(--font-ratio));
-    --font-size-13: calc(var(--font-size-12) * var(--font-ratio));
-    --font-size-14: calc(var(--font-size-13) * var(--font-ratio));
-    --font-size-15: calc(var(--font-size-14) * var(--font-ratio));
-    --font-size-16: calc(var(--font-size-15) * var(--font-ratio));
-    --font-size-17: calc(var(--font-size-16) * var(--font-ratio));
-    --font-size-18: calc(var(--font-size-17) * var(--font-ratio));
-    --font-size-19: calc(var(--font-size-18) * var(--font-ratio));
-    --font-size-20: calc(var(--font-size-19) * var(--font-ratio));
-    --font-weight: normal;
-    --font-weight-100: 100;
-    --font-weight-200: 200;
-    --font-weight-300: 300;
-    --font-weight-400: 400;
-    --font-weight-500: 500;
-    --font-weight-600: 600;
-    --font-weight-700: 700;
-    --font-weight-800: 800;
-    --font-weight-900: 900;
+    --font-family: 'Open Sans', sans-serif;
+    --font-family-header: 'Oswald', sans-serif;
 
     --dark-gray: #1f1f1f;
     --white: #ffffff;
     --black: #000000;
-    --red: #920000;
-    --blue: #3b82f6;
-    --purple: #a855f7;
+    --red: #e81f59;
+    --blue: #004487;
     --gray: #e1e0e0;
 
     --opacity-on-hover: 0.7;
@@ -52,25 +19,25 @@
 
     --background: var(--white);
     --p-text-color: var(--black);
-    --link-color: var(--blue);
+    --link-color: var(--red);
 
     // BUTTONS
     --p-button-border-radius: 0;
     --p-button-padding-x: 3.5rem;
     --p-button-padding-y: 0.7rem;
     --p-button-icon-only-width: 50px;
-    --p-button-primary-border-color: var(--blue);
-    --p-button-primary-hover-border-color: var(--blue);
-    --p-button-primary-background: var(--orange);
-    --p-button-primary-color: var(--blue);
-    --p-button-primary-hover-background: var(--blue);
-    --p-button-primary-hover-color: var(--orange);
-    --p-button-secondary-border-color: var(--orange);
-    --p-button-secondary-hover-border-color: var(--orange);
-    --p-button-secondary-background: var(--blue);
-    --p-button-secondary-color: var(--orange);
-    --p-button-secondary-hover-background: var(--orange);
-    --p-button-secondary-hover-color: var(--blue);
+    --p-button-primary-border-color: var(--red);
+    --p-button-primary-hover-border-color: var(--red);
+    --p-button-primary-background: var(--red);
+    --p-button-primary-color: var(--white);
+    --p-button-primary-hover-background: var(--red);
+    --p-button-primary-hover-color: var(--white);
+    --p-button-secondary-border-color: var(--black);
+    --p-button-secondary-hover-border-color: var(--black);
+    --p-button-secondary-background: var(--black);
+    --p-button-secondary-color: var(--white);
+    --p-button-secondary-hover-background: var(--black);
+    --p-button-secondary-hover-color: var(--white);
     --p-button-sm-font-size: 14px;
     --p-button-sm-padding-y: 0.5rem;
     --p-button-sm-padding-x: 0.5rem;
@@ -79,5 +46,5 @@
     --p-menubar-padding: 0;
     --p-menubar-base-item-padding: 0;
     --p-menubar-gap: 12px;
-    --p-menubar-mobile-button-color: var(--white);
+    --p-menubar-mobile-button-color: var(--black);
 }
