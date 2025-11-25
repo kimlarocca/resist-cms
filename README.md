@@ -1,4 +1,4 @@
-# NJ11th.com
+# Resist CMS
 
 NODE VERSION: 22.14.0
 

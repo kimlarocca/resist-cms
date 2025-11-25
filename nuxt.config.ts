@@ -8,13 +8,12 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: `NJ 11th Special Election`,
+      title: `Resist CMS`,
       htmlAttrs: {
         lang: 'en',
       },
       meta: [
-        { name: 'description', content: 'CantFixJack.com exposes Jack Ciattarelli\'s shady opioid-pushing businesses, political flip-flops, and relentless self-serving bids for NJ power.' },
-        { name: 'keywords', content: 'Jack Ciattarelli, NJ politics, MAGA, Stop the Steal, Super PAC, Trump ties, authoritarianism' },
+        { name: 'description', content: 'Content management for the resistance!' },
         { name: 'msapplication-TileColor', content: '#0a84ff' },
         { name: 'theme-color', content: '#0a84ff' }
       ],
@@ -66,7 +65,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       environment: process.env.environment ?? 'local',
-      gtagId: 'G-2YMMJJ5HJM',
+      gtagId: 'G-K6YTWGEB2Q',
       supabaseKey: 'sb_publishable_hfb4cBZp-dppxuSEFkidtw_XdBFGbK2',
       supabaseUrl: 'https://udsyxtnbyejnwwvbifjr.supabase.co',
     }
