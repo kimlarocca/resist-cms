@@ -1,5 +1,5 @@
 <template>
-  <main class="blank-layout grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+  <main class="blank-layout grid grid-cols-1 md:grid-cols-2 min-h-screen">
     <div class="flex p-4 items-center">
       <NuxtPage />
     </div>
