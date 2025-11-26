@@ -68,6 +68,8 @@ export default defineNuxtConfig({
       gtagId: 'G-K6YTWGEB2Q',
       supabaseKey: 'sb_publishable_hfb4cBZp-dppxuSEFkidtw_XdBFGbK2',
       supabaseUrl: 'https://udsyxtnbyejnwwvbifjr.supabase.co',
+      supabaseAuthTokenName: 'sb-udsyxtnbyejnwwvbifjr-auth-token',
+      supabaseAuthSignInRedirectTo: process.env.environment === 'local' ? 'http://localhost:3000' : 'https://resistcms.com',
     }
   }
 })
