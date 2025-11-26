@@ -47,4 +47,16 @@
     --p-menubar-base-item-padding: 0;
     --p-menubar-gap: 12px;
     --p-menubar-mobile-button-color: var(--black);
+
+    // FORMS
+    --forms-input-font-family: var(--font-family);
+    --forms-input-font-size: 1rem;
+    --forms-input-height: 3rem;
+    --forms-input-width: 100%;
+    --forms-input-padding: 0.5rem 1rem;
+    --forms-input-border: 1px solid var(--gray);
+    --forms-input-outline-color: var(--blue);
+    --forms-input-color: var(--black);
+    --forms-text-area-height: 150px;
+    --forms-inline-button-padding: 0 1.5rem;
 }

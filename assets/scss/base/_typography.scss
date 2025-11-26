@@ -17,18 +17,18 @@
   p {
     font-family: var(--font-family);
     font-weight: 400;
-    font-size: 16px;
-    line-height: 20px;
+    font-size: 14px;
+    line-height: 18px;
     @screen lg {
-      font-size: 18px;
-      line-height: 22px;
+      font-size: 16px;
+      line-height: 20px;
     }
   }
 
   h1,
   .like-h1 {
     font-family: var(--font-family-header);
-    font-weight: 500;
+    font-weight: 400;
     font-size: 45px;
     line-height: 45px;
     @screen lg {
