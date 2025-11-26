@@ -1,57 +1,38 @@
 <template>
-  <div class="sign-up">
+  <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Cuetip ERP | Sign Up</Title>
+        <Title>Resist CMS | Sign Up</Title>
       </Head>
     </Html>
-    <header class="flex align-items-end justify-content-between">
-      <nuxt-link to="/" class="plain"><cuetip-logo /></nuxt-link>
-      <p class="small">
-        Already have an account?
-        <nuxt-link to="/" class="like-h6">Sign In</nuxt-link>
-      </p>
-    </header>
-    <divider class="mb-6" />
-    <h1 class="mb-3">Welcome To Cuetip</h1>
-    <h2 class="mb-2">Tech and data provider in the cannabis space</h2>
-    <p>
-      Cuetip is a Tech and Data provider of premium technology and services to
-      the entire supply chain in the cannabis space. cuetip provides exclusive
-      insights into the rapidly evolving cannabis market and captures current
-      data.
-    </p>
-    <divider class="my-6 w-2" />
-    <h4 class="mb-4">Fill out the form below to register</h4>
-    <supabase-signup-with-email />
-    <divider class="mt-5 mb-4 w-2" />
-    <p class="mb-3">Or sign in with social:</p>
-    <supabase-login-with-google />
+    <Logo class="mb-3 ml-1" />
+    <hr class="w-44 ml-0 mb-8" />
+    <h1 class="mb-6">Join The Resistance</h1>
+    <p class="mb-4">Please fill out the form below to sign up for an account.</p>
+    <supabase-signup-with-email class="mb-4" />
+    <p class="text-xs">Already have an account? <nuxt-link to="/">Login</nuxt-link></p>
   </div>
 </template>
 
 <script setup>
-definePageMeta( {
-  layout: 'blank',
-} )
+definePageMeta({
+  layout: "blank",
+})
+const currentUser = useSupabaseUser()
+// const client = useSupabaseClient()
+// const user = await client.auth.getUser()
+// const session = await client.auth.getSession()
 
-import { useCurrentUser } from '~/composables/states'
+// // check supabase session for logged in user
+// if (user?.data?.user) {
+//   currentUser.value = user?.data?.user
+// } else if (session?.data?.session?.user) {
+//   currentUser.value = session?.data?.session?.user
+// }
 
-const currentUser = useCurrentUser()
-const client = useSupabaseClient()
-const user = await client.auth.getUser()
-const session = await client.auth.getSession()
-
-// check supabase session for logged in user
-if ( user?.data?.user ) {
-  currentUser.value = user?.data?.user
-} else if ( session?.data?.session?.user ) {
-  currentUser.value = session?.data?.session?.user
-}
-
-onMounted( () => {
-  if ( currentUser.value ) {
-    window.location.href = '/dashboard'
+onMounted(() => {
+  if (currentUser.value) {
+    window.location.href = "/dashboard"
   }
-} )
+})
 </script>

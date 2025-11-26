@@ -1,7 +1,7 @@
 <template>
   <div>
     <form class="password-reset" @submit.prevent="resetPassword">
-      <h3 class="mb-4">Update Your Password</h3>
+      <h3 class="mb-6">Update Your Password</h3>
       <p class="mb-2">
         Email Address: <strong>{{ currentUser.email }}</strong>
       </p>
@@ -31,13 +31,11 @@
 </template>
 
 <script setup>
-import { useCurrentUser } from '~/composables/states'
-const currentUser = useCurrentUser()
-
+const currentUser = useSupabaseUser()
 const client = useSupabaseClient()
 
-const password = ref('')
-const errorMessage = ref('')
+const password = ref("")
+const errorMessage = ref("")
 const successMessage = ref(null)
 const pending = ref(false)
 
@@ -50,13 +48,13 @@ const resetPassword = async () => {
   pending.value = false
   if (error) {
     console.log(error)
-    if (error.toString().includes('8 characters')) {
-      errorMessage.value = 'Password should be at least 8 characters.'
+    if (error.toString().includes("8 characters")) {
+      errorMessage.value = "Password should be at least 8 characters."
     } else {
       errorMessage.value = error
     }
   } else {
-    successMessage.value = 'Success! Your password has been updated.'
+    successMessage.value = "Success! Your password has been updated."
   }
 }
 </script>

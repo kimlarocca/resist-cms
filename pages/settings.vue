@@ -1,37 +1,37 @@
 <template>
-  <div v-if="profile && profile.length > 0" class="settings">
+  <div v-if="profile && profile.length > 0" class="settings container p-4">
     <Html lang="en">
       <Head>
-        <Title>Cuetip ERP | Profile Settings</Title>
+        <Title>Resist CMS | Account Settings</Title>
       </Head>
     </Html>
-    <div class="grid">
-      <div class="col hidden col-12 lg:col-3 lg:flex mb-4">
-        <nav class="container-white w-full h-fit p-4">
+    <div class="grid grid-cols-4 md:gap-8">
+      <div class="hidden md:flex col-span-1">
+        <nav class="bg-gray w-full h-fit rounded-xl p-4">
           <p>
             <nuxt-link
               to="#profile"
-              class="plain"
+              class="plain text-red"
               :class="hash === '#profile' ? 'active' : ''"
             >
               <i class="pi pi-cog mr-2" /> Profile
             </nuxt-link>
           </p>
-          <divider class="gray my-3" />
+          <Divider class="my-3" />
           <p>
             <nuxt-link
               to="#password"
-              class="plain"
+              class="plain text-red"
               :class="hash === '#password' ? 'active' : ''"
             >
               <i class="pi pi-lock mr-2" /> Change Password
             </nuxt-link>
           </p>
-          <divider class="gray my-3" />
+          <Divider class="my-3" />
           <p>
             <nuxt-link
               to="#delete"
-              class="plain"
+              class="plain text-red"
               :class="hash === '#delete' ? 'active' : ''"
             >
               <i class="pi pi-trash mr-2" /> Delete Account
@@ -39,20 +39,21 @@
           </p>
         </nav>
       </div>
-      <div class="col col-12 lg:col-9">
-        <div id="profile" class="container-white p-4 mb-4">
-          <h4 class="mb-4">Profile</h4>
-          <supabase-upload-image :image="avatarImage || ''" class="mb-5" />
+      <div class="col-span-4 md:col-span-3">
+        <h1 class="mb-8">Account Settings</h1>
+        <div id="profile" class="mb-12">
+          <h3 class="mb-4">Profile</h3>
+          <!-- <supabase-upload-image :image="avatarImage || ''" class="mb-5" /> -->
           <manage-user-profile />
         </div>
-        <div id="password" class="container-white p-4 mb-4">
+        <div id="password" class="mb-12">
           <supabase-reset-password />
         </div>
-        <div id="delete" class="container-white p-4 mb-4">
-          <h4 class="mb-4">Delete Account</h4>
+        <div id="delete" class="mb-12">
+          <h3 class="mb-4">Delete Account</h3>
           <p>
-            Please <a href="mailto:help@cuetip.com">contact us</a> if you wish
-            to delete your account.
+            Please <a href="mailto:help@resistcms.com">contact us</a> if you wish to
+            delete your account.
           </p>
         </div>
         <div class="changes-saved-toast">
@@ -72,51 +73,51 @@
 </template>
 
 <script setup>
-definePageMeta( {
-  middleware: 'auth',
-} )
+definePageMeta({
+  middleware: "auth",
+})
 
 const currentUser = useSupabaseUser()
 const supabase = useSupabaseClient()
 const route = useRoute()
 
-const avatarImage = ref( null )
-const hash = ref( null )
-const profile = ref( [] )
-const successMessage = ref( false )
-const userType = ref( null )
+const avatarImage = ref(null)
+const hash = ref(null)
+const profile = ref([])
+const successMessage = ref(false)
+const userType = ref(null)
 
-onMounted( () => {
+onMounted(() => {
   // set hash name
   hash.value = route.hash
   // if hash exists, scroll down to that id
-  if ( window.location.hash ) {
-    const element = document.getElementById( window.location.hash.slice( 1 ) )
-    if ( element ) {
+  if (window.location.hash) {
+    const element = document.getElementById(window.location.hash.slice(1))
+    if (element) {
       element.scrollIntoView()
       hash.value = window.location.hash
     }
   }
-} )
+})
 
 // watch for route.hash changes
 watch(
   () => route.hash,
-  ( newVal ) => {
+  (newVal) => {
     hash.value = newVal
   }
 )
 
 // get the profile for the logged in user
 let { data } = await supabase
-  .from( 'profiles' )
-  .select( '*' )
-  .eq( 'id', currentUser.value?.id )
-  .limit( 1 )
-if ( data ) {
+  .from("profiles")
+  .select("*")
+  .eq("id", currentUser.value?.sub)
+  .limit(1)
+if (data) {
   profile.value = data
-  avatarImage.value = data[ 0 ]?.avatar_url
-  userType.value = data[ 0 ]?.user_type
+  avatarImage.value = data[0]?.avatar_url
+  userType.value = data[0]?.user_type
 }
 </script>
 

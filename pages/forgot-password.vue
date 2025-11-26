@@ -1,5 +1,10 @@
 <template>
   <div class="container p-4">
+    <Html lang="en">
+      <Head>
+        <Title>Resist CMS | Forgot Password</Title>
+      </Head>
+    </Html>
     <Logo class="mb-3 ml-1" />
     <hr class="w-44 ml-0 mb-8" />
     <h1 class="mb-6">Forgot your password?</h1>
