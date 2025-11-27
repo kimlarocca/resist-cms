@@ -75,7 +75,7 @@ const uploadImage = async (event) => {
     uploading.value = true
     const file = event.files[0]
     const fileExt = file.name?.split(".")?.pop()
-    const filePath = `${props.userId}-${Math.random()}.${fileExt}`
+    const filePath = `${currentUser.value.sub}-${Math.random()}.${fileExt}`
 
     const { error: uploadError } = await supabase.storage
       .from("avatars")
