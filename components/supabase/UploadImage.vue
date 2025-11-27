@@ -17,7 +17,7 @@
     </p>
     <template v-else>
       <p v-if="!imageUrl" class="mb-3">You have not added a profile photo yet.</p>
-      <div class="flex flex-column lg:flex-row">
+      <div class="flex gap-3">
         <FileUpload
           mode="basic"
           :customUpload="true"
@@ -29,13 +29,7 @@
           :auto="true"
           upload-icon="pi pi-image"
         />
-        <Button
-          v-if="imageUrl"
-          @click="deleteImage"
-          class="mt-3 lg:mt-0 lg:ml-3 p-button-outlined fit-width"
-          label="Delete"
-          icon="pi pi-trash"
-        />
+        <Button v-if="imageUrl" @click="deleteImage" icon="pi pi-trash" />
       </div>
       <p v-if="!imageUrl" class="small mt-3">
         <em>
