@@ -1,6 +1,7 @@
 <template>
   <div v-if="profile && profile.length > 0">
-    <p class="text-sm mb-6">Username: {{ currentUser?.email }}</p>
+    <p class="text-sm mb-2">Username: {{ currentUser?.email }}</p>
+    <p class="text-sm mb-6">Website: {{ currentUserProfile?.website }}</p>
     <div class="mb-4">
       <FloatLabel variant="on">
         <InputText id="full_name" v-model="fullName" @change="updateProfile" />

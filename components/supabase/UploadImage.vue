@@ -1,33 +1,49 @@
 <template>
-  <div class="apexchart upload-image">
-    <h3 class="mb-4">Update Your Logo</h3>
+  <div class="upload-image">
     <ProgressSpinner class="inline-block mb-4" v-if="uploading" />
-    <img
-      v-else-if="path || logo"
-      :src="path ? path : logo"
-      alt="logo image"
+    <Avatar
+      v-if="imageUrl"
+      :image="imageUrl"
+      size="xlarge"
+      shape="circle"
+      alt="profile photo"
       class="mb-4"
     />
-    <p v-else class="mb-4">
-      You have not added a logo yet. Please use the form below to upload one!
-    </p>
-    <FileUpload
-      mode="basic"
-      :customUpload="true"
-      @uploader="uploadImage"
-      accept="image/*"
-      :maxFileSize="1000000"
-      :fileLimit="1"
-      choose-label="Upload Image"
-      :auto="true"
-      class="inline-block"
-    />
-    <p class="mt-4">
+    <p v-if="currentUser.app_metadata.provider === 'google'">
       <em>
-        Image files must be less than 1MB in size, and should ideally be a
-        square.
+        You are using your <strong>{{ currentUser.email }}</strong> Google account to
+        login. To change your profile picture, you must do so through your Google account.
       </em>
     </p>
+    <template v-else>
+      <p v-if="!imageUrl" class="mb-3">You have not added a profile photo yet.</p>
+      <div class="flex flex-column lg:flex-row">
+        <FileUpload
+          mode="basic"
+          :customUpload="true"
+          @uploader="uploadImage"
+          accept="image/*"
+          :maxFileSize="1000000"
+          :fileLimit="1"
+          choose-label="Update Photo"
+          :auto="true"
+          upload-icon="pi pi-image"
+        />
+        <Button
+          v-if="imageUrl"
+          @click="deleteImage"
+          class="mt-3 lg:mt-0 lg:ml-3 p-button-outlined fit-width"
+          label="Delete"
+          icon="pi pi-trash"
+        />
+      </div>
+      <p v-if="!imageUrl" class="small mt-3">
+        <em>
+          Image files must be less than 1MB in size, and should ideally be a square.<br />jpg,
+          png, webp, and gif files are accepted.
+        </em>
+      </p>
+    </template>
     <template v-if="errorMessage">
       <Message class="mt-4" severity="error">
         {{ errorMessage }}
@@ -42,20 +58,15 @@
 </template>
 
 <script setup>
-import { createClient } from '@supabase/supabase-js'
-
-const config = useRuntimeConfig()
-const supabase = createClient(config.supabaseUrl, config.supabaseKey)
+import { useCurrentUserProfile } from "~/composables/states"
+const currentUser = useSupabaseUser()
+const currentUserProfile = useCurrentUserProfile()
+const supabase = useSupabaseClient()
 
 const props = defineProps({
-  userId: {
+  image: {
     type: String,
-    default: '',
-    required: true,
-  },
-  logo: {
-    type: String,
-    default: '',
+    default: "",
     required: true,
   },
 })
@@ -63,36 +74,41 @@ const props = defineProps({
 const uploading = ref(false)
 const errorMessage = ref()
 const successMessage = ref()
-const path = ref()
+const imageUrl = ref(props.image)
 
 const uploadImage = async (event) => {
   try {
     uploading.value = true
     const file = event.files[0]
-    const fileExt = file.name.split('.').pop()
+    const fileExt = file.name?.split(".")?.pop()
     const filePath = `${props.userId}-${Math.random()}.${fileExt}`
 
-    let { error: uploadError } = await supabase.storage
-      .from('logos')
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
       .upload(filePath, file)
 
     if (uploadError) throw uploadError
 
-    path.value = `https://brwzzilslduwostxbufg.supabase.co/storage/v1/object/public/logos/${filePath}`
+    const { data: imagePublicUrl } = await supabase.storage
+      .from("avatars")
+      .getPublicUrl(filePath)
+
+    imageUrl.value = imagePublicUrl.publicUrl
 
     const { error } = await supabase
-      .from('profiles')
+      .from("profiles")
       .upsert({
-        id: props.userId,
+        id: currentUser.value.sub,
         updated_at: new Date().toISOString(),
-        logo: path.value,
+        avatar_url: imageUrl.value,
       })
-      .match({ id: props.userId })
+      .match({ id: currentUser.value.sub })
     if (error) {
       console.log(error)
       errorMessage.value = `Error: ${error}`
     } else {
-      successMessage.value = 'Success! Your changes have been saved.'
+      successMessage.value = "Success! Your image has been saved."
+      currentUserProfile.value.avatar_url = imageUrl.value
     }
   } catch (error) {
     errorMessage.value = `Error: ${error}`
@@ -101,13 +117,32 @@ const uploadImage = async (event) => {
   }
 }
 
-// watch(path, () => {
-//   if (path.value) downloadImage()
-// })
+// delete the image from the database and storage
+const deleteImage = async () => {
+  const { error } = await supabase
+    .from("profiles")
+    .upsert({
+      id: currentUser.value.sub,
+      updated_at: new Date().toISOString(),
+      avatar_url: null,
+    })
+    .match({ id: currentUser.value.sub })
+  if (error) {
+    console.log(error)
+    errorMessage.value = `Error: ${error}`
+  } else {
+    successMessage.value = "Success! Your photo has been deleted."
+    imageUrl.value = null
+    currentUserProfile.value.avatar_url = null
+  }
+}
 </script>
 
-<style lang="scss">
-.upload-image img {
-  max-height: 100px;
+<style lang="scss" scoped>
+img {
+  height: 150px;
+  width: 150px;
+  border-radius: 50%;
+  border: solid 1px var(--light-gray);
 }
 </style>

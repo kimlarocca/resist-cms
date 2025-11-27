@@ -1,4 +1,5 @@
 <script setup>
+const currentUserProfile = useCurrentUserProfile()
 const visible = ref(false)
 const navItems = [
   {
@@ -22,7 +23,23 @@ const navItems = [
       <NuxtLink to="/dashboard" class="plain">
         <Logo />
       </NuxtLink>
-      <div>
+      <div class="flex items-center gap-3">
+        <nuxt-link to="/settings" class="plain clickable" aria-label="manage profile">
+          <Avatar
+            v-if="currentUserProfile && currentUserProfile.avatar_url"
+            :image="currentUserProfile.avatar_url"
+            size="large"
+            shape="circle"
+            aria-label="user avatar image"
+          />
+          <Avatar
+            v-else
+            size="large"
+            shape="circle"
+            icon="pi pi-user"
+            aria-label="user avatar image"
+          />
+        </nuxt-link>
         <i class="pi pi-bars text-2xl cursor-pointer" @click="visible = true" />
       </div>
     </div>

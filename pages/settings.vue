@@ -41,15 +41,17 @@
       </div>
       <div class="col-span-4 md:col-span-3">
         <h1 class="mb-8">Account Settings</h1>
-        <div id="profile" class="mb-12">
+        <div id="profile">
           <h3 class="mb-4">Profile</h3>
-          <!-- <supabase-upload-image :image="avatarImage || ''" class="mb-5" /> -->
+          <supabase-upload-image :image="avatarImage || ''" class="mb-6" />
           <manage-user-profile />
         </div>
-        <div id="password" class="mb-12">
+        <Divider class="my-16" />
+        <div id="password">
           <supabase-reset-password />
         </div>
-        <div id="delete" class="mb-12">
+        <Divider class="my-16" />
+        <div id="delete">
           <h3 class="mb-4">Delete Account</h3>
           <p>
             Please <a href="mailto:help@resistcms.com">contact us</a> if you wish to
