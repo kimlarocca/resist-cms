@@ -17,7 +17,7 @@
               <i class="pi pi-cog mr-2" /> Profile
             </nuxt-link>
           </p>
-          <Divider class="my-3" />
+          <Divider class="darker my-3" />
           <p>
             <nuxt-link
               to="#password"
@@ -27,7 +27,7 @@
               <i class="pi pi-lock mr-2" /> Change Password
             </nuxt-link>
           </p>
-          <Divider class="my-3" />
+          <Divider class="darker my-3" />
           <p>
             <nuxt-link
               to="#delete"

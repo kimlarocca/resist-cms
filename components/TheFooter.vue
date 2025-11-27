@@ -3,9 +3,9 @@ const currentYear = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="bg-white-opacity-70 container rounded-xl">
-    <div class="py-8 px-4 text-center">
-      <p class="small">
+  <footer class="container p-4">
+    <div class="bg-gray rounded-xl p-4 text-center">
+      <p class="text-sm">
         Copyright © {{ currentYear }} ResistCMS.com. All Rights Reserved.
       </p>
     </div>

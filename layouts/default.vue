@@ -1,7 +1,7 @@
 <template>
   <div>
     <TheHeader />
-    <main>
+    <main class="mb-8">
       <NuxtPage />
     </main>
     <TheFooter />

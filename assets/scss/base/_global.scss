@@ -81,6 +81,10 @@ a {
     background-color: rgba(0, 68, 135, 0.2) !important;
 }
 
+.p-divider.darker::before {
+    border-block-start: 1px solid var(--medium-gray) !important;
+}
+
 // primevue overrides
 .p-button {
     border-width: 2px !important;
