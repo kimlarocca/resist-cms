@@ -28,14 +28,14 @@
 const client = useSupabaseClient()
 const config = useRuntimeConfig()
 
-const email = ref('')
-const errorMessage = ref('')
-const successMessage = ref('')
+const email = ref("")
+const errorMessage = ref("")
+const successMessage = ref("")
 
 const props = defineProps({
   label: {
     type: String,
-    default: 'Sign In With Magic Link',
+    default: "Sign In With Magic Link",
   },
 })
 
@@ -53,7 +53,7 @@ const login = async () => {
     errorMessage.value = `Sorry, there was a problem logging with your magic link. Please try again! Error message: ${error}`
   } else {
     successMessage.value =
-      'Success! If you created an account with an email address, you will get an email to with a magic link to login. If you created your account with Google, Zoom or Microsoft, please log in with those options.'
+      "Success! If you created an account with an email address, you will get an email to with a magic link to login."
   }
 }
 </script>

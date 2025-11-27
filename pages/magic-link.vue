@@ -47,5 +47,7 @@ definePageMeta({
 // }
 
 // for some reason, navigateTo doesn't work here?!
-window.location.href = "/dashboard"
+onMounted(() => {
+  window.location.href = "/dashboard"
+})
 </script>
