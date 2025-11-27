@@ -17,12 +17,18 @@
         Update Password
       </Button>
       <template v-if="errorMessage">
-        <Message :sticky="false" :life="5000" class="mt-4" severity="error">
+        <Message :sticky="true" class="mt-4" severity="error">
           Sorry, there was an error updating your password: {{ errorMessage }}
         </Message>
       </template>
       <template v-if="successMessage">
-        <Message :sticky="true" :life="5000" class="mt-4" severity="success">
+        <Message
+          :sticky="true"
+          class="mt-4"
+          severity="success"
+          :closable="true"
+          @close="successMessage = null"
+        >
           {{ successMessage }}
         </Message>
       </template>

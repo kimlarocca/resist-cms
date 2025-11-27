@@ -27,7 +27,7 @@ textarea {
 
   &:focus {
     outline: var(--forms-input-outline-color);
-    border: none;
+    // border: none;
     outline-offset: -1px;
   }
 }
