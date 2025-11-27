@@ -9,9 +9,9 @@
     <hr class="w-44 ml-0 mb-8" />
     <h1 class="mb-6">Forgot your password?</h1>
     <p class="mb-4">
-      Please enter your email address below and a magic link will be sent to you. Once you
-      click on the magic link and are logged in, you may reset your password on your
-      account settings page.
+      Enter your email address below and a magic link will be sent to you. Once you click
+      on the magic link and are logged in, you may reset your password on your account
+      settings page.
     </p>
     <supabase-login-with-magic-link class="mb-4" />
     <p class="text-xs">Already have an account? <nuxt-link to="/">Login</nuxt-link></p>
