@@ -85,6 +85,14 @@ a {
     border-block-start: 1px solid var(--medium-gray) !important;
 }
 
+.clickable {
+    cursor: pointer;
+    transition: var(--transition);
+    &:hover {
+        opacity: var(--opacity-on-hover);
+    }
+}
+
 // primevue overrides
 .p-button {
     border-width: 2px !important;

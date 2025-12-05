@@ -1,20 +1,18 @@
 <script setup>
-import { useCurrentUserProfile } from "~/composables/states"
 definePageMeta({
   middleware: "auth",
 })
-const user = useSupabaseUser()
-const currentUserProfile = useCurrentUserProfile()
 </script>
 
 <template>
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Dashboard</Title>
+        <Title>Resist CMS | Manage Races</Title>
       </Head>
     </Html>
-    <h1>Dashboard</h1>
+    <h1>Manage Races</h1>
     <Divider class="my-7" />
+    <RacesManageRaces />
   </div>
 </template>
