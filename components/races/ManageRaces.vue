@@ -9,7 +9,7 @@
     </Message>
 
     <div class="grid grid-cols-2 item-center gap-4 mb-6">
-      <InputText v-model="filters.global" placeholder="Search races..." />
+      <InputText v-model="filters.global.value" placeholder="Search races..." />
       <div class="text-right">
         <Button class="w-fit" label="Add Race" icon="pi pi-plus" @click="openDialog()" />
       </div>
@@ -22,6 +22,7 @@
       :rows="10"
       :rowsPerPageOptions="[10, 25, 50]"
       stripedRows
+      v-model:filters="filters"
       filterDisplay="menu"
       :globalFilterFields="['name', 'state', 'city', 'type']"
       class="p-datatable-sm"
@@ -100,17 +101,26 @@
 
         <div class="flex flex-col gap-2">
           <label for="type" class="font-semibold">Type</label>
-          <InputText
+          <Select
             id="type"
             v-model="formData.type"
-            placeholder="e.g., House, Senate, Governor"
+            :options="raceTypes"
+            placeholder="Select race type"
+            class="w-full"
           />
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-2">
             <label for="state" class="font-semibold">State</label>
-            <InputText id="state" v-model="formData.state" placeholder="e.g., CA" />
+            <Select
+              id="state"
+              v-model="formData.state"
+              :options="usStates"
+              placeholder="Select state"
+              class="w-full"
+              filter
+            />
           </div>
 
           <div class="flex flex-col gap-2">
@@ -210,6 +220,8 @@
 </template>
 
 <script setup>
+import { FilterMatchMode } from "@primevue/core/api"
+
 const client = useSupabaseClient()
 
 const races = ref([])
@@ -225,8 +237,63 @@ const editingRace = ref(null)
 const raceToDelete = ref(null)
 
 const filters = ref({
-  global: "",
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
+
+const raceTypes = ["presidential", "gubernatorial", "congress", "special election"]
+
+const usStates = [
+  "AL",
+  "AK",
+  "AZ",
+  "AR",
+  "CA",
+  "CO",
+  "CT",
+  "DE",
+  "FL",
+  "GA",
+  "HI",
+  "ID",
+  "IL",
+  "IN",
+  "IA",
+  "KS",
+  "KY",
+  "LA",
+  "ME",
+  "MD",
+  "MA",
+  "MI",
+  "MN",
+  "MS",
+  "MO",
+  "MT",
+  "NE",
+  "NV",
+  "NH",
+  "NJ",
+  "NM",
+  "NY",
+  "NC",
+  "ND",
+  "OH",
+  "OK",
+  "OR",
+  "PA",
+  "RI",
+  "SC",
+  "SD",
+  "TN",
+  "TX",
+  "UT",
+  "VT",
+  "VA",
+  "WA",
+  "WV",
+  "WI",
+  "WY",
+]
 
 const formData = ref({
   name: "",
