@@ -52,7 +52,28 @@
         </template>
       </Column>
 
-      <Column style="width: 12rem">
+      <Column v-if="isSuperAdmin" style="width: 12rem">
+        <template #body="{ data }">
+          <div class="flex gap-2">
+            <Button
+              icon="pi pi-pencil"
+              severity="info"
+              size="small"
+              @click="openDialog(data)"
+              title="Edit"
+            />
+            <Button
+              icon="pi pi-trash"
+              severity="danger"
+              size="small"
+              @click="confirmDelete(data)"
+              title="Delete"
+            />
+          </div>
+        </template>
+      </Column>
+
+      <Column v-else-if="isRaceAdmin" style="width: 12rem">
         <template #body="{ data }">
           <div class="flex gap-2">
             <Button
@@ -223,6 +244,8 @@
 import { FilterMatchMode } from "@primevue/core/api"
 
 const client = useSupabaseClient()
+const user = useSupabaseUser()
+const currentUserProfile = useCurrentUserProfile()
 
 const races = ref([])
 const loading = ref(false)
@@ -307,19 +330,38 @@ const formData = ref({
   draft: true,
 })
 
+// Check if user is super admin
+const isSuperAdmin = computed(() => currentUserProfile.value?.role === "super_admin")
+const isRaceAdmin = computed(() => currentUserProfile.value?.role === "race_admin")
+
+// Check if user can edit a specific race
+const canEditRace = (race) => {
+  if (isSuperAdmin.value) return true
+  if (isRaceAdmin.value && race.admin_id === user.value?.sub) return true
+  return false
+}
+
 // Fetch all races
 const fetchRaces = async () => {
   loading.value = true
   errorMessage.value = ""
 
   try {
-    const { data, error } = await client
-      .from("races")
-      .select("*")
-      .order("election_date", { ascending: false })
+    let query = client.from("races").select("*")
+
+    // If user is race_admin, only fetch their races
+    if (isRaceAdmin.value && !isSuperAdmin.value) {
+      console.log("Filtering races by admin_id:", user.value.sub)
+      query = query.eq("admin_id", user.value.sub)
+    }
+
+    query = query.order("election_date", { ascending: false })
+
+    const { data, error } = await query
 
     if (error) throw error
 
+    console.log("Fetched races:", data)
     races.value = data || []
   } catch (error) {
     console.error("Error fetching races:", error)
@@ -340,6 +382,12 @@ const generateSlug = (name) => {
 // Open dialog for create or edit
 const openDialog = (race = null) => {
   if (race) {
+    // Check if user has permission to edit this race
+    if (!canEditRace(race)) {
+      errorMessage.value = "You do not have permission to edit this race."
+      return
+    }
+
     editingRace.value = race
     formData.value = {
       name: race.name || "",
@@ -398,6 +446,13 @@ const saveRace = async () => {
     }
 
     if (editingRace.value) {
+      // Check permission before updating
+      if (!canEditRace(editingRace.value)) {
+        errorMessage.value = "You do not have permission to edit this race."
+        saving.value = false
+        return
+      }
+
       // Update existing race
       const { error } = await client
         .from("races")
@@ -409,6 +464,11 @@ const saveRace = async () => {
       successMessage.value = "Race updated successfully!"
     } else {
       // Create new race
+      // If user is race_admin, set them as admin_id
+      if (isRaceAdmin.value && !isSuperAdmin.value) {
+        raceData.admin_id = user.value.id
+      }
+
       const { error } = await client.from("races").insert([raceData])
 
       if (error) throw error
@@ -428,6 +488,12 @@ const saveRace = async () => {
 
 // Confirm delete
 const confirmDelete = (race) => {
+  // Check if user has permission to delete this race
+  if (!canEditRace(race)) {
+    errorMessage.value = "You do not have permission to delete this race."
+    return
+  }
+
   raceToDelete.value = race
   deleteDialogVisible.value = true
   successMessage.value = ""
@@ -456,8 +522,8 @@ const deleteRace = async () => {
 }
 
 // Load races on mount
-onMounted(() => {
-  fetchRaces()
+onMounted(async () => {
+  await fetchRaces()
 })
 </script>
 
