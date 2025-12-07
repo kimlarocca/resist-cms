@@ -52,9 +52,16 @@
         </template>
       </Column>
 
-      <Column v-if="isSuperAdmin" style="width: 12rem">
+      <Column v-if="isSuperAdmin" style="width: 15rem">
         <template #body="{ data }">
           <div class="flex gap-2">
+            <Button
+              icon="pi pi-users"
+              severity="secondary"
+              size="small"
+              @click="manageCandidates(data)"
+              title="Manage Candidates"
+            />
             <Button
               icon="pi pi-pencil"
               severity="info"
@@ -73,9 +80,16 @@
         </template>
       </Column>
 
-      <Column v-else-if="isRaceAdmin" style="width: 12rem">
+      <Column v-else-if="isRaceAdmin" style="width: 15rem">
         <template #body="{ data }">
           <div class="flex gap-2">
+            <Button
+              icon="pi pi-users"
+              severity="secondary"
+              size="small"
+              @click="manageCandidates(data)"
+              title="Manage Candidates"
+            />
             <Button
               icon="pi pi-pencil"
               severity="info"
@@ -351,7 +365,6 @@ const fetchRaces = async () => {
 
     // If user is race_admin, only fetch their races
     if (isRaceAdmin.value && !isSuperAdmin.value) {
-      console.log("Filtering races by admin_id:", user.value.sub)
       query = query.eq("admin_id", user.value.sub)
     }
 
@@ -360,8 +373,6 @@ const fetchRaces = async () => {
     const { data, error } = await query
 
     if (error) throw error
-
-    console.log("Fetched races:", data)
     races.value = data || []
   } catch (error) {
     console.error("Error fetching races:", error)
@@ -498,6 +509,13 @@ const confirmDelete = (race) => {
   deleteDialogVisible.value = true
   successMessage.value = ""
   errorMessage.value = ""
+}
+
+// Navigate to manage candidates for this race
+const manageCandidates = (race) => {
+  // You can implement this to navigate to a candidates management page
+  // filtered by this race, or open a dialog, etc.
+  navigateTo(`/candidates/${race.slug}`)
 }
 
 // Delete race
