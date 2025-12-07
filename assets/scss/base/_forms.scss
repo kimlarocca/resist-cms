@@ -23,6 +23,7 @@ textarea {
 
   &::placeholder {
     @extend .form-element-styles;
+    color: #808080;
   }
 
   &:focus {
