@@ -60,13 +60,17 @@
       <Column style="width: 12rem">
         <template #body="{ data }">
           <div class="flex gap-2">
-            <Button
-              icon="pi pi-external-link"
-              severity="secondary"
-              size="small"
-              @click="window.open(`https://www.votebyvalues.com/${data.slug}`, '_blank')"
-              title="View on Site"
-            />
+            <NuxtLink
+              :to="`https://votebyvalues.com/${data.slug}`"
+              target="_blank"
+              rel="noopener"
+            >
+              <Button
+                icon="pi pi-eye"
+                severity="secondary"
+                size="small"
+                title="View on Site"
+            /></NuxtLink>
             <Button
               icon="pi pi-pencil"
               severity="info"
@@ -205,7 +209,7 @@
 
         <div class="flex flex-col gap-2">
           <label for="bio" class="font-semibold">Bio</label>
-          <Textarea
+          <SimpleEditor
             id="bio"
             v-model="formData.bio"
             rows="4"
@@ -215,7 +219,7 @@
 
         <div class="flex flex-col gap-2">
           <label for="experience" class="font-semibold">Experience</label>
-          <Textarea
+          <SimpleEditor
             id="experience"
             v-model="formData.experience"
             rows="3"
@@ -333,7 +337,7 @@
               <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-2">
                   <label for="funding" class="font-semibold">Funding Info</label>
-                  <Textarea
+                  <SimpleEditor
                     id="funding"
                     v-model="formData.funding"
                     rows="3"
@@ -343,7 +347,7 @@
 
                 <div class="flex flex-col gap-2">
                   <label for="endorsements" class="font-semibold">Endorsements</label>
-                  <Textarea
+                  <SimpleEditor
                     id="endorsements"
                     v-model="formData.endorsements"
                     rows="3"
@@ -459,7 +463,7 @@
                 <label for="special_interests" class="font-semibold"
                   >Special Interests</label
                 >
-                <Textarea
+                <SimpleEditor
                   id="special_interests"
                   v-model="formData.special_interests"
                   rows="3"
