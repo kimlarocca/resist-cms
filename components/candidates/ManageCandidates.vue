@@ -69,21 +69,21 @@
                 icon="pi pi-eye"
                 severity="secondary"
                 size="small"
-                title="View on Site"
+                v-tooltip.bottom="'View on Site'"
             /></NuxtLink>
             <Button
               icon="pi pi-pencil"
               severity="info"
               size="small"
               @click="openDialog(data)"
-              title="Edit"
+              v-tooltip.bottom="'Edit'"
             />
             <Button
               icon="pi pi-trash"
               severity="danger"
               size="small"
               @click="confirmDelete(data)"
-              title="Delete"
+              v-tooltip.bottom="'Delete'"
             />
           </div>
         </template>

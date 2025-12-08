@@ -55,26 +55,37 @@
       <Column v-if="isSuperAdmin" style="width: 15rem">
         <template #body="{ data }">
           <div class="flex gap-2">
+            <NuxtLink
+              :to="`https://votebyvalues.com/race/${data.slug}`"
+              target="_blank"
+              rel="noopener"
+            >
+              <Button
+                icon="pi pi-eye"
+                severity="secondary"
+                size="small"
+                v-tooltip.bottom="'View on Site'"
+            /></NuxtLink>
             <Button
               icon="pi pi-users"
               severity="secondary"
               size="small"
               @click="manageCandidates(data)"
-              title="Manage Candidates"
+              v-tooltip.bottom="'Manage Candidates'"
             />
             <Button
               icon="pi pi-pencil"
               severity="info"
               size="small"
               @click="openDialog(data)"
-              title="Edit"
+              v-tooltip.bottom="'Edit'"
             />
             <Button
               icon="pi pi-trash"
               severity="danger"
               size="small"
               @click="confirmDelete(data)"
-              title="Delete"
+              v-tooltip.bottom="'Delete'"
             />
           </div>
         </template>
@@ -88,21 +99,21 @@
               severity="secondary"
               size="small"
               @click="manageCandidates(data)"
-              title="Manage Candidates"
+              v-tooltip.bottom="'Manage Candidates'"
             />
             <Button
               icon="pi pi-pencil"
               severity="info"
               size="small"
               @click="openDialog(data)"
-              title="Edit"
+              v-tooltip.bottom="'Edit'"
             />
             <Button
               icon="pi pi-trash"
               severity="danger"
               size="small"
               @click="confirmDelete(data)"
-              title="Delete"
+              v-tooltip.bottom="'Delete'"
             />
           </div>
         </template>
