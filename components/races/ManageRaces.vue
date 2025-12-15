@@ -205,7 +205,7 @@
 
         <div class="flex flex-col gap-2">
           <label for="description" class="font-semibold">Description</label>
-          <Textarea
+          <SimpleEditor
             id="description"
             v-model="formData.description"
             rows="4"
