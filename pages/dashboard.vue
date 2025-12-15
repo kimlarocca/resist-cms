@@ -25,8 +25,20 @@ const currentUserProfile = useCurrentUserProfile()
       >
         <i class="pi pi-flag-fill text-2xl mx-auto mb-1"></i>
         <h2 class="mb-3">Races</h2>
-        <p class="mb-3">Manage races including creating, updating, and deleting races.</p>
+        <p class="mb-3">Manage races including adding, updating, and deleting races.</p>
         <Button label="Manage Races" />
+      </div>
+      <div
+        v-if="currentUserProfile?.role === 'super_admin'"
+        class="flex flex-col rounded-xl bg-gray p-4 shadow-lg text-center clickable"
+        @click="$router.push('/websites')"
+      >
+        <i class="pi pi-flag-fill text-2xl mx-auto mb-1"></i>
+        <h2 class="mb-3">Websites</h2>
+        <p class="mb-3">
+          Manage websites including adding, updating, and deleting websites.
+        </p>
+        <Button label="Manage Websites" />
       </div>
     </div>
   </div>
