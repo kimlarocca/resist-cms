@@ -45,8 +45,11 @@
       <p class="text-sm mt-2">
         <i class="pi pi-info-circle text-sm" />
         Your website description is for search engine optimization purposes. The ideal
-        meta description length is about 120 characters, as longer descriptions get cut
-        off by Google, impacting user clicks.
+        length is about 120 characters, as longer descriptions get cut off by Google,
+        impacting user clicks.
+        <span v-if="description?.length"
+          >Characters used: {{ description?.length }}.</span
+        >
       </p>
     </div>
 
