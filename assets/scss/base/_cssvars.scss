@@ -21,6 +21,7 @@
     --background: var(--white);
     --p-text-color: var(--black);
     --link-color: var(--red);
+    --border-radius: 16px;
 
     // BUTTONS
     --p-button-border-radius: 0;
@@ -60,4 +61,10 @@
     --forms-input-color: var(--black);
     --forms-text-area-height: 150px;
     --forms-inline-button-padding: 0 1.5rem;
+
+    // TAGS
+    --p-tag-primary-background: var(--blue);
+    --p-tag-primary-color: var(--white);
+    --p-tag-secondary-background: var(--red);
+    --p-tag-secondary-color: var(--white);
 }

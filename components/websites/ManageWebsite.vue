@@ -7,29 +7,55 @@
     />
   </div>
   <div v-else-if="website">
+    <!-- Type field - editable for super_admin only -->
+    <div v-if="isSuperAdmin" class="border-blue p-4 mb-6">
+      <Tag value="Super Admin" class="mb-6 w-fit" />
+      <FloatLabel variant="on">
+        <Select id="type" v-model="type" :options="typeOptions" @change="updateWebsite" />
+        <label for="type">Type</label>
+      </FloatLabel>
+    </div>
+
     <!-- URL field - editable for super_admin only -->
-    <div v-if="isSuperAdmin" class="mb-4">
+    <div v-if="isSuperAdmin" class="border-blue p-4 mb-6">
+      <Tag value="Super Admin" class="mb-6 w-fit" />
       <FloatLabel variant="on">
         <InputText id="url" v-model="url" @change="updateWebsite" />
         <label for="url">Website URL</label>
       </FloatLabel>
     </div>
-    <p v-else class="mb-6">
-      <NuxtLink :to="website.url" target="_blank">{{ website.url }}</NuxtLink>
+
+    <p v-else class="mb-8">
+      <NuxtLink :to="website.url" target="_blank">
+        {{ website.url }}<i class="pi pi-external-link plain ml-2" />
+      </NuxtLink>
     </p>
 
-    <div class="mb-4">
+    <div class="mb-6">
       <FloatLabel variant="on">
         <InputText id="email" v-model="email" type="email" @change="updateWebsite" />
         <label for="email">Email Address</label>
       </FloatLabel>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-6">
       <FloatLabel variant="on">
         <InputText id="title" v-model="title" @change="updateWebsite" />
         <label for="title">Title</label>
       </FloatLabel>
+      <p class="text-sm mt-2">
+        <i class="pi pi-info-circle text-sm" />
+        Your website title is also used for search engine optimization purposes. The ideal
+        length is about 50 characters, as longer titles get cut off by Google, impacting
+        user clicks.
+        <span
+          v-if="title?.length"
+          class="p-1 rounded text-white"
+          :class="title?.length > 50 ? 'bg-red' : 'bg-blue'"
+        >
+          Characters used: {{ title?.length }}.
+        </span>
+      </p>
     </div>
 
     <div class="mb-4">
@@ -47,9 +73,13 @@
         Your website description is for search engine optimization purposes. The ideal
         length is about 120 characters, as longer descriptions get cut off by Google,
         impacting user clicks.
-        <span v-if="description?.length"
-          >Characters used: {{ description?.length }}.</span
+        <span
+          v-if="description?.length"
+          class="p-1 rounded text-white"
+          :class="description?.length > 120 ? 'bg-red' : 'bg-blue'"
         >
+          Characters used: {{ description?.length }}.
+        </span>
       </p>
     </div>
 
@@ -148,7 +178,11 @@ const isSuperAdmin = computed(() => {
   return currentUserProfile.value?.role === "super_admin"
 })
 
+// Type options for the select menu
+const typeOptions = ref(["visibility_brigade"])
+
 // Reactive form fields
+const type = ref(null)
 const url = ref(null)
 const title = ref(null)
 const description = ref(null)
@@ -188,6 +222,7 @@ const fetchWebsite = async () => {
   } else if (data) {
     website.value = data
     // Populate form fields
+    type.value = data.type
     url.value = data.url
     title.value = data.title
     description.value = data.description
@@ -229,8 +264,9 @@ const updateWebsite = async () => {
     terms: terms.value,
   }
 
-  // Only super_admin can update the URL
+  // Only super_admin can update the URL and type
   if (isSuperAdmin.value) {
+    updateData.type = type.value
     updateData.url = url.value
   }
 

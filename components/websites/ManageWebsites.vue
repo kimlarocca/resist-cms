@@ -28,9 +28,9 @@
         </template>
       </Column>
 
-      <Column field="title" header="Title">
+      <Column field="type" header="Type" sortable>
         <template #body="slotProps">
-          {{ slotProps.data?.title }}
+          {{ slotProps.data?.type }}
         </template>
       </Column>
 
@@ -40,7 +40,7 @@
         </template>
       </Column>
 
-      <Column header="Actions" style="width: 200px">
+      <Column header="Actions" style="width: 250px">
         <template #body="slotProps">
           <div class="flex gap-2">
             <Button
@@ -49,6 +49,14 @@
               size="small"
               @click="editWebsite(slotProps.data.id)"
               v-tooltip.top="'Edit'"
+            />
+            <Button
+              v-if="slotProps.data.type === 'visibility_brigade'"
+              icon="pi pi-file-edit"
+              severity="secondary"
+              size="small"
+              @click="manageVisibilityBrigade(slotProps.data.id)"
+              v-tooltip.top="'Manage Content'"
             />
             <Button
               icon="pi pi-trash"
@@ -220,6 +228,11 @@ const saveNewWebsite = async () => {
   }
 
   saving.value = false
+}
+
+// Navigate to manage visibility brigade content
+const manageVisibilityBrigade = (websiteId) => {
+  router.push(`/websites/${websiteId}/manage`)
 }
 
 // Show delete confirmation
