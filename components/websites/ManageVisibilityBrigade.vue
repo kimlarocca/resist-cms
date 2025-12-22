@@ -23,18 +23,20 @@
 
     <div class="mb-4">
       <label class="block text-sm font-medium mb-2">Hero Image</label>
-      <UploadImage
+      <SupabaseImageUploader
         v-model="heroImage"
         bucket="visibility_brigade"
+        :website-id="websiteId"
         @update:modelValue="updateContent"
       />
     </div>
 
     <div class="mb-4">
       <label class="block text-sm font-medium mb-2">Hero Sub Image</label>
-      <UploadImage
+      <SupabaseImageUploader
         v-model="heroSubImage"
         bucket="visibility_brigade"
+        :website-id="websiteId"
         @update:modelValue="updateContent"
       />
     </div>
@@ -50,9 +52,17 @@
 
     <div class="mb-4">
       <FloatLabel variant="on">
-        <InputText id="cta_link" v-model="ctaLink" @change="updateContent" />
+        <InputText
+          id="cta_link"
+          class="w-full"
+          v-model="ctaLink"
+          type="url"
+          :class="{ 'p-invalid': ctaLinkError }"
+          @blur="validateCtaLink"
+        />
         <label for="cta_link">CTA Link</label>
       </FloatLabel>
+      <small v-if="ctaLinkError" class="text-red">{{ ctaLinkError }}</small>
     </div>
 
     <h3 class="text-lg font-bold mt-6 mb-4">About Us Section</h3>
@@ -104,9 +114,10 @@
 
     <div class="mb-4">
       <label class="block text-sm font-medium mb-2">Get Involved Image</label>
-      <UploadImage
+      <SupabaseImageUploader
         v-model="getInvolvedImage"
         bucket="visibility_brigade"
+        :website-id="websiteId"
         @update:modelValue="updateContent"
       />
     </div>
@@ -142,6 +153,8 @@ const supabase = useSupabaseClient()
 const content = ref(null)
 const loading = ref(true)
 const successMessage = ref(false)
+const ctaLinkError = ref(null)
+const websiteId = ref(null)
 
 // Reactive form fields
 const heroHeadline = ref(null)
@@ -176,6 +189,7 @@ const fetchContent = async () => {
     console.error("Error fetching content:", error)
   } else if (data) {
     content.value = data
+    websiteId.value = data.website_id
     // Populate form fields
     heroHeadline.value = data.hero_headline
     heroText.value = data.hero_text
@@ -192,6 +206,27 @@ const fetchContent = async () => {
   }
 
   loading.value = false
+}
+
+// Validate CTA Link URL
+const validateCtaLink = () => {
+  ctaLinkError.value = null
+
+  if (ctaLink.value && ctaLink.value.trim() !== "") {
+    try {
+      const url = new URL(ctaLink.value)
+      if (!url.protocol.startsWith("http")) {
+        ctaLinkError.value = "URL must start with http:// or https://"
+      }
+    } catch {
+      ctaLinkError.value = "Please enter a valid URL"
+    }
+  }
+
+  // If valid, update content
+  if (!ctaLinkError.value) {
+    updateContent()
+  }
 }
 
 // Update content data

@@ -7,6 +7,7 @@
     />
   </div>
   <div v-else-if="website">
+    <h3 class="text-lg font-bold mt-6 mb-4">Basic Information</h3>
     <!-- Type field - editable for super_admin only -->
     <div v-if="isSuperAdmin" class="border-blue p-4 mb-6">
       <Tag value="Super Admin" class="mb-6 w-fit" />
@@ -87,51 +88,107 @@
 
     <div class="mb-4">
       <FloatLabel variant="on">
-        <InputText id="tiktok" v-model="tiktok" @change="updateWebsite" />
+        <InputText
+          id="tiktok"
+          class="w-full"
+          v-model="tiktok"
+          type="url"
+          :class="{ 'p-invalid': tiktokError }"
+          @blur="validateUrl('tiktok')"
+        />
         <label for="tiktok">TikTok</label>
       </FloatLabel>
+      <small v-if="tiktokError" class="text-red">{{ tiktokError }}</small>
     </div>
 
     <div class="mb-4">
       <FloatLabel variant="on">
-        <InputText id="bluesky" v-model="bluesky" @change="updateWebsite" />
+        <InputText
+          id="bluesky"
+          class="w-full"
+          v-model="bluesky"
+          type="url"
+          :class="{ 'p-invalid': blueskyError }"
+          @blur="validateUrl('bluesky')"
+        />
         <label for="bluesky">Bluesky</label>
       </FloatLabel>
+      <small v-if="blueskyError" class="text-red">{{ blueskyError }}</small>
     </div>
 
     <div class="mb-4">
       <FloatLabel variant="on">
-        <InputText id="facebook" v-model="facebook" @change="updateWebsite" />
+        <InputText
+          id="facebook"
+          class="w-full"
+          v-model="facebook"
+          type="url"
+          :class="{ 'p-invalid': facebookError }"
+          @blur="validateUrl('facebook')"
+        />
         <label for="facebook">Facebook</label>
       </FloatLabel>
+      <small v-if="facebookError" class="text-red">{{ facebookError }}</small>
     </div>
 
     <div class="mb-4">
       <FloatLabel variant="on">
-        <InputText id="instagram" v-model="instagram" @change="updateWebsite" />
+        <InputText
+          id="instagram"
+          class="w-full"
+          v-model="instagram"
+          type="url"
+          :class="{ 'p-invalid': instagramError }"
+          @blur="validateUrl('instagram')"
+        />
         <label for="instagram">Instagram</label>
       </FloatLabel>
+      <small v-if="instagramError" class="text-red">{{ instagramError }}</small>
     </div>
 
     <div class="mb-4">
       <FloatLabel variant="on">
-        <InputText id="youtube" v-model="youtube" @change="updateWebsite" />
+        <InputText
+          id="youtube"
+          class="w-full"
+          v-model="youtube"
+          type="url"
+          :class="{ 'p-invalid': youtubeError }"
+          @blur="validateUrl('youtube')"
+        />
         <label for="youtube">YouTube</label>
       </FloatLabel>
+      <small v-if="youtubeError" class="text-red">{{ youtubeError }}</small>
     </div>
 
     <div class="mb-4">
       <FloatLabel variant="on">
-        <InputText id="threads" v-model="threads" @change="updateWebsite" />
+        <InputText
+          id="threads"
+          class="w-full"
+          v-model="threads"
+          type="url"
+          :class="{ 'p-invalid': threadsError }"
+          @blur="validateUrl('threads')"
+        />
         <label for="threads">Threads</label>
       </FloatLabel>
+      <small v-if="threadsError" class="text-red">{{ threadsError }}</small>
     </div>
 
     <div class="mb-4">
       <FloatLabel variant="on">
-        <InputText id="linktree" v-model="linktree" @change="updateWebsite" />
+        <InputText
+          id="linktree"
+          class="w-full"
+          v-model="linktree"
+          type="url"
+          :class="{ 'p-invalid': linktreeError }"
+          @blur="validateUrl('linktree')"
+        />
         <label for="linktree">Linktree</label>
       </FloatLabel>
+      <small v-if="linktreeError" class="text-red">{{ linktreeError }}</small>
     </div>
 
     <h3 class="text-lg font-bold mt-6 mb-4">Privacy Policy</h3>
@@ -173,6 +230,15 @@ const website = ref(null)
 const loading = ref(true)
 const successMessage = ref(false)
 
+// Error states for URL validation
+const tiktokError = ref(null)
+const blueskyError = ref(null)
+const facebookError = ref(null)
+const instagramError = ref(null)
+const youtubeError = ref(null)
+const threadsError = ref(null)
+const linktreeError = ref(null)
+
 // Check if user is super_admin
 const isSuperAdmin = computed(() => {
   return currentUserProfile.value?.role === "super_admin"
@@ -201,6 +267,50 @@ const terms = ref(null)
 const effectiveWebsiteId = computed(() => {
   return props.websiteId || currentUserProfile.value?.website_id
 })
+
+// Validate social media URLs
+const validateUrl = (field) => {
+  const errorMap = {
+    tiktok: tiktokError,
+    bluesky: blueskyError,
+    facebook: facebookError,
+    instagram: instagramError,
+    youtube: youtubeError,
+    threads: threadsError,
+    linktree: linktreeError,
+  }
+
+  const valueMap = {
+    tiktok: tiktok,
+    bluesky: bluesky,
+    facebook: facebook,
+    instagram: instagram,
+    youtube: youtube,
+    threads: threads,
+    linktree: linktree,
+  }
+
+  const error = errorMap[field]
+  const value = valueMap[field]
+
+  error.value = null
+
+  if (value.value && value.value.trim() !== "") {
+    try {
+      const url = new URL(value.value)
+      if (!url.protocol.startsWith("http")) {
+        error.value = "URL must start with http:// or https://"
+        return
+      }
+    } catch {
+      error.value = "Please enter a valid URL"
+      return
+    }
+  }
+
+  // If valid or empty, update website
+  updateWebsite()
+}
 
 // Fetch the website data based on website_id from props or currentUserProfile
 const fetchWebsite = async () => {
