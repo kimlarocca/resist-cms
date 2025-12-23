@@ -32,6 +32,16 @@
       </NuxtLink>
     </p>
 
+    <div class="mb-8">
+      <label class="block text-sm font-medium mb-2">Logo Image</label>
+      <SupabaseImageUploader
+        v-model="logo"
+        bucket="logos"
+        :website-id="effectiveWebsiteId"
+        @update:modelValue="updateWebsite"
+      />
+    </div>
+
     <div class="mb-6">
       <FloatLabel variant="on">
         <InputText id="email" v-model="email" type="email" @change="updateWebsite" />
@@ -44,18 +54,19 @@
         <InputText id="title" v-model="title" @change="updateWebsite" />
         <label for="title">Title</label>
       </FloatLabel>
-      <p class="text-sm mt-2">
-        <i class="pi pi-info-circle text-sm" />
-        Your website title is also used for search engine optimization purposes. The ideal
-        length is about 50 characters, as longer titles get cut off by Google, impacting
-        user clicks.
-        <span
-          v-if="title?.length"
-          class="p-1 rounded text-white"
-          :class="title?.length > 50 ? 'bg-red' : 'bg-blue'"
+      <p class="text-sm mt-3 text-gray-600">
+        <em>
+          Your website title is also used for search engine optimization purposes. The
+          ideal length is about 50 characters, as longer titles get cut off by Google,
+          impacting user clicks.
+          <span
+            v-if="title?.length"
+            class="p-1 rounded text-white"
+            :class="title?.length > 50 ? 'bg-red' : 'bg-blue'"
+          >
+            Characters used: {{ title?.length }}.
+          </span></em
         >
-          Characters used: {{ title?.length }}.
-        </span>
       </p>
     </div>
 
@@ -69,18 +80,19 @@
         />
         <label for="description">Description</label>
       </FloatLabel>
-      <p class="text-sm mt-2">
-        <i class="pi pi-info-circle text-sm" />
-        Your website description is for search engine optimization purposes. The ideal
-        length is about 120 characters, as longer descriptions get cut off by Google,
-        impacting user clicks.
-        <span
-          v-if="description?.length"
-          class="p-1 rounded text-white"
-          :class="description?.length > 120 ? 'bg-red' : 'bg-blue'"
+      <p class="text-sm mt-3 text-gray-600">
+        <em>
+          Your website description is for search engine optimization purposes. The ideal
+          length is about 120 characters, as longer descriptions get cut off by Google,
+          impacting user clicks.
+          <span
+            v-if="description?.length"
+            class="p-1 rounded text-white"
+            :class="description?.length > 120 ? 'bg-red' : 'bg-blue'"
+          >
+            Characters used: {{ description?.length }}.
+          </span></em
         >
-          Characters used: {{ description?.length }}.
-        </span>
       </p>
     </div>
 
@@ -191,11 +203,17 @@
       <small v-if="linktreeError" class="text-red">{{ linktreeError }}</small>
     </div>
 
-    <h3 class="text-lg font-bold mt-6 mb-4">Privacy Policy</h3>
-    <SimpleEditor id="privacy_policy" v-model="privacyPolicy" rows="4" class="mb-4" />
+    <!-- URL field - editable for super_admin only -->
+    <div v-if="isPaidUser" class="border-blue p-4 my-6">
+      <Tag value="Paid Users Only" class="mb-6 w-fit" />
+      <h3 class="text-lg font-bold mb-4">Privacy Policy</h3>
+      <SimpleEditor id="privacy_policy" v-model="privacyPolicy" rows="4" class="mb-4" />
 
-    <h3 class="text-lg font-bold mt-6 mb-4">Terms &amp; Conditions</h3>
-    <SimpleEditor id="terms" v-model="terms" rows="4" class="mb-4" />
+      <h3 class="text-lg font-bold mt-6 mb-4">Terms &amp; Conditions</h3>
+      <SimpleEditor id="terms" v-model="terms" rows="4" class="mb-4" />
+    </div>
+
+    <Button label="Save Changes" icon="pi pi-check" class="mt-4" @click="updateWebsite" />
 
     <div class="changes-saved-toast">
       <Message
@@ -244,6 +262,11 @@ const isSuperAdmin = computed(() => {
   return currentUserProfile.value?.role === "super_admin"
 })
 
+// Check if website is not free (paid user)
+const isPaidUser = computed(() => {
+  return website.value?.product !== "free"
+})
+
 // Type options for the select menu
 const typeOptions = ref(["visibility_brigade"])
 
@@ -262,6 +285,7 @@ const threads = ref(null)
 const linktree = ref(null)
 const privacyPolicy = ref(null)
 const terms = ref(null)
+const logo = ref(null)
 
 // Compute the effective website ID to use
 const effectiveWebsiteId = computed(() => {
@@ -346,6 +370,7 @@ const fetchWebsite = async () => {
     linktree.value = data.linktree
     privacyPolicy.value = data.privacy_policy
     terms.value = data.terms
+    logo.value = data.logo
   }
 
   loading.value = false
@@ -372,6 +397,7 @@ const updateWebsite = async () => {
     linktree: linktree.value,
     privacy_policy: privacyPolicy.value,
     terms: terms.value,
+    logo: logo.value,
   }
 
   // Only super_admin can update the URL and type

@@ -30,9 +30,9 @@ export default defineNuxtConfig({
           href: 'https://fonts.googleapis.com'
         }
       ],
-      // script: [
-      //   { src: 'https://www.googletagmanager.com/gtag/js?id=G-7GDC05EZKE' }
-      // ]
+      script: [
+        { src: 'https://elfsightcdn.com/platform.js' }
+      ]
     }
   },
 

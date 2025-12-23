@@ -52,7 +52,7 @@ const currentUserProfile = useCurrentUserProfile()
           <h2 class="mb-3">Website Settings</h2>
           <p class="mb-5">
             Manage your website settings including contact information, title,
-            description, privacy policy, terms, and more.
+            description, and more.
           </p>
         </div>
         <Button label="Manage Settings" class="w-fit" />
@@ -63,7 +63,7 @@ const currentUserProfile = useCurrentUserProfile()
         @click="$router.push(`/websites/${currentUserProfile.website_id}/manage`)"
       >
         <div>
-          <i class="pi pi-cog text-2xl mb-2" />
+          <i class="pi pi-book text-2xl mb-2" />
           <h2 class="mb-3">Website Content</h2>
           <p class="mb-5">Manage your website content.</p>
         </div>

@@ -35,6 +35,10 @@ a {
         color: var(--red);
         opacity: var(--opacity-on-hover);
     }
+    &.plain {
+        text-decoration: none !important;
+        border-bottom: none !important;
+    }
 }
 .plain {
     text-decoration: none !important;
@@ -96,6 +100,33 @@ a {
     &:hover {
         opacity: var(--opacity-on-hover);
     }
+}
+
+.background-color {
+    background-color: var(--p-content-background);
+}
+
+.text-color {
+    color: var(--p-text-color);
+}
+.inverse-text-color {
+    color: var(--p-primary-inverse-color);
+}
+
+.contrast,
+.contrast h1,
+.contrast h2,
+.contrast h3,
+.contrast h4,
+.contrast h5,
+.contrast h6,
+.contrast p {
+    background: var(--black);
+    color: var(--white);
+}
+.contrast a,
+.inverse a {
+    color: var(--white);
 }
 
 // primevue overrides
