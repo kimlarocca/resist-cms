@@ -3,8 +3,15 @@
     <div v-if="pending" class="text-center py-12">
       <ProgressSpinner />
     </div>
-    <div v-else-if="error || !website" class="text-center py-12">
-      <p class="text-lg">Website not found</p>
+    <div
+      v-else-if="error || !website"
+      class="flex flex-col items-center justify-center gap-6 p-4 h-screen"
+    >
+      <NuxtLink to="/" class="plain">
+        <Logo />
+      </NuxtLink>
+      <img src="/images/404.png" alt="404 Not Found" />
+      <h1>Page Not Found</h1>
     </div>
     <VisibilityBrigadePage v-else-if="type === 'visibility-brigade'" />
   </div>

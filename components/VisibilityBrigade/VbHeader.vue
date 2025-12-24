@@ -7,7 +7,7 @@ const { data: websiteData } = await useAsyncData("website-data", () => getWebsit
 </script>
 
 <template>
-  <header class="rounded-lg">
+  <header class="visibility-brigade-header rounded-lg">
     <div class="flex justify-between gap-4 items-center">
       <div class="p-5 bg-black rounded-lg">
         <VisibilityBrigadeLogo />
@@ -38,32 +38,33 @@ const { data: websiteData } = await useAsyncData("website-data", () => getWebsit
 </template>
 
 <style lang="scss">
-header {
+.visibility-brigade-header {
   position: absolute;
   z-index: 10;
   top: 1.5rem;
   left: 1.5rem;
   right: 1.5rem;
-}
-.p-drawer {
-  background: var(--p-text-color) !important;
-  color: var(--p-primary-inverse-color) !important;
-}
-.p-drawer-header button {
-  color: var(--p-button-primary-color) !important;
-  background: var(--p-button-primary-background) !important;
-  border: none !important;
-  width: 3rem !important;
-  height: 3rem !important;
-  padding: 0.5rem !important;
-  &:hover {
-    background: var(--p-button-primary-hover-background) !important;
-    color: var(--p-button-primary-hover-color) !important;
+
+  .p-drawer {
+    background: var(--p-text-color) !important;
+    color: var(--p-primary-inverse-color) !important;
   }
-  &:focus,
-  &:focus-visible {
-    outline-color: transparent !important;
-    box-shadow: none !important;
+  .p-drawer-header button {
+    color: var(--p-button-primary-color) !important;
+    background: var(--p-button-primary-background) !important;
+    border: none !important;
+    width: 3rem !important;
+    height: 3rem !important;
+    padding: 0.5rem !important;
+    &:hover {
+      background: var(--p-button-primary-hover-background) !important;
+      color: var(--p-button-primary-hover-color) !important;
+    }
+    &:focus,
+    &:focus-visible {
+      outline-color: transparent !important;
+      box-shadow: none !important;
+    }
   }
 }
 </style>

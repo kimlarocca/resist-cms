@@ -27,7 +27,7 @@ const fetchWebsite = async () => {
     website.value = data
 
     // If type is visibility_brigade, fetch the content record
-    if (data?.type === "visibility_brigade") {
+    if (data?.type === "visibility-brigade") {
       await fetchVisibilityBrigadeContent()
     }
   }
@@ -87,7 +87,7 @@ onMounted(() => {
       <Divider class="my-7" />
 
       <!-- Visibility Brigade Content -->
-      <div v-if="website.type === 'visibility_brigade' && visibilityBrigadeContentId">
+      <div v-if="website.type === 'visibility-brigade' && visibilityBrigadeContentId">
         <WebsitesManageVisibilityBrigade :content-id="visibilityBrigadeContentId" />
       </div>
 

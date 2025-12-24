@@ -51,8 +51,8 @@ const currentUserProfile = useCurrentUserProfile()
           <i class="pi pi-cog text-2xl mb-2" />
           <h2 class="mb-3">Website Settings</h2>
           <p class="mb-5">
-            Manage your website settings including contact information, title,
-            description, and more.
+            Manage your website settings including contact information, title, logo, and
+            more.
           </p>
         </div>
         <Button label="Manage Settings" class="w-fit" />
@@ -65,7 +65,7 @@ const currentUserProfile = useCurrentUserProfile()
         <div>
           <i class="pi pi-book text-2xl mb-2" />
           <h2 class="mb-3">Website Content</h2>
-          <p class="mb-5">Manage your website content.</p>
+          <p class="mb-5">Manage your website content including text and images.</p>
         </div>
         <Button label="Manage Content" class="w-fit" />
       </div>

@@ -18,7 +18,7 @@ const navItems = [
 </script>
 
 <template>
-  <header class="bg-white-opacity-70 container rounded-xl !mt-4 !mb-8">
+  <header class="bg-white-opacity-70 container rounded-xl !my-4">
     <div class="container p-4 flex justify-between items-center">
       <NuxtLink to="/dashboard" class="plain">
         <Logo />

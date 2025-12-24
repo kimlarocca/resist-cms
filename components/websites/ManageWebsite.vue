@@ -268,7 +268,7 @@ const isPaidUser = computed(() => {
 })
 
 // Type options for the select menu
-const typeOptions = ref(["visibility_brigade"])
+const typeOptions = ref(["visibility-brigade"])
 
 // Reactive form fields
 const type = ref(null)
