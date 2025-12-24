@@ -51,7 +51,7 @@
               v-tooltip.top="'Edit'"
             />
             <Button
-              v-if="slotProps.data.type === 'visibility_brigade'"
+              v-if="slotProps.data.type === 'visibility-brigade'"
               icon="pi pi-file-edit"
               severity="secondary"
               size="small"
@@ -108,7 +108,7 @@
       header="Add New Website"
       :modal="true"
     >
-      <div class="mb-4">
+      <div class="mb-4 mt-6">
         <FloatLabel variant="on">
           <InputText
             id="newWebsiteUrl"

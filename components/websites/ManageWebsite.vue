@@ -11,9 +11,29 @@
     <!-- Type field - editable for super_admin only -->
     <div v-if="isSuperAdmin" class="border-blue p-4 mb-6">
       <Tag value="Super Admin" class="mb-6 w-fit" />
-      <FloatLabel variant="on">
-        <Select id="type" v-model="type" :options="typeOptions" @change="updateWebsite" />
+      <FloatLabel variant="on" class="mb-6">
+        <Select
+          class="w-full"
+          id="type"
+          v-model="type"
+          :options="typeOptions"
+          @change="updateWebsite"
+        />
         <label for="type">Type</label>
+      </FloatLabel>
+      <FloatLabel variant="on" class="mb-6">
+        <InputText id="slug" v-model="slug" @change="updateWebsite" />
+        <label for="slug">Slug</label>
+      </FloatLabel>
+      <FloatLabel variant="on">
+        <Select
+          class="w-full"
+          id="product"
+          v-model="product"
+          :options="productOptions"
+          @change="updateWebsite"
+        />
+        <label for="product">Product</label>
       </FloatLabel>
     </div>
 
@@ -264,11 +284,14 @@ const isSuperAdmin = computed(() => {
 
 // Check if website is not free (paid user)
 const isPaidUser = computed(() => {
-  return website.value?.product !== "free"
+  return website.value?.product !== "free" || product.value === "paid"
 })
 
 // Type options for the select menu
 const typeOptions = ref(["visibility-brigade"])
+
+// Product options for the select menu
+const productOptions = ref(["free", "paid"])
 
 // Reactive form fields
 const type = ref(null)
@@ -286,6 +309,8 @@ const linktree = ref(null)
 const privacyPolicy = ref(null)
 const terms = ref(null)
 const logo = ref(null)
+const slug = ref(null)
+const product = ref(null)
 
 // Compute the effective website ID to use
 const effectiveWebsiteId = computed(() => {
@@ -371,6 +396,8 @@ const fetchWebsite = async () => {
     privacyPolicy.value = data.privacy_policy
     terms.value = data.terms
     logo.value = data.logo
+    slug.value = data.slug
+    product.value = data.product
   }
 
   loading.value = false
@@ -400,10 +427,12 @@ const updateWebsite = async () => {
     logo: logo.value,
   }
 
-  // Only super_admin can update the URL and type
+  // Only super_admin can update these fields
   if (isSuperAdmin.value) {
     updateData.type = type.value
     updateData.url = url.value
+    updateData.slug = slug.value
+    updateData.product = product.value
   }
 
   const { error } = await supabase
