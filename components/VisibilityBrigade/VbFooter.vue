@@ -22,7 +22,9 @@ const description = computed(() => contentData.value?.hero_text || "")
     <footer class="container p-4">
       <div class="grid lg:grid-cols-4 gap-16 mb-12">
         <div class="col-span-1 lg:col-span-2">
-          <VisibilityBrigadeLogo class="minimal" />
+          <div class="p-5 bg-white rounded-lg w-fit">
+            <VisibilityBrigadeLogo class="black" />
+          </div>
           <p class="mt-5">{{ description }}</p>
         </div>
         <div class="col-span-1">

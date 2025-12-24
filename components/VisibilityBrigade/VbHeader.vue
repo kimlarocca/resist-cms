@@ -9,7 +9,9 @@ const { data: websiteData } = await useAsyncData("website-data", () => getWebsit
 <template>
   <header class="rounded-lg">
     <div class="flex justify-between gap-4 items-center">
-      <VisibilityBrigadeLogo />
+      <div class="p-5 bg-black rounded-lg">
+        <VisibilityBrigadeLogo />
+      </div>
       <i
         v-if="navigationLinks"
         class="bg-black p-4 rounded-full pi pi-bars text-xl text-white clickable"
