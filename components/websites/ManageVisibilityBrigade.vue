@@ -10,10 +10,15 @@
     <h3 class="text-lg font-bold mt-6 mb-4">Hero Section</h3>
 
     <div class="mb-4">
-      <FloatLabel variant="on">
-        <InputText id="hero_headline" v-model="heroHeadline" @change="updateContent" />
-        <label for="hero_headline">Hero Headline</label>
-      </FloatLabel>
+      <label for="hero_headline" class="block text-sm font-medium mb-2"
+        >Hero Headline</label
+      >
+      <InputText
+        id="hero_headline"
+        v-model="heroHeadline"
+        @change="updateContent"
+        class="w-full"
+      />
     </div>
 
     <div class="mb-4">
@@ -41,41 +46,38 @@
       />
     </div>
 
-    <h3 class="text-lg font-bold mt-6 mb-4">Call to Action</h3>
+    <h3 class="text-lg font-bold mt-6 mb-4">Call To Action (CTA)</h3>
 
     <div class="mb-4">
-      <FloatLabel variant="on">
-        <InputText id="cta_text" v-model="ctaText" @change="updateContent" />
-        <label for="cta_text">CTA Text</label>
-      </FloatLabel>
+      <label for="cta_text" class="block text-sm font-medium mb-2">CTA Text</label>
+      <InputText id="cta_text" v-model="ctaText" @change="updateContent" class="w-full" />
     </div>
 
     <div class="mb-4">
-      <FloatLabel variant="on">
-        <InputText
-          id="cta_link"
-          class="w-full"
-          v-model="ctaLink"
-          type="url"
-          :class="{ 'p-invalid': ctaLinkError }"
-          @blur="validateCtaLink"
-        />
-        <label for="cta_link">CTA Link</label>
-      </FloatLabel>
+      <label for="cta_link" class="block text-sm font-medium mb-2">CTA Link</label>
+      <InputText
+        id="cta_link"
+        class="w-full"
+        v-model="ctaLink"
+        type="url"
+        :class="{ 'p-invalid': ctaLinkError }"
+        @blur="validateCtaLink"
+      />
       <small v-if="ctaLinkError" class="text-red">{{ ctaLinkError }}</small>
     </div>
 
     <h3 class="text-lg font-bold mt-6 mb-4">About Us Section</h3>
 
     <div class="mb-4">
-      <FloatLabel variant="on">
-        <InputText
-          id="about_us_headline"
-          v-model="aboutUsHeadline"
-          @change="updateContent"
-        />
-        <label for="about_us_headline">About Us Headline</label>
-      </FloatLabel>
+      <label for="about_us_headline" class="block text-sm font-medium mb-2"
+        >About Us Headline</label
+      >
+      <InputText
+        id="about_us_headline"
+        v-model="aboutUsHeadline"
+        @change="updateContent"
+        class="w-full"
+      />
     </div>
 
     <div class="mb-4">
@@ -83,28 +85,46 @@
       <SimpleEditor id="about_us_text" v-model="aboutUsText" rows="4" />
     </div>
 
+    <h3 class="text-lg font-bold mt-6 mb-4">Social Media Embed</h3>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-2">
+        Paste your social media embed code here:
+      </label>
+      <Textarea
+        id="social_embed_code"
+        v-model="socialEmbedCode"
+        rows="6"
+        class="w-full"
+        @change="updateContent"
+        placeholder="Paste your embed code here (HTML and script tags are supported)"
+      />
+    </div>
+
     <h3 class="text-lg font-bold mt-6 mb-4">Get Involved Section</h3>
 
     <div class="mb-4">
-      <FloatLabel variant="on">
-        <InputText
-          id="get_involved_headline"
-          v-model="getInvolvedHeadline"
-          @change="updateContent"
-        />
-        <label for="get_involved_headline">Get Involved Headline</label>
-      </FloatLabel>
+      <label for="get_involved_headline" class="block text-sm font-medium mb-2"
+        >Get Involved Headline</label
+      >
+      <InputText
+        id="get_involved_headline"
+        v-model="getInvolvedHeadline"
+        @change="updateContent"
+        class="w-full"
+      />
     </div>
 
     <div class="mb-4">
-      <FloatLabel variant="on">
-        <InputText
-          id="get_involved_sub_header"
-          v-model="getInvolvedSubHeader"
-          @change="updateContent"
-        />
-        <label for="get_involved_sub_header">Get Involved Sub Header</label>
-      </FloatLabel>
+      <label for="get_involved_sub_header" class="block text-sm font-medium mb-2"
+        >Get Involved Sub Header</label
+      >
+      <InputText
+        id="get_involved_sub_header"
+        v-model="getInvolvedSubHeader"
+        @change="updateContent"
+        class="w-full"
+      />
     </div>
 
     <div class="mb-4">
@@ -169,6 +189,7 @@ const getInvolvedHeadline = ref(null)
 const getInvolvedSubHeader = ref(null)
 const getInvolvedText = ref(null)
 const getInvolvedImage = ref(null)
+const socialEmbedCode = ref(null)
 
 // Fetch the content data based on content_id
 const fetchContent = async () => {
@@ -203,6 +224,7 @@ const fetchContent = async () => {
     getInvolvedSubHeader.value = data.get_involved_sub_header
     getInvolvedText.value = data.get_involved_text
     getInvolvedImage.value = data.get_involved_image
+    socialEmbedCode.value = data.social_embed_code
   }
 
   loading.value = false
@@ -250,6 +272,7 @@ const updateContent = async () => {
     get_involved_sub_header: getInvolvedSubHeader.value,
     get_involved_text: getInvolvedText.value,
     get_involved_image: getInvolvedImage.value,
+    social_embed_code: socialEmbedCode.value,
   }
 
   const { error } = await supabase
