@@ -101,6 +101,20 @@
       />
     </div>
 
+    <div v-if="isSuperAdmin" class="border-blue p-4 mb-6">
+      <Tag value="Super Admin" class="mb-6 w-fit" />
+      <label for="instagram_widget_id" class="block text-sm font-medium mb-2">
+        Elfsight Widget ID
+      </label>
+      <InputText
+        id="instagram_widget_id"
+        v-model="instagramWidgetId"
+        @change="updateContent"
+        class="w-full"
+        placeholder="Enter Instagram Widget ID"
+      />
+    </div>
+
     <h3 class="text-lg font-bold mt-6 mb-4">Get Involved Section</h3>
 
     <div class="mb-4">
@@ -169,12 +183,18 @@ const props = defineProps({
 })
 
 const supabase = useSupabaseClient()
+const currentUserProfile = useCurrentUserProfile()
 
 const content = ref(null)
 const loading = ref(true)
 const successMessage = ref(false)
 const ctaLinkError = ref(null)
 const websiteId = ref(null)
+
+// Check if user is super_admin
+const isSuperAdmin = computed(() => {
+  return currentUserProfile.value?.role === "super_admin"
+})
 
 // Reactive form fields
 const heroHeadline = ref(null)
@@ -190,6 +210,7 @@ const getInvolvedSubHeader = ref(null)
 const getInvolvedText = ref(null)
 const getInvolvedImage = ref(null)
 const socialEmbedCode = ref(null)
+const instagramWidgetId = ref(null)
 
 // Fetch the content data based on content_id
 const fetchContent = async () => {
@@ -225,6 +246,7 @@ const fetchContent = async () => {
     getInvolvedText.value = data.get_involved_text
     getInvolvedImage.value = data.get_involved_image
     socialEmbedCode.value = data.social_embed_code
+    instagramWidgetId.value = data.instagram_widget_id
   }
 
   loading.value = false
@@ -273,6 +295,7 @@ const updateContent = async () => {
     get_involved_text: getInvolvedText.value,
     get_involved_image: getInvolvedImage.value,
     social_embed_code: socialEmbedCode.value,
+    instagram_widget_id: instagramWidgetId.value,
   }
 
   const { error } = await supabase
