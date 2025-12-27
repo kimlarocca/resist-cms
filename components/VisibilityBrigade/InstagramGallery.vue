@@ -1,6 +1,14 @@
 <template>
-  <section v-if="content?.instagram_widget_id" id="gallery" class="mb-40">
-    <div :class="content.instagram_widget_id" data-elfsight-app-lazy />
+  <section
+    v-if="content?.instagram_widget_id || content?.social_embed_code"
+    id="gallery"
+    class="mb-40"
+  >
+    <div
+      v-if="content?.instagram_widget_id"
+      :class="content.instagram_widget_id"
+      data-elfsight-app-lazy
+    />
   </section>
 </template>
 

@@ -56,6 +56,12 @@
     <VisibilityBrigadeInstagramGallery v-if="content?.instagram_widget_id" />
 
     <section
+      v-if="content?.social_embed_code"
+      ref="embedSection"
+      class="social-embed mx-6 mt-8 lg:mt-16 mb-32"
+    />
+
+    <section
       class="relative contrast rounded-xl mx-6 mt-8 lg:mt-16 mb-32"
       id="get-involved"
     >
@@ -121,6 +127,39 @@ const { data: content } = await useAsyncData("visibility-content", () =>
 const { data: websiteData } = await useAsyncData("website-data", () =>
   getWebsiteData(props.websiteId)
 )
+
+const embedSection = ref(null)
+
+// Handle embedding code with scripts
+onMounted(() => {
+  if (content.value?.social_embed_code && embedSection.value) {
+    const tempDiv = document.createElement("div")
+    tempDiv.innerHTML = content.value.social_embed_code
+
+    // Extract and execute script tags
+    const scripts = tempDiv.querySelectorAll("script")
+    const fragment = document.createDocumentFragment()
+
+    // Add non-script elements first
+    Array.from(tempDiv.childNodes).forEach((node) => {
+      if (node.nodeName !== "SCRIPT") {
+        fragment.appendChild(node.cloneNode(true))
+      }
+    })
+
+    embedSection.value.appendChild(fragment)
+
+    // Execute scripts
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement("script")
+      Array.from(oldScript.attributes).forEach((attr) => {
+        newScript.setAttribute(attr.name, attr.value)
+      })
+      newScript.textContent = oldScript.textContent
+      embedSection.value.appendChild(newScript)
+    })
+  }
+})
 </script>
 
 <style lang="scss" scoped>
