@@ -108,10 +108,19 @@
 </template>
 
 <script setup>
+const props = defineProps({
+  websiteId: {
+    type: Number,
+    required: true,
+  },
+})
+
 const { data: content } = await useAsyncData("visibility-content", () =>
-  getVisibilityBrigadeContent()
+  getVisibilityBrigadeContent(props.websiteId)
 )
-const { data: websiteData } = await useAsyncData("website-data", () => getWebsiteData())
+const { data: websiteData } = await useAsyncData("website-data", () =>
+  getWebsiteData(props.websiteId)
+)
 </script>
 
 <style lang="scss" scoped>

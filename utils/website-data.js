@@ -1,7 +1,5 @@
-const websiteId = 1
-
 // Fetch website data
-export async function getWebsiteData () {
+export async function getWebsiteData (websiteId = 1) {
     const supabase = useSupabaseClient()
     const { data, error } = await supabase
         .from("websites")
@@ -17,7 +15,7 @@ export async function getWebsiteData () {
 }
 
 // Fetch visibility brigade content
-export async function getVisibilityBrigadeContent () {
+export async function getVisibilityBrigadeContent (websiteId = 1) {
     const supabase = useSupabaseClient()
     const { data, error } = await supabase
         .from("visibility-brigade-content")
@@ -33,10 +31,10 @@ export async function getVisibilityBrigadeContent () {
 }
 
 // Fetch all data for the website
-export async function getAllWebsiteData () {
+export async function getAllWebsiteData (websiteId = 1) {
     const [websiteData, contentData] = await Promise.all([
-        getWebsiteData(),
-        getVisibilityBrigadeContent(),
+        getWebsiteData(websiteId),
+        getVisibilityBrigadeContent(websiteId),
     ])
 
     return {
@@ -46,8 +44,8 @@ export async function getAllWebsiteData () {
 }
 
 // Fetch navigation links with dynamic CTA
-export async function getNavigationLinks () {
-    const contentData = await getVisibilityBrigadeContent()
+export async function getNavigationLinks (websiteId = 1) {
+    const contentData = await getVisibilityBrigadeContent(websiteId)
 
     const links = [{ label: "About Us", href: "/", hash: "#about-us", target: "" }]
 
@@ -70,8 +68,8 @@ export async function getNavigationLinks () {
 }
 
 // Fetch social links from website data
-export async function getSocialLinks () {
-    const websiteData = await getWebsiteData()
+export async function getSocialLinks (websiteId = 1) {
+    const websiteData = await getWebsiteData(websiteId)
 
     if (!websiteData) return []
 

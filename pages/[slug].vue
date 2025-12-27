@@ -13,7 +13,10 @@
       <img src="/images/404.png" alt="404 Not Found" />
       <h1>Page Not Found</h1>
     </div>
-    <VisibilityBrigadePage v-else-if="type === 'visibility-brigade'" />
+    <VisibilityBrigadePage
+      v-else-if="type === 'visibility-brigade'"
+      :website-id="website.id"
+    />
   </div>
 </template>
 
