@@ -200,7 +200,7 @@
 
         <div class="flex flex-col gap-2">
           <label for="micro_bio" class="font-semibold">Micro Bio</label>
-          <SimpleEditor
+          <InputText
             v-model="formData.micro_bio"
             placeholder="Brief one-liner"
             height="100px"
