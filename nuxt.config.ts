@@ -71,5 +71,11 @@ export default defineNuxtConfig({
       supabaseAuthTokenName: 'sb-udsyxtnbyejnwwvbifjr-auth-token',
       supabaseAuthSignInRedirectTo: process.env.environment === 'local' ? 'http://localhost:3000' : 'https://resistcms.com',
     }
+  },
+
+  vite: {
+    optimizeDeps: {
+      include: ['quill']
+    }
   }
 })

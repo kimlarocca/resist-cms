@@ -19,8 +19,11 @@
     "@nuxtjs/tailwindcss": "^6.13.2",
     "@primeuix/themes": "^1.0.0",
     "@primevue/forms": "^4.3.2",
+    "@tiptap/extension-link": "^3.19.0",
+    "@tiptap/extension-underline": "^3.19.0",
+    "@tiptap/starter-kit": "^3.19.0",
+    "@tiptap/vue-3": "^3.19.0",
     "nuxt": "^3.16.0",
-    "quill": "^2.0.3",
     "survey-vue3-ui": "^2.3.16",
     "tailwindcss-primeui": "^0.5.1"
   },
