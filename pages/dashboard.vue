@@ -33,6 +33,18 @@ const currentUserProfile = useCurrentUserProfile()
       <div
         v-if="currentUserProfile?.role === 'super_admin'"
         class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
+        @click="$router.push('/surveys')"
+      >
+        <div>
+          <Tag value="Super Admin" class="mb-3 w-fit mx-auto" />
+          <h2 class="mb-3">Manage Surveys</h2>
+          <p class="mb-5">Manage surveys, categories and survey questions.</p>
+        </div>
+        <Button label="Manage Surveys" class="w-fit" />
+      </div>
+      <div
+        v-if="currentUserProfile?.role === 'super_admin'"
+        class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
         @click="$router.push('/websites')"
       >
         <div>
