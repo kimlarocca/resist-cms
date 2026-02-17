@@ -1,19 +1,19 @@
 <template>
   <div class="manage-questions">
     <div class="mb-6">
-      <NuxtLink to="/surveys">
-        <i class="pi pi-arrow-left mr-2" /> Back To Surveys</NuxtLink
-      >
-      <div class="flex justify-between items-center mt-12">
+      <div class="flex justify-between items-center">
         <div>
           <h2 class="mb-2">{{ survey?.name }}</h2>
-          <p class="text-gray-600">{{ survey?.description }}</p>
+          <p class="text-gray-600 mb-1">Description: {{ survey?.description }}</p>
+          <p class="text-gray-600">
+            Race: <NuxtLink :to="survey?.race_slug">{{ race?.name }}</NuxtLink>
+          </p>
         </div>
         <Button
           label="Create New Question"
           icon="pi pi-plus"
           @click="openCreateDialog"
-          :disabled="!isSuperAdmin"
+          :disabled="!canManageQuestions"
         />
       </div>
     </div>
@@ -81,10 +81,11 @@
         </template>
       </Column>
 
-      <Column v-if="isSuperAdmin" style="width: 15rem">
+      <Column v-if="canManageQuestions" style="width: 15rem">
         <template #body="{ data }">
           <div class="flex gap-2">
             <Button
+              v-if="data.question_type === 'radiogroup'"
               icon="pi pi-list"
               severity="info"
               v-tooltip.top="'Manage Choices'"
@@ -248,8 +249,10 @@ const props = defineProps({
 
 const client = useSupabaseClient()
 const currentUserProfile = useCurrentUserProfile()
+const user = useSupabaseUser()
 
 const survey = ref(null)
+const race = ref(null)
 const questions = ref([])
 const categories = ref([])
 const loading = ref(false)
@@ -280,6 +283,15 @@ const formData = ref({
 
 // Check if user is super admin
 const isSuperAdmin = computed(() => currentUserProfile.value?.role === "super_admin")
+const isRaceAdmin = computed(() => currentUserProfile.value?.role === "race_admin")
+
+// Check if user can manage questions (super admin or race admin for this race)
+const canManageQuestions = computed(() => {
+  if (isSuperAdmin.value) return true
+  if (isRaceAdmin.value && race.value && race.value.admin_id === user.value?.sub)
+    return true
+  return false
+})
 
 // Get category name by ID
 const getCategoryName = (categoryId) => {
@@ -299,9 +311,31 @@ const fetchSurvey = async () => {
 
     if (error) throw error
     survey.value = data
+
+    // Fetch the associated race if race_slug exists
+    if (data.race_slug) {
+      await fetchRace(data.race_slug)
+    }
   } catch (error) {
     console.error("Error fetching survey:", error)
     errorMessage.value = "Failed to load survey details."
+  }
+}
+
+// Fetch race details
+const fetchRace = async (raceSlug) => {
+  try {
+    const { data, error } = await client
+      .from("races")
+      .select("*")
+      .eq("slug", raceSlug)
+      .single()
+
+    if (error) throw error
+    race.value = data
+  } catch (error) {
+    console.error("Error fetching race:", error)
+    // Don't show error to user, just log it
   }
 }
 

@@ -74,6 +74,13 @@
               v-tooltip.bottom="'Manage Candidates'"
             />
             <Button
+              icon="pi pi-chart-bar"
+              severity="success"
+              size="small"
+              @click="manageSurvey(data)"
+              v-tooltip.bottom="'Manage Survey'"
+            />
+            <Button
               icon="pi pi-pencil"
               severity="info"
               size="small"
@@ -100,6 +107,13 @@
               size="small"
               @click="manageCandidates(data)"
               v-tooltip.bottom="'Manage Candidates'"
+            />
+            <Button
+              icon="pi pi-chart-bar"
+              severity="success"
+              size="small"
+              @click="manageSurvey(data)"
+              v-tooltip.bottom="'Manage Survey'"
             />
             <Button
               icon="pi pi-pencil"
@@ -527,6 +541,56 @@ const manageCandidates = (race) => {
   // You can implement this to navigate to a candidates management page
   // filtered by this race, or open a dialog, etc.
   navigateTo(`/candidates/${race.slug}`)
+}
+
+// Navigate to manage survey for this race
+const manageSurvey = async (race) => {
+  // Check if user has permission to manage this race's survey
+  if (!canEditRace(race)) {
+    errorMessage.value = "You do not have permission to manage this race's survey."
+    return
+  }
+
+  try {
+    // Check if survey exists for this race
+    const { data: existingSurvey, error: fetchError } = await client
+      .from("surveys")
+      .select("*")
+      .eq("race_slug", race.slug)
+      .single()
+
+    if (fetchError && fetchError.code !== "PGRST116") {
+      // PGRST116 is "not found" error, which is expected if no survey exists
+      throw fetchError
+    }
+
+    if (existingSurvey) {
+      // Survey exists, navigate to questions page
+      navigateTo(`/surveys/${existingSurvey.id}/questions`)
+    } else {
+      // No survey exists, create one
+      const { data: newSurvey, error: createError } = await client
+        .from("surveys")
+        .insert([
+          {
+            name: `${race.name} Survey`,
+            description: `Survey for ${race.name}`,
+            state: race.state,
+            race_slug: race.slug,
+          },
+        ])
+        .select()
+        .single()
+
+      if (createError) throw createError
+
+      // Navigate to the new survey's questions page
+      navigateTo(`/surveys/${newSurvey.id}/questions`)
+    }
+  } catch (error) {
+    console.error("Error managing survey:", error)
+    errorMessage.value = `Failed to manage survey: ${error.message}`
+  }
 }
 
 // Delete race

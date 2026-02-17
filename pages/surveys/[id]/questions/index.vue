@@ -8,6 +8,7 @@ definePageMeta({
 const route = useRoute()
 const surveyId = computed(() => route.params.id)
 const currentUserProfile = useCurrentUserProfile()
+const isSuperAdmin = computed(() => currentUserProfile.value?.role === "super_admin")
 </script>
 
 <template>
@@ -18,6 +19,9 @@ const currentUserProfile = useCurrentUserProfile()
       </Head>
     </Html>
     <h1 class="mb-6">Manage Survey Questions</h1>
+    <p>
+      <NuxtLink to="/surveys">All Surveys</NuxtLink>
+    </p>
     <Divider class="mb-7" />
     <SurveysManageQuestions :survey-id="surveyId" />
   </div>
