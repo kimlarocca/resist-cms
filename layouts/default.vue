@@ -2,7 +2,7 @@
   <div class="default-container flex flex-col h-full">
     <TheHeader />
     <main class="mb-8">
-      <NuxtPage />
+      <slot />
     </main>
     <TheFooter class="mt-auto" />
   </div>

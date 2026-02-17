@@ -16,6 +16,6 @@ const currentUserProfile = useCurrentUserProfile()
     </Html>
     <h1>Manage Surveys</h1>
     <Divider class="my-7" />
-    <p>coming soon!</p>
+    <SurveysManageSurveys />
   </div>
 </template>
