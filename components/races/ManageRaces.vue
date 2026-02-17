@@ -11,7 +11,13 @@
     <div class="grid grid-cols-2 item-center gap-4 mb-6">
       <InputText v-model="filters.global.value" placeholder="Search races..." />
       <div class="text-right">
-        <Button class="w-fit" label="Add Race" icon="pi pi-plus" @click="openDialog()" />
+        <Button
+          v-if="isSuperAdmin"
+          class="w-fit"
+          label="Add Race"
+          icon="pi pi-plus"
+          @click="openDialog()"
+        />
       </div>
     </div>
 
