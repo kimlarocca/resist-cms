@@ -1,16 +1,12 @@
 <template>
   <div class="manage-questions">
     <div class="mb-6">
-      <Button
-        label="Back to Surveys"
-        icon="pi pi-arrow-left"
-        text
-        @click="navigateTo('/surveys')"
-        class="mb-4"
-      />
-      <div class="flex justify-between items-center">
+      <NuxtLink to="/surveys">
+        <i class="pi pi-arrow-left mr-2" /> Back To Surveys</NuxtLink
+      >
+      <div class="flex justify-between items-center mt-12">
         <div>
-          <h2 class="text-2xl font-bold mb-2">{{ survey?.name }}</h2>
+          <h2 class="mb-2">{{ survey?.name }}</h2>
           <p class="text-gray-600">{{ survey?.description }}</p>
         </div>
         <Button

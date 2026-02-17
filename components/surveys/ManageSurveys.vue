@@ -278,10 +278,7 @@ const fetchSurveys = async () => {
   errorMessage.value = ""
 
   try {
-    const { data, error } = await client
-      .from("surveys")
-      .select("*")
-      .order("created_at", { ascending: false })
+    const { data, error } = await client.from("surveys").select("*").order("id")
 
     if (error) throw error
     surveys.value = data || []
