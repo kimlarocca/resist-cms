@@ -24,7 +24,7 @@
       :value="candidates"
       :loading="loading"
       paginator
-      :rows="10"
+      :rows="50"
       :rowsPerPageOptions="[10, 25, 50]"
       stripedRows
       v-model:filters="filters"

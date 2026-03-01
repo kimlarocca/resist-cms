@@ -14,7 +14,7 @@ const currentUserProfile = useCurrentUserProfile()
     </Html>
     <h1 class="mb-8">Dashboard</h1>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
       <div
         v-if="
           currentUserProfile?.role === 'super_admin' ||
@@ -29,6 +29,20 @@ const currentUserProfile = useCurrentUserProfile()
           <p class="mb-5">Manage races including adding, updating, and deleting races.</p>
         </div>
         <Button label="Manage Races" class="w-fit" />
+      </div>
+      <div
+        v-if="currentUserProfile?.role === 'super_admin'"
+        class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
+        @click="$router.push('/candidates/')"
+      >
+        <div>
+          <Tag value="Super Admin" class="mb-3 w-fit mx-auto" />
+          <h2 class="mb-3">Manage All Candidates</h2>
+          <p class="mb-5">
+            Manage all candidates including adding, updating, and deleting candidates.
+          </p>
+        </div>
+        <Button label="Manage Candidates" class="w-fit" />
       </div>
       <div
         v-if="currentUserProfile?.role === 'super_admin'"
