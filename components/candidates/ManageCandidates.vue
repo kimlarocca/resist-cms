@@ -230,26 +230,13 @@
         <Accordion>
           <AccordionTab header="Contact & Social Media">
             <div class="flex flex-col gap-4">
-              <div class="grid grid-cols-2 gap-4">
-                <div class="flex flex-col gap-2">
-                  <label for="website_url" class="font-semibold">Website URL</label>
-                  <InputText
-                    id="website_url"
-                    v-model="formData.website_url"
-                    placeholder="https://..."
-                  />
-                </div>
-
-                <div class="flex flex-col gap-2">
-                  <label for="announcement_url" class="font-semibold"
-                    >Announcement URL</label
-                  >
-                  <InputText
-                    id="announcement_url"
-                    v-model="formData.announcement_url"
-                    placeholder="https://..."
-                  />
-                </div>
+              <div class="flex flex-col gap-2">
+                <label for="website_url" class="font-semibold">Website URL</label>
+                <InputText
+                  id="website_url"
+                  v-model="formData.website_url"
+                  placeholder="https://..."
+                />
               </div>
 
               <div class="grid grid-cols-3 gap-4">
@@ -419,24 +406,13 @@
 
           <AccordionTab header="Additional Info">
             <div class="flex flex-col gap-4">
-              <div class="grid grid-cols-2 gap-4">
-                <div class="flex flex-col gap-2">
-                  <label for="image" class="font-semibold">Image URL</label>
-                  <InputText
-                    id="image"
-                    v-model="formData.image"
-                    placeholder="https://..."
-                  />
-                </div>
-
-                <div class="flex flex-col gap-2">
-                  <label for="video_url" class="font-semibold">Video URL</label>
-                  <InputText
-                    id="video_url"
-                    v-model="formData.video_url"
-                    placeholder="https://..."
-                  />
-                </div>
+              <div class="flex flex-col gap-2">
+                <label for="image" class="font-semibold">Image URL</label>
+                <InputText
+                  id="image"
+                  v-model="formData.image"
+                  placeholder="https://..."
+                />
               </div>
 
               <div class="grid grid-cols-2 gap-4">
@@ -457,18 +433,6 @@
                     placeholder="Unique code"
                   />
                 </div>
-              </div>
-
-              <div class="flex flex-col gap-2">
-                <label for="special_interests" class="font-semibold"
-                  >Special Interests</label
-                >
-                <SimpleEditor
-                  id="special_interests"
-                  v-model="formData.special_interests"
-                  rows="3"
-                  placeholder="Special interests information"
-                />
               </div>
             </div>
           </AccordionTab>
@@ -565,9 +529,6 @@ const formData = ref({
   bio: "",
   experience: "",
   website_url: "",
-  announcement_url: "",
-  video_url: "",
-  video_embed: "",
   image: "",
   slug: "",
   candidate_code: "",
@@ -583,7 +544,6 @@ const formData = ref({
   ballotpedia: "",
   funding: "",
   endorsements: "",
-  special_interests: "",
   corporate_pacs: "No Statement",
   aipac: "No Statement",
   any_pacs: "No Statement",
@@ -717,9 +677,6 @@ const openDialog = (candidate = null) => {
       bio: candidate.bio || "",
       experience: candidate.experience || "",
       website_url: candidate.website_url || "",
-      announcement_url: candidate.announcement_url || "",
-      video_url: candidate.video_url || "",
-      video_embed: candidate.video_embed || "",
       image: candidate.image || "",
       slug: candidate.slug || "",
       candidate_code: candidate.candidate_code || "",
@@ -735,7 +692,6 @@ const openDialog = (candidate = null) => {
       ballotpedia: candidate.ballotpedia || "",
       funding: candidate.funding || "",
       endorsements: candidate.endorsements || "",
-      special_interests: candidate.special_interests || "",
       corporate_pacs: candidate.corporate_pacs || "No Statement",
       aipac: candidate.aipac || "No Statement",
       any_pacs: candidate.any_pacs || "No Statement",
@@ -753,9 +709,6 @@ const openDialog = (candidate = null) => {
       bio: "",
       experience: "",
       website_url: "",
-      announcement_url: "",
-      video_url: "",
-      video_embed: "",
       image: "",
       slug: "",
       candidate_code: "",
@@ -771,7 +724,6 @@ const openDialog = (candidate = null) => {
       ballotpedia: "",
       funding: "",
       endorsements: "",
-      special_interests: "",
       corporate_pacs: "No Statement",
       aipac: "No Statement",
       any_pacs: "No Statement",
@@ -805,9 +757,6 @@ const saveCandidate = async () => {
       bio: formData.value.bio || null,
       experience: formData.value.experience || null,
       website_url: formData.value.website_url || null,
-      announcement_url: formData.value.announcement_url || null,
-      video_url: formData.value.video_url || null,
-      video_embed: formData.value.video_embed || null,
       image: formData.value.image || null,
       slug: formData.value.slug || null,
       candidate_code: formData.value.candidate_code || null,
@@ -823,7 +772,6 @@ const saveCandidate = async () => {
       ballotpedia: formData.value.ballotpedia || null,
       funding: formData.value.funding || null,
       endorsements: formData.value.endorsements || null,
-      special_interests: formData.value.special_interests || null,
       corporate_pacs: formData.value.corporate_pacs || "No Statement",
       aipac: formData.value.aipac || "No Statement",
       any_pacs: formData.value.any_pacs || "No Statement",
