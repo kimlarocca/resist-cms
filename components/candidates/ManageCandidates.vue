@@ -72,6 +72,13 @@
                 v-tooltip.bottom="'View on Site'"
             /></NuxtLink>
             <Button
+              icon="pi pi-link"
+              severity="secondary"
+              size="small"
+              @click="manageKeyLinks(data)"
+              v-tooltip.bottom="'Manage Key Links'"
+            />
+            <Button
               icon="pi pi-pencil"
               severity="info"
               size="small"
@@ -851,6 +858,11 @@ const deleteCandidate = async () => {
   } finally {
     deleting.value = false
   }
+}
+
+// Navigate to manage key links for this candidate
+const manageKeyLinks = (candidate) => {
+  navigateTo(`/key-links?candidate_id=${candidate.id}`)
 }
 
 // Load data on mount

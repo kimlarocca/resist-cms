@@ -59,6 +59,20 @@ const currentUserProfile = useCurrentUserProfile()
       <div
         v-if="currentUserProfile?.role === 'super_admin'"
         class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
+        @click="$router.push('/key-links')"
+      >
+        <div>
+          <Tag value="Super Admin" class="mb-3 w-fit mx-auto" />
+          <h2 class="mb-3">Manage Key Links</h2>
+          <p class="mb-5">
+            Manage key links, including adding, updating, and deleting links.
+          </p>
+        </div>
+        <Button label="Manage Key Links" class="w-fit" />
+      </div>
+      <div
+        v-if="currentUserProfile?.role === 'super_admin'"
+        class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
         @click="$router.push('/websites')"
       >
         <div>

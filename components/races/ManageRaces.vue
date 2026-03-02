@@ -80,6 +80,13 @@
               v-tooltip.bottom="'Manage Candidates'"
             />
             <Button
+              icon="pi pi-link"
+              severity="secondary"
+              size="small"
+              @click="manageKeyLinks(data)"
+              v-tooltip.bottom="'Manage Key Links'"
+            />
+            <Button
               icon="pi pi-chart-bar"
               severity="success"
               size="small"
@@ -113,6 +120,13 @@
               size="small"
               @click="manageCandidates(data)"
               v-tooltip.bottom="'Manage Candidates'"
+            />
+            <Button
+              icon="pi pi-link"
+              severity="secondary"
+              size="small"
+              @click="manageKeyLinks(data)"
+              v-tooltip.bottom="'Manage Key Links'"
             />
             <Button
               icon="pi pi-chart-bar"
@@ -547,6 +561,11 @@ const manageCandidates = (race) => {
   // You can implement this to navigate to a candidates management page
   // filtered by this race, or open a dialog, etc.
   navigateTo(`/candidates/${race.slug}`)
+}
+
+// Navigate to manage key links for this race
+const manageKeyLinks = (race) => {
+  navigateTo(`/key-links?race_id=${race.id}`)
 }
 
 // Navigate to manage survey for this race
