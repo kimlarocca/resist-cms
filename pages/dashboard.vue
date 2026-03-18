@@ -25,7 +25,7 @@ const currentUserProfile = useCurrentUserProfile()
       >
         <div>
           <Tag value="Election Managers" class="mb-3 w-fit mx-auto" />
-          <h2 class="mb-3">Elections</h2>
+          <h2 class="mb-3">My Elections</h2>
           <p class="mb-5">
             Manage elections including adding, updating, and deleting elections.
           </p>
@@ -33,13 +33,16 @@ const currentUserProfile = useCurrentUserProfile()
         <Button label="Manage Elections" class="w-fit" />
       </div>
       <div
-        v-if="currentUserProfile?.role === 'super_admin'"
+        v-if="
+          currentUserProfile?.role === 'super_admin' ||
+          currentUserProfile?.role === 'election_manager'
+        "
         class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
         @click="$router.push('/candidates/')"
       >
         <div>
-          <Tag value="Super Admin" class="mb-3 w-fit mx-auto" />
-          <h2 class="mb-3">Manage All Candidates</h2>
+          <Tag value="Election Managers" class="mb-3 w-fit mx-auto" />
+          <h2 class="mb-3">My Candidates</h2>
           <p class="mb-5">
             Manage all candidates including adding, updating, and deleting candidates.
           </p>

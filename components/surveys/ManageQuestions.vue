@@ -283,7 +283,7 @@ const formData = ref({
 
 // Check if user is super admin
 const isSuperAdmin = computed(() => currentUserProfile.value?.role === "super_admin")
-const isRaceAdmin = computed(() => currentUserProfile.value?.role === "race_admin")
+const isRaceAdmin = computed(() => currentUserProfile.value?.role === "election_manager")
 
 // Check if user can manage questions (super admin or race admin for this race)
 const canManageQuestions = computed(() => {

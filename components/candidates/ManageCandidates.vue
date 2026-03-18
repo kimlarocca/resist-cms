@@ -13,7 +13,7 @@
       <div class="text-right">
         <Button
           class="w-fit"
-          label="Add Candidate"
+          label="Add New Candidate"
           icon="pi pi-plus"
           @click="openDialog()"
         />
@@ -560,7 +560,7 @@ const formData = ref({
 
 // Check if user is super admin
 const isSuperAdmin = computed(() => userProfile.value?.role === "super_admin")
-const isRaceAdmin = computed(() => userProfile.value?.role === "race_admin")
+const isRaceAdmin = computed(() => userProfile.value?.role === "election_manager")
 
 // Check if user can edit a specific candidate (via race)
 const canEditCandidate = (candidate) => {
@@ -596,7 +596,7 @@ const fetchRaces = async () => {
   try {
     let query = client.from("races").select("*")
 
-    // If user is race_admin, only fetch their races
+    // If user is election_manager, only fetch their races
     if (isRaceAdmin.value && !isSuperAdmin.value && userProfile.value?.id) {
       query = query.eq("admin_id", userProfile.value.id)
     }
@@ -631,7 +631,7 @@ const fetchCandidates = async () => {
     if (props.raceSlug) {
       query = query.eq("race_slug", props.raceSlug)
     }
-    // Otherwise, if user is race_admin, only fetch candidates for their races
+    // Otherwise, if user is election_manager, only fetch candidates for their races
     else if (isRaceAdmin.value && !isSuperAdmin.value) {
       const raceSlugs = availableRaces.value.map((r) => r.slug)
       if (raceSlugs.length > 0) {
@@ -871,10 +871,3 @@ onMounted(async () => {
   await fetchCandidates()
 })
 </script>
-
-<style scoped>
-label.required::after {
-  content: " *";
-  color: var(--red);
-}
-</style>

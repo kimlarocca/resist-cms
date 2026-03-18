@@ -114,6 +114,17 @@
       <Column v-else-if="isRaceAdmin" style="width: 15rem">
         <template #body="{ data }">
           <div class="flex gap-2">
+            <NuxtLink
+              :to="`https://votebyvalues.com/race/${data.slug}`"
+              target="_blank"
+              rel="noopener"
+            >
+              <Button
+                icon="pi pi-eye"
+                severity="secondary"
+                size="small"
+                v-tooltip.bottom="'View on Site'"
+            /></NuxtLink>
             <Button
               icon="pi pi-users"
               severity="secondary"
@@ -141,13 +152,6 @@
               size="small"
               @click="openDialog(data)"
               v-tooltip.bottom="'Edit'"
-            />
-            <Button
-              icon="pi pi-trash"
-              severity="danger"
-              size="small"
-              @click="confirmDelete(data)"
-              v-tooltip.bottom="'Delete'"
             />
           </div>
         </template>
@@ -391,7 +395,7 @@ const formData = ref({
 
 // Check if user is super admin
 const isSuperAdmin = computed(() => currentUserProfile.value?.role === "super_admin")
-const isRaceAdmin = computed(() => currentUserProfile.value?.role === "race_admin")
+const isRaceAdmin = computed(() => currentUserProfile.value?.role === "election_manager")
 
 // Check if user can edit a specific race
 const canEditRace = (race) => {
@@ -408,7 +412,7 @@ const fetchRaces = async () => {
   try {
     let query = client.from("races").select("*")
 
-    // If user is race_admin, only fetch their races
+    // If user is election_manager, only fetch their races
     if (isRaceAdmin.value && !isSuperAdmin.value) {
       query = query.eq("admin_id", user.value.sub)
     }
@@ -520,7 +524,7 @@ const saveRace = async () => {
       successMessage.value = "Race updated successfully!"
     } else {
       // Create new race
-      // If user is race_admin, set them as admin_id
+      // If user is election_manager, set them as admin_id
       if (isRaceAdmin.value && !isSuperAdmin.value) {
         raceData.admin_id = user.value.id
       }

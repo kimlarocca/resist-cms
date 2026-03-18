@@ -8,14 +8,22 @@ definePageMeta({
 const user = useSupabaseUser()
 const currentUserProfile = useCurrentUserProfile()
 
-// Check if user is super admin
-const isSuperAdmin = computed(() => currentUserProfile.value?.role === "super_admin")
+// Check if user is super admin or election manager
+const hasAccess = computed(
+  () =>
+    currentUserProfile.value?.role === "super_admin" ||
+    currentUserProfile.value?.role === "election_manager"
+)
 
-// Redirect if not super admin
+// Redirect if not authorized
 watch(
   currentUserProfile,
   (profile) => {
-    if (profile && profile.role !== "super_admin") {
+    if (
+      profile &&
+      profile.role !== "super_admin" &&
+      profile.role !== "election_manager"
+    ) {
       navigateTo("/dashboard")
     }
   },
@@ -27,7 +35,7 @@ watch(
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Manage All Candidates</Title>
+        <Title>Resist CMS | My Candidates</Title>
       </Head>
     </Html>
 
@@ -35,14 +43,15 @@ watch(
       <ProgressSpinner />
     </div>
 
-    <div v-else-if="!isSuperAdmin">
+    <div v-else-if="!hasAccess">
       <Message severity="error">
-        Access denied. This page is only available to super administrators.
+        Access denied. This page is only available to super administrators and election
+        managers.
       </Message>
     </div>
 
     <div v-else>
-      <h1>Manage All Candidates</h1>
+      <h1>My Candidates</h1>
       <Divider class="my-7" />
       <CandidatesManageCandidates />
     </div>

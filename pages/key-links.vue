@@ -32,14 +32,14 @@ const candidateId = computed(() => {
 
 // Check if user is super admin or race admin
 const isSuperAdmin = computed(() => currentUserProfile.value?.role === "super_admin")
-const isRaceAdmin = computed(() => currentUserProfile.value?.role === "race_admin")
+const isRaceAdmin = computed(() => currentUserProfile.value?.role === "election_manager")
 const canAccess = computed(() => isSuperAdmin.value || isRaceAdmin.value)
 
 // Redirect if not authorized
 watch(
   currentUserProfile,
   (profile) => {
-    if (profile && profile.role !== "super_admin" && profile.role !== "race_admin") {
+    if (profile && profile.role !== "super_admin" && profile.role !== "election_manager") {
       navigateTo("/dashboard")
     }
   },
