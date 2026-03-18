@@ -9,9 +9,13 @@
     </Message>
 
     <div class="grid grid-cols-2 item-center gap-4 mb-6">
-      <InputText v-model="filters.global.value" placeholder="Search candidates..." />
+      <InputText
+        v-model="filters.global.value"
+        placeholder="Filter candidates by name..."
+      />
       <div class="text-right">
         <Button
+          v-if="isSuperAdmin"
           class="w-fit"
           label="Add New Candidate"
           icon="pi pi-plus"
@@ -32,7 +36,7 @@
       :globalFilterFields="['name', 'party', 'race_slug', 'candidate_status']"
       class="p-datatable-sm"
     >
-      <Column field="name" header="Candidate Name" sortable>
+      <Column field="name" header="Name" sortable>
         <template #body="{ data }">
           {{ data.name }}
         </template>
@@ -51,15 +55,57 @@
         </template>
       </Column>
 
-      <Column field="race_slug" header="Race" sortable>
+      <Column field="race_slug" header="Election" sortable>
         <template #body="{ data }">
-          {{ data.race_slug || "N/A" }}
+          {{ getRaceName(data.race_slug) }}
+        </template>
+      </Column>
+
+      <Column header="Survey">
+        <template #body="{ data }">
+          <Tag
+            :severity="getCompletionSeverity(data)"
+            :value="getSurveyCompletion(data)"
+          />
         </template>
       </Column>
 
       <Column style="width: 12rem">
         <template #body="{ data }">
           <div class="flex gap-2">
+            <Button
+              icon="pi pi-pencil"
+              severity="info"
+              size="small"
+              @click="openDialog(data)"
+              v-tooltip.bottom="'Edit Candidate Content'"
+            />
+            <Button
+              icon="pi pi-link"
+              severity="secondary"
+              size="small"
+              @click="manageKeyLinks(data)"
+              v-tooltip.bottom="'Manage Candidate Links'"
+            />
+            <Button
+              v-if="isSuperAdmin"
+              icon="pi pi-trash"
+              severity="danger"
+              size="small"
+              @click="confirmDelete(data)"
+              v-tooltip.bottom="'Delete'"
+            />
+            <NuxtLink
+              :to="`https://votebyvalues.com/survey?code=${data.candidate_code}`"
+              target="_blank"
+              rel="noopener"
+            >
+              <Button
+                icon="pi pi-chart-bar"
+                severity="secondary"
+                size="small"
+                v-tooltip.bottom="'Preview Survey'"
+            /></NuxtLink>
             <NuxtLink
               :to="`https://votebyvalues.com/${data.slug}`"
               target="_blank"
@@ -71,27 +117,6 @@
                 size="small"
                 v-tooltip.bottom="'View on Site'"
             /></NuxtLink>
-            <Button
-              icon="pi pi-link"
-              severity="secondary"
-              size="small"
-              @click="manageKeyLinks(data)"
-              v-tooltip.bottom="'Manage Key Links'"
-            />
-            <Button
-              icon="pi pi-pencil"
-              severity="info"
-              size="small"
-              @click="openDialog(data)"
-              v-tooltip.bottom="'Edit'"
-            />
-            <Button
-              icon="pi pi-trash"
-              severity="danger"
-              size="small"
-              @click="confirmDelete(data)"
-              v-tooltip.bottom="'Delete'"
-            />
           </div>
         </template>
       </Column>
@@ -508,6 +533,8 @@ const userProfile = useCurrentUserProfile()
 
 const candidates = ref([])
 const availableRaces = ref([])
+const surveyData = ref({}) // Store survey questions count by race_slug
+const surveyQuestionIds = ref({}) // Store question IDs per race_slug
 const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(false)
@@ -591,6 +618,93 @@ const getStatusSeverity = (status) => {
   return severityMap[status] || "secondary"
 }
 
+// Get race name from slug
+const getRaceName = (raceSlug) => {
+  if (!raceSlug) return "N/A"
+  const race = availableRaces.value.find((r) => r.slug === raceSlug)
+  return race ? race.name : raceSlug
+}
+
+// Fetch survey data (questions count per race)
+const fetchSurveyData = async () => {
+  try {
+    // Get all surveys with their question counts
+    const { data: surveys, error: surveyError } = await client
+      .from("surveys")
+      .select("id, race_slug")
+
+    if (surveyError) throw surveyError
+
+    // For each survey, get the question IDs
+    for (const survey of surveys || []) {
+      const { data: questions, error: countError } = await client
+        .from("survey-questions")
+        .select("id")
+        .eq("survey_id", survey.id)
+
+      if (!countError && survey.race_slug) {
+        const count = questions?.length || 0
+        const questionIds = questions?.map((q) => String(q.id)) || []
+
+        // Accumulate counts and question IDs for races with multiple surveys
+        surveyData.value[survey.race_slug] =
+          (surveyData.value[survey.race_slug] || 0) + count
+        surveyQuestionIds.value[survey.race_slug] = [
+          ...(surveyQuestionIds.value[survey.race_slug] || []),
+          ...questionIds,
+        ]
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching survey data:", error)
+  }
+}
+
+// Calculate survey completion percentage for a candidate
+const getSurveyCompletion = (candidate) => {
+  if (!candidate.race_slug) return "N/A"
+
+  const totalQuestions = surveyData.value[candidate.race_slug] || 0
+  if (totalQuestions === 0) return "No Survey"
+
+  // Get the question IDs for this race
+  const raceQuestionIds = surveyQuestionIds.value[candidate.race_slug] || []
+
+  // Parse the survey_response JSON object and only count responses for this race's questions
+  const surveyResponse = candidate.survey_response || {}
+  const answeredQuestions = Object.keys(surveyResponse).filter((key) => {
+    // Filter out comment keys (e.g., "1-Comment") and only include numeric question IDs
+    if (key.includes("-")) return false
+    // Check if this question ID belongs to this race's survey
+    return raceQuestionIds.includes(key)
+  }).length
+
+  const percentage = Math.round((answeredQuestions / totalQuestions) * 100)
+
+  return `${percentage}%`
+}
+
+// Get severity for completion percentage
+const getCompletionSeverity = (candidate) => {
+  if (!candidate.race_slug || !surveyData.value[candidate.race_slug]) return "secondary"
+
+  const totalQuestions = surveyData.value[candidate.race_slug]
+  const raceQuestionIds = surveyQuestionIds.value[candidate.race_slug] || []
+  const surveyResponse = candidate.survey_response || {}
+
+  // Only count responses for this race's questions (excluding comment keys)
+  const answeredQuestions = Object.keys(surveyResponse).filter((key) => {
+    if (key.includes("-")) return false
+    return raceQuestionIds.includes(key)
+  }).length
+
+  const percentage = (answeredQuestions / totalQuestions) * 100
+
+  if (percentage === 100) return "success"
+  if (percentage >= 50) return "warning"
+  return "danger"
+}
+
 // Fetch available races
 const fetchRaces = async () => {
   try {
@@ -648,6 +762,10 @@ const fetchCandidates = async () => {
 
     if (error) throw error
 
+    // Fetch survey data BEFORE setting candidates (to avoid race condition)
+    await fetchSurveyData()
+
+    // Now set candidates after survey data is ready
     candidates.value = data || []
   } catch (error) {
     console.error("Error fetching candidates:", error)
