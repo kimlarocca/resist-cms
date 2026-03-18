@@ -122,7 +122,7 @@ const currentUserProfile = useCurrentUserProfile()
       <div
         v-if="currentUserProfile?.website_id"
         class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
-        @click="$router.push(`/websites/${currentUserProfile.website_id}/manage`)"
+        @click="$router.push(`/websites/${currentUserProfile.website_id}/manage-content`)"
       >
         <div>
           <i class="pi pi-book text-2xl mb-2" />
