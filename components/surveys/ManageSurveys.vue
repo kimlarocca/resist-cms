@@ -68,7 +68,7 @@
         </template>
       </Column>
 
-      <Column v-if="isSuperAdmin" style="width: 15rem">
+      <Column v-if="isSuperAdmin || isElectionManager" style="width: 15rem">
         <template #body="{ data }">
           <div class="flex gap-2">
             <Button
@@ -79,6 +79,7 @@
               text
             />
             <Button
+              v-if="isSuperAdmin"
               icon="pi pi-pencil"
               severity="secondary"
               v-tooltip.top="'Edit Survey'"
@@ -86,6 +87,7 @@
               text
             />
             <Button
+              v-if="isSuperAdmin"
               icon="pi pi-trash"
               severity="danger"
               v-tooltip.top="'Delete Survey'"
@@ -192,8 +194,10 @@ import { FilterMatchMode } from "@primevue/core/api"
 
 const client = useSupabaseClient()
 const currentUserProfile = useCurrentUserProfile()
+const user = useSupabaseUser()
 
 const surveys = ref([])
+const managedRaces = ref([])
 const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(false)
@@ -269,8 +273,28 @@ const formData = ref({
   race_slug: "",
 })
 
-// Check if user is super admin
+// Check if user is super admin or election manager
 const isSuperAdmin = computed(() => currentUserProfile.value?.role === "super_admin")
+const isElectionManager = computed(
+  () => currentUserProfile.value?.role === "election_manager"
+)
+
+// Fetch races managed by the election manager
+const fetchManagedRaces = async () => {
+  if (!isElectionManager.value || isSuperAdmin.value) return
+
+  try {
+    const { data, error } = await client
+      .from("races")
+      .select("slug")
+      .eq("admin_id", user.value?.sub)
+
+    if (error) throw error
+    managedRaces.value = data || []
+  } catch (error) {
+    console.error("Error fetching managed races:", error)
+  }
+}
 
 // Fetch all surveys
 const fetchSurveys = async () => {
@@ -278,7 +302,27 @@ const fetchSurveys = async () => {
   errorMessage.value = ""
 
   try {
-    const { data, error } = await client.from("surveys").select("*").order("id")
+    // First, fetch managed races if election manager
+    if (isElectionManager.value && !isSuperAdmin.value) {
+      await fetchManagedRaces()
+    }
+
+    let query = client.from("surveys").select("*").order("id")
+
+    // If user is election_manager, only fetch surveys for their races
+    if (isElectionManager.value && !isSuperAdmin.value) {
+      const raceSlugs = managedRaces.value.map((r) => r.slug)
+      if (raceSlugs.length > 0) {
+        query = query.in("race_slug", raceSlugs)
+      } else {
+        // No races, so no surveys
+        surveys.value = []
+        loading.value = false
+        return
+      }
+    }
+
+    const { data, error } = await query
 
     if (error) throw error
     surveys.value = data || []
@@ -406,10 +450,17 @@ const manageQuestions = (survey) => {
   navigateTo(`/surveys/${survey.id}/questions`)
 }
 
-// Fetch surveys on mount
-onMounted(() => {
-  fetchSurveys()
-})
+// Wait for user profile to load before fetching surveys
+watch(
+  currentUserProfile,
+  (profile) => {
+    if (profile) {
+      console.log("User profile loaded, fetching surveys...")
+      fetchSurveys()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="scss" scoped>
