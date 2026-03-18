@@ -2,10 +2,10 @@
   <div class="manage-surveys">
     <div class="mb-4 flex justify-between items-center">
       <Button
+        v-if="isSuperAdmin"
         label="Create New Survey"
         icon="pi pi-plus"
         @click="openCreateDialog"
-        :disabled="!isSuperAdmin"
       />
     </div>
 
@@ -34,7 +34,7 @@
         <div class="flex justify-between">
           <InputText
             v-model="filters['global'].value"
-            placeholder="Search surveys..."
+            placeholder="Filter surveys by name..."
             class="w-full max-w-xs"
           />
         </div>
@@ -42,7 +42,7 @@
 
       <template #empty> No surveys found. </template>
 
-      <Column field="name" header="Survey Name" sortable style="min-width: 15rem">
+      <Column field="name" header="Name" sortable style="min-width: 15rem">
         <template #body="{ data }">
           <strong>{{ data.name }}</strong>
         </template>
@@ -64,7 +64,7 @@
 
       <Column field="race_slug" header="Race" sortable style="min-width: 12rem">
         <template #body="{ data }">
-          {{ data.race_slug }}
+          {{ getRaceName(data.race_slug) }}
         </template>
       </Column>
 
@@ -198,6 +198,7 @@ const user = useSupabaseUser()
 
 const surveys = ref([])
 const managedRaces = ref([])
+const allRaces = ref([]) // Store all races for name lookup
 const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(false)
@@ -279,6 +280,25 @@ const isElectionManager = computed(
   () => currentUserProfile.value?.role === "election_manager"
 )
 
+// Get race name from slug
+const getRaceName = (raceSlug) => {
+  if (!raceSlug) return "N/A"
+  const race = allRaces.value.find((r) => r.slug === raceSlug)
+  return race ? race.name : raceSlug
+}
+
+// Fetch all races for name lookup
+const fetchAllRaces = async () => {
+  try {
+    const { data, error } = await client.from("races").select("slug, name")
+
+    if (error) throw error
+    allRaces.value = data || []
+  } catch (error) {
+    console.error("Error fetching all races:", error)
+  }
+}
+
 // Fetch races managed by the election manager
 const fetchManagedRaces = async () => {
   if (!isElectionManager.value || isSuperAdmin.value) return
@@ -302,6 +322,9 @@ const fetchSurveys = async () => {
   errorMessage.value = ""
 
   try {
+    // Fetch all races for name lookup
+    await fetchAllRaces()
+
     // First, fetch managed races if election manager
     if (isElectionManager.value && !isSuperAdmin.value) {
       await fetchManagedRaces()
