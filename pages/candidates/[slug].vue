@@ -46,7 +46,7 @@ watch(slug, () => {
 
     <h1 class="mb-6">Manage Candidates</h1>
     <p>
-      <NuxtLink to="/races">All Races</NuxtLink>
+      <NuxtLink to="/elections">All Elections</NuxtLink>
       <span v-if="currentRace"> | {{ currentRace.name }}</span>
     </p>
     <Divider class="my-7" />

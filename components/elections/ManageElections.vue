@@ -9,12 +9,12 @@
     </Message>
 
     <div class="grid grid-cols-2 item-center gap-4 mb-6">
-      <InputText v-model="filters.global.value" placeholder="Search races..." />
+      <InputText v-model="filters.global.value" placeholder="Search elections..." />
       <div class="text-right">
         <Button
           v-if="isSuperAdmin"
           class="w-fit"
-          label="Add Race"
+          label="Add New Election"
           icon="pi pi-plus"
           @click="openDialog()"
         />
@@ -33,7 +33,7 @@
       :globalFilterFields="['name', 'state', 'city', 'type']"
       class="p-datatable-sm"
     >
-      <Column field="name" header="Race Name" sortable>
+      <Column field="name" header="Name" sortable>
         <template #body="{ data }">
           <div class="flex items-center gap-2">
             <Tag v-if="data.draft" severity="warning" value="Draft" />
@@ -155,7 +155,7 @@
 
       <template #empty>
         <div class="text-center py-8">
-          No races found. Click "Add New Race" to create one.
+          No elections found. Click "Add New Election" to create one.
         </div>
       </template>
     </DataTable>
@@ -163,14 +163,14 @@
     <!-- Create/Edit Dialog -->
     <Dialog
       v-model:visible="dialogVisible"
-      :header="editingRace ? 'Edit Race' : 'Add New Race'"
+      :header="editingRace ? 'Edit Election' : 'Add New Election'"
       :modal="true"
       :style="{ width: '50vw' }"
       :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
     >
       <form @submit.prevent="saveRace" class="flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <label for="name" class="font-semibold required">Race Name</label>
+          <label for="name" class="font-semibold required">Election Name</label>
           <InputText
             id="name"
             v-model="formData.name"
@@ -185,7 +185,7 @@
             id="type"
             v-model="formData.type"
             :options="raceTypes"
-            placeholder="Select race type"
+            placeholder="Select election type"
             class="w-full"
           />
         </div>
@@ -243,7 +243,7 @@
             id="description"
             v-model="formData.description"
             rows="4"
-            placeholder="Brief description of the race"
+            placeholder="Brief description of the election"
           />
         </div>
 
@@ -648,10 +648,5 @@ onMounted(async () => {
 <style scoped>
 .manage-races {
   padding: 1rem;
-}
-
-label.required::after {
-  content: " *";
-  color: var(--red);
 }
 </style>

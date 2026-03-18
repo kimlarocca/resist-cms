@@ -18,17 +18,19 @@ const currentUserProfile = useCurrentUserProfile()
       <div
         v-if="
           currentUserProfile?.role === 'super_admin' ||
-          currentUserProfile?.role === 'race_admin'
+          currentUserProfile?.role === 'election_manager'
         "
         class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
-        @click="$router.push('/races')"
+        @click="$router.push('/elections')"
       >
         <div>
-          <Tag value="Race Admin" class="mb-3 w-fit mx-auto" />
-          <h2 class="mb-3">Races</h2>
-          <p class="mb-5">Manage races including adding, updating, and deleting races.</p>
+          <Tag value="Election Managers" class="mb-3 w-fit mx-auto" />
+          <h2 class="mb-3">Elections</h2>
+          <p class="mb-5">
+            Manage elections including adding, updating, and deleting elections.
+          </p>
         </div>
-        <Button label="Manage Races" class="w-fit" />
+        <Button label="Manage Elections" class="w-fit" />
       </div>
       <div
         v-if="currentUserProfile?.role === 'super_admin'"
