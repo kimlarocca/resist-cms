@@ -9,7 +9,10 @@
     </Message>
 
     <div class="grid grid-cols-2 item-center gap-4 mb-6">
-      <InputText v-model="filters.global.value" placeholder="Search elections..." />
+      <InputText
+        v-model="filters.global.value"
+        placeholder="Filter elections by name..."
+      />
       <div class="text-right">
         <Button
           v-if="isSuperAdmin"
@@ -21,8 +24,152 @@
       </div>
     </div>
 
+    <!-- Upcoming Elections -->
+    <h2 class="text-xl font-semibold mb-4">Upcoming Elections</h2>
     <DataTable
-      :value="races"
+      :value="upcomingRaces"
+      :loading="loading"
+      paginator
+      :rows="10"
+      :rowsPerPageOptions="[10, 25, 50]"
+      stripedRows
+      v-model:filters="filters"
+      filterDisplay="menu"
+      :globalFilterFields="['name', 'state', 'city', 'type']"
+      class="p-datatable-sm mb-8"
+    >
+      <Column field="name" header="Name" sortable>
+        <template #body="{ data }">
+          <div class="flex items-center gap-2">
+            <Tag v-if="data.draft" severity="warning" value="Draft" />
+            {{ data.name }}
+          </div>
+        </template>
+      </Column>
+
+      <Column field="type" header="Type" sortable />
+
+      <Column field="state" header="State" sortable />
+
+      <Column field="district" header="District" sortable />
+
+      <Column field="primary_date" header="Primary Date" sortable>
+        <template #body="{ data }">
+          {{
+            data.primary_date ? new Date(data.primary_date).toLocaleDateString() : "N/A"
+          }}
+        </template>
+      </Column>
+
+      <Column field="election_date" header="Election Date" sortable>
+        <template #body="{ data }">
+          {{
+            data.election_date ? new Date(data.election_date).toLocaleDateString() : "N/A"
+          }}
+        </template>
+      </Column>
+
+      <Column v-if="isSuperAdmin" style="width: 15rem">
+        <template #body="{ data }">
+          <div class="flex gap-2">
+            <NuxtLink
+              :to="`https://votebyvalues.com/race/${data.slug}`"
+              target="_blank"
+              rel="noopener"
+            >
+              <Button
+                icon="pi pi-eye"
+                severity="secondary"
+                size="small"
+                v-tooltip.bottom="'View on Site'"
+            /></NuxtLink>
+            <Button
+              icon="pi pi-users"
+              severity="secondary"
+              size="small"
+              @click="manageCandidates(data)"
+              v-tooltip.bottom="'Manage Candidates'"
+            />
+            <Button
+              icon="pi pi-link"
+              severity="secondary"
+              size="small"
+              @click="manageKeyLinks(data)"
+              v-tooltip.bottom="'Manage Key Links'"
+            />
+            <Button
+              icon="pi pi-chart-bar"
+              severity="success"
+              size="small"
+              @click="manageSurvey(data)"
+              v-tooltip.bottom="'Manage Survey'"
+            />
+            <Button
+              icon="pi pi-pencil"
+              severity="info"
+              size="small"
+              @click="openDialog(data)"
+              v-tooltip.bottom="'Edit'"
+            />
+            <Button
+              icon="pi pi-trash"
+              severity="danger"
+              size="small"
+              @click="confirmDelete(data)"
+              v-tooltip.bottom="'Delete'"
+            />
+          </div>
+        </template>
+      </Column>
+
+      <Column v-else-if="isRaceAdmin" style="width: 15rem">
+        <template #body="{ data }">
+          <div class="flex gap-2">
+            <Button
+              icon="pi pi-users"
+              severity="secondary"
+              size="small"
+              @click="manageCandidates(data)"
+              v-tooltip.bottom="'Manage Candidates'"
+            />
+            <Button
+              icon="pi pi-link"
+              severity="secondary"
+              size="small"
+              @click="manageKeyLinks(data)"
+              v-tooltip.bottom="'Manage Key Links'"
+            />
+            <Button
+              icon="pi pi-chart-bar"
+              severity="success"
+              size="small"
+              @click="manageSurvey(data)"
+              v-tooltip.bottom="'Manage Survey'"
+            />
+            <NuxtLink
+              :to="`https://votebyvalues.com/race/${data.slug}`"
+              target="_blank"
+              rel="noopener"
+            >
+              <Button
+                icon="pi pi-eye"
+                severity="secondary"
+                size="small"
+                v-tooltip.bottom="'View on Site'"
+            /></NuxtLink>
+          </div>
+        </template>
+      </Column>
+
+      <template #empty>
+        <div class="text-center py-8">No upcoming elections found.</div>
+      </template>
+    </DataTable>
+
+    <!-- Past Elections -->
+    <h2 class="text-xl font-semibold mb-4 mt-12">Past Elections</h2>
+    <DataTable
+      :value="pastRaces"
       :loading="loading"
       paginator
       :rows="10"
@@ -46,9 +193,15 @@
 
       <Column field="state" header="State" sortable />
 
-      <Column field="city" header="City" sortable />
-
       <Column field="district" header="District" sortable />
+
+      <Column field="primary_date" header="Primary Date" sortable>
+        <template #body="{ data }">
+          {{
+            data.primary_date ? new Date(data.primary_date).toLocaleDateString() : "N/A"
+          }}
+        </template>
+      </Column>
 
       <Column field="election_date" header="Election Date" sortable>
         <template #body="{ data }">
@@ -158,9 +311,7 @@
       </Column>
 
       <template #empty>
-        <div class="text-center py-8">
-          No elections found. Click "Add New Election" to create one.
-        </div>
+        <div class="text-center py-8">No past elections found.</div>
       </template>
     </DataTable>
 
@@ -396,6 +547,64 @@ const formData = ref({
 // Check if user is super admin
 const isSuperAdmin = computed(() => currentUserProfile.value?.role === "super_admin")
 const isRaceAdmin = computed(() => currentUserProfile.value?.role === "election_manager")
+
+// Split races into upcoming and past
+const upcomingRaces = computed(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  return races.value
+    .filter((race) => {
+      const primaryDate = race.primary_date ? new Date(race.primary_date) : null
+      const electionDate = race.election_date ? new Date(race.election_date) : null
+
+      // Include if either date is today or in the future
+      if (primaryDate && primaryDate >= today) return true
+      if (electionDate && electionDate >= today) return true
+      return false
+    })
+    .sort((a, b) => {
+      // Get the earliest upcoming date for each race
+      const getPrimaryOrElectionDate = (race) => {
+        const primaryDate = race.primary_date ? new Date(race.primary_date) : null
+        const electionDate = race.election_date ? new Date(race.election_date) : null
+
+        // Return the earliest date that's still upcoming
+        if (primaryDate && primaryDate >= today) {
+          if (electionDate && electionDate >= today) {
+            return primaryDate < electionDate ? primaryDate : electionDate
+          }
+          return primaryDate
+        }
+        return electionDate
+      }
+
+      const dateA = getPrimaryOrElectionDate(a)
+      const dateB = getPrimaryOrElectionDate(b)
+
+      // Sort by soonest date first (ascending)
+      if (!dateA && !dateB) return 0
+      if (!dateA) return 1
+      if (!dateB) return -1
+      return dateA - dateB
+    })
+})
+
+const pastRaces = computed(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  return races.value.filter((race) => {
+    const primaryDate = race.primary_date ? new Date(race.primary_date) : null
+    const electionDate = race.election_date ? new Date(race.election_date) : null
+
+    // Include only if both dates are in the past (or null)
+    const primaryInPast = !primaryDate || primaryDate < today
+    const electionInPast = !electionDate || electionDate < today
+
+    return primaryInPast && electionInPast && (primaryDate || electionDate)
+  })
+})
 
 // Check if user can edit a specific race
 const canEditRace = (race) => {

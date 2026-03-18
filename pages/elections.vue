@@ -8,10 +8,10 @@ definePageMeta({
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Manage Elections</Title>
+        <Title>Resist CMS | My Elections</Title>
       </Head>
     </Html>
-    <h1>Manage Elections</h1>
+    <h1>My Elections</h1>
     <Divider class="my-7" />
     <ElectionsManageElections />
   </div>
