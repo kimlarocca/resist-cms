@@ -131,6 +131,20 @@ const currentUserProfile = useCurrentUserProfile()
         </div>
         <Button label="Manage Content" class="w-fit p-button-sm" />
       </div>
+      <div
+        v-if="currentUserProfile?.website_id"
+        class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
+        @click="$router.push(`/websites/${currentUserProfile.website_id}/manage-signup-form`)"
+      >
+        <div>
+          <i class="pi pi-file-edit text-2xl mb-2" />
+          <h2 class="mb-3">Signup Form</h2>
+          <p class="mb-5">
+            Manage your signup form questions, field types, and display order.
+          </p>
+        </div>
+        <Button label="Manage Signup Form" class="w-fit p-button-sm" />
+      </div>
     </div>
   </div>
 </template>
