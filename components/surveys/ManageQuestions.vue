@@ -38,6 +38,7 @@
       :globalFilterFields="['title', 'question_type']"
       sortMode="multiple"
       tableStyle="min-width: 50rem"
+      @rowReorder="onRowReorder"
     >
       <template #header>
         <div class="flex justify-between">
@@ -51,6 +52,7 @@
 
       <template #empty> No questions found for this survey. </template>
 
+      <Column rowReorder style="width: 3rem" />
       <Column field="sort_order" header="Order" sortable style="width: 6rem">
         <template #body="{ data }">
           {{ data.sort_order }}
@@ -496,6 +498,31 @@ const saveQuestion = async () => {
     errorMessage.value = `Failed to save question: ${error.message}`
   } finally {
     saving.value = false
+  }
+}
+
+// Handle row reorder via drag and drop
+const onRowReorder = async (event) => {
+  questions.value = event.value
+
+  const updates = questions.value.map((q, index) => ({
+    ...q,
+    sort_order: index + 1,
+  }))
+  questions.value = updates
+
+  try {
+    for (const q of updates) {
+      const { error } = await client
+        .from("survey-questions")
+        .update({ sort_order: q.sort_order })
+        .eq("id", q.id)
+      if (error) throw error
+    }
+  } catch (error) {
+    console.error("Error saving reorder:", error)
+    errorMessage.value = "Failed to save new order."
+    await fetchQuestions()
   }
 }
 
