@@ -62,40 +62,6 @@ const manageSignupForm = (websiteId) => {
   router.push(`/groups/${websiteId}/manage-signup-form`)
 }
 
-// Delete website (super admin only)
-const deleteDialogVisible = ref(false)
-const websiteToDelete = ref(null)
-
-const confirmDeleteWebsite = (website) => {
-  websiteToDelete.value = website
-  deleteDialogVisible.value = true
-}
-
-const deleteWebsite = async () => {
-  if (!websiteToDelete.value) return
-
-  try {
-    const { error } = await supabase
-      .from("websites")
-      .delete()
-      .eq("id", websiteToDelete.value.id)
-
-    if (error) throw error
-
-    await fetchUserWebsites()
-  } catch (error) {
-    console.error("Error deleting website:", error)
-  } finally {
-    deleteDialogVisible.value = false
-    websiteToDelete.value = null
-  }
-}
-
-// Check if user is super admin
-const isSuperAdmin = computed(() => {
-  return currentUserProfile.value?.role === "super_admin"
-})
-
 // Watch for currentUserProfile to become available
 watch(
   () => currentUserProfile.value?.id,
@@ -210,96 +176,74 @@ onMounted(() => {
     </div>
 
     <!-- My Groups/Websites -->
-    <div v-if="userWebsites.length > 0 || loadingWebsites" class="mb-16">
-      <h2 class="mb-6">My Groups</h2>
-
+    <div v-if="userWebsites.length > 0 || loadingWebsites">
       <div v-if="loadingWebsites" class="flex justify-center py-8">
         <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="4" />
       </div>
 
-      <DataTable v-else :value="userWebsites" stripedRows class="p-datatable-sm">
-        <Column field="title" header="Title" sortable>
-          <template #body="{ data }">
-            {{ data.title || "Untitled" }}
-          </template>
-        </Column>
+      <div v-else>
+        <div v-for="website in userWebsites" :key="website.id" class="mb-12">
+          <h2 class="mb-3">{{ website.title || "Untitled" }}</h2>
+          <div class="mb-6">
+            <p v-if="website.url" class="mb-1">
+              <a
+                :href="website.url"
+                target="_blank"
+                class="text-blue-600 hover:underline"
+              >
+                {{ website.url }}
+              </a>
+            </p>
+            <p v-if="website.email">Email Address: {{ website.email }}</p>
+          </div>
 
-        <Column field="url" header="URL" sortable>
-          <template #body="{ data }">
-            <a
-              v-if="data.url"
-              :href="data.url"
-              target="_blank"
-              class="text-blue-600 hover:underline"
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+            <div
+              class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
+              @click="editGroupSettings(website.id)"
             >
-              {{ data.url }}
-            </a>
-          </template>
-        </Column>
-
-        <Column field="email" header="Email">
-          <template #body="{ data }">
-            {{ data.email }}
-          </template>
-        </Column>
-
-        <Column header="Actions" style="width: 300px">
-          <template #body="{ data }">
-            <div class="flex gap-2 flex-wrap">
-              <Button
-                icon="pi pi-cog"
-                severity="info"
-                size="small"
-                @click="editGroupSettings(data.id)"
-                v-tooltip.top="'Edit Group Settings'"
-              />
-              <Button
-                icon="pi pi-book"
-                severity="secondary"
-                size="small"
-                @click="manageContent(data.id)"
-                v-tooltip.top="'Manage Content'"
-              />
-              <Button
-                icon="pi pi-file-edit"
-                severity="secondary"
-                size="small"
-                @click="manageSignupForm(data.id)"
-                v-tooltip.top="'Manage Signup Form'"
-              />
-              <Button
-                v-if="isSuperAdmin"
-                icon="pi pi-trash"
-                severity="danger"
-                size="small"
-                @click="confirmDeleteWebsite(data)"
-                v-tooltip.top="'Delete'"
-              />
+              <div>
+                <i class="pi pi-cog text-2xl mb-2" />
+                <h3 class="mb-3">Group Settings</h3>
+                <p class="mb-5">
+                  Manage your group's settings including contact information, logo, social
+                  media, and more.
+                </p>
+              </div>
+              <Button label="Manage Settings" class="w-fit p-button-sm" />
             </div>
-          </template>
-        </Column>
-      </DataTable>
-    </div>
 
-    <!-- Delete Confirmation Dialog -->
-    <Dialog
-      v-model:visible="deleteDialogVisible"
-      :style="{ width: '450px' }"
-      header="Confirm Delete"
-      :modal="true"
-    >
-      <div class="flex items-center gap-3">
-        <i class="pi pi-exclamation-triangle text-3xl text-red-500"></i>
-        <span>
-          Are you sure you want to delete
-          <strong>{{ websiteToDelete?.title || websiteToDelete?.url }}</strong
-          >?
-        </span>
+            <div
+              class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
+              @click="manageContent(website.id)"
+            >
+              <div>
+                <i class="pi pi-book text-2xl mb-2" />
+                <h3 class="mb-3">Website Content</h3>
+                <p class="mb-5">
+                  Manage your group's website content including text and images.
+                </p>
+              </div>
+              <Button label="Manage Content" class="w-fit p-button-sm" />
+            </div>
+
+            <div
+              class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
+              @click="manageSignupForm(website.id)"
+            >
+              <div>
+                <i class="pi pi-file-edit text-2xl mb-2" />
+                <h3 class="mb-3">Signup Form</h3>
+                <p class="mb-5">
+                  Manage your group's signup form introduction, questions, and display
+                  order.
+                </p>
+              </div>
+              <Button label="Manage Signup Form" class="w-fit p-button-sm" />
+            </div>
+          </div>
+        </div>
       </div>
-      <template #footer>
-        <Button label="Cancel" @click="deleteDialogVisible = false" text />
-        <Button label="Delete" @click="deleteWebsite" severity="danger" />
-      </template>
-    </Dialog>
+    </div>
   </div>
 </template>
