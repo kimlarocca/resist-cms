@@ -22,9 +22,17 @@
         <label for="type">Type</label>
       </FloatLabel>
       <FloatLabel variant="on" class="mb-6">
-        <InputText id="slug" v-model="slug" @change="updateWebsite" />
+        <InputText
+          id="slug"
+          v-model="slug"
+          @blur="validateSlug"
+          :class="{ 'p-invalid': slugError }"
+        />
         <label for="slug">Slug</label>
       </FloatLabel>
+      <small v-if="slugError" class="text-red-500 block -mt-4 mb-4">{{
+        slugError
+      }}</small>
       <FloatLabel variant="on">
         <Select
           class="w-full"
@@ -233,7 +241,13 @@
       <SimpleEditor id="terms" v-model="terms" rows="4" class="mb-4" />
     </div>
 
-    <Button label="Save Changes" icon="pi pi-check" class="mt-4" @click="updateWebsite" />
+    <Button
+      label="Save Changes"
+      icon="pi pi-check"
+      class="mt-4"
+      @click="updateWebsite"
+      :disabled="!!slugError"
+    />
 
     <div class="changes-saved-toast">
       <Message
@@ -276,6 +290,7 @@ const instagramError = ref(null)
 const youtubeError = ref(null)
 const threadsError = ref(null)
 const linktreeError = ref(null)
+const slugError = ref(null)
 
 // Check if user is super_admin
 const isSuperAdmin = computed(() => {
@@ -316,6 +331,39 @@ const product = ref(null)
 const effectiveWebsiteId = computed(() => {
   return props.websiteId || currentUserProfile.value?.website_id
 })
+
+// Check if slug already exists
+const checkSlugExists = async (slug, excludeId = null) => {
+  const query = supabase.from("websites").select("id").eq("slug", slug)
+
+  if (excludeId) {
+    query.neq("id", excludeId)
+  }
+
+  const { data, error } = await query
+
+  if (error) throw error
+  return data && data.length > 0
+}
+
+// Validate slug on blur
+const validateSlug = async () => {
+  slugError.value = null
+
+  if (!slug.value || slug.value.trim() === "") {
+    return
+  }
+
+  try {
+    const exists = await checkSlugExists(slug.value, effectiveWebsiteId.value)
+
+    if (exists) {
+      slugError.value = "This slug is already in use. Please choose a different one."
+    }
+  } catch (error) {
+    console.error("Error validating slug:", error)
+  }
+}
 
 // Validate social media URLs
 const validateUrl = (field) => {
@@ -409,6 +457,25 @@ const updateWebsite = async () => {
     return
   }
 
+  // Prevent save if slug is invalid
+  if (slugError.value) {
+    return
+  }
+
+  // Validate slug uniqueness if super admin is updating it
+  if (isSuperAdmin.value && slug.value) {
+    try {
+      const slugExists = await checkSlugExists(slug.value, effectiveWebsiteId.value)
+      if (slugExists) {
+        slugError.value = "This slug is already in use. Please choose a different one."
+        return
+      }
+    } catch (error) {
+      console.error("Error checking slug:", error)
+      return
+    }
+  }
+
   successMessage.value = false
 
   const updateData = {
@@ -449,6 +516,16 @@ const updateWebsite = async () => {
     }, 3000)
   }
 }
+
+// Clear slug error when user modifies the slug
+watch(
+  () => slug.value,
+  () => {
+    if (slugError.value) {
+      slugError.value = null
+    }
+  }
+)
 
 // Watch for changes in websiteId prop and refetch
 watch(
