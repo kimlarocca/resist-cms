@@ -386,8 +386,15 @@
 
         <div class="flex flex-col gap-2">
           <label for="slug" class="font-semibold">Slug</label>
-          <InputText id="slug" v-model="formData.slug" placeholder="e.g., ca-house-5" />
-          <small class="text-gray-500"
+          <InputText
+            id="slug"
+            v-model="formData.slug"
+            placeholder="e.g., ca-house-5"
+            @blur="validateSlug"
+            :class="{ 'p-invalid': slugError }"
+          />
+          <small v-if="slugError" class="text-red-500">{{ slugError }}</small>
+          <small v-else class="text-gray-500"
             >URL-friendly identifier (auto-generated from name if left blank)</small
           >
         </div>
@@ -418,6 +425,7 @@
             :label="editingRace ? 'Update' : 'Create'"
             type="submit"
             :loading="saving"
+            :disabled="!!slugError"
           />
         </div>
       </form>
@@ -467,6 +475,7 @@ const saving = ref(false)
 const deleting = ref(false)
 const errorMessage = ref("")
 const successMessage = ref("")
+const slugError = ref("")
 
 const dialogVisible = ref(false)
 const deleteDialogVisible = ref(false)
@@ -650,6 +659,8 @@ const generateSlug = (name) => {
 
 // Open dialog for create or edit
 const openDialog = (race = null) => {
+  slugError.value = "" // Clear any previous slug error
+
   if (race) {
     // Check if user has permission to edit this race
     if (!canEditRace(race)) {
@@ -688,6 +699,39 @@ const openDialog = (race = null) => {
   errorMessage.value = ""
 }
 
+// Check if slug already exists
+const checkSlugExists = async (slug, excludeId = null) => {
+  const query = client.from("races").select("id").eq("slug", slug)
+
+  if (excludeId) {
+    query.neq("id", excludeId)
+  }
+
+  const { data, error } = await query
+
+  if (error) throw error
+  return data && data.length > 0
+}
+
+// Validate slug on blur
+const validateSlug = async () => {
+  slugError.value = ""
+
+  if (!formData.value.slug || formData.value.slug.trim() === "") {
+    return
+  }
+
+  try {
+    const exists = await checkSlugExists(formData.value.slug, editingRace.value?.id)
+
+    if (exists) {
+      slugError.value = "This slug is already in use. Please choose a different one."
+    }
+  } catch (error) {
+    console.error("Error validating slug:", error)
+  }
+}
+
 // Save race (create or update)
 const saveRace = async () => {
   saving.value = true
@@ -698,6 +742,17 @@ const saveRace = async () => {
     // Auto-generate slug if not provided
     if (!formData.value.slug && formData.value.name) {
       formData.value.slug = generateSlug(formData.value.name)
+    }
+
+    // Validate slug uniqueness
+    if (formData.value.slug) {
+      const slugExists = await checkSlugExists(formData.value.slug, editingRace.value?.id)
+
+      if (slugExists) {
+        errorMessage.value = `The slug "${formData.value.slug}" is already in use. Please choose a different slug.`
+        saving.value = false
+        return
+      }
     }
 
     const raceData = {
@@ -851,6 +906,16 @@ const deleteRace = async () => {
     deleting.value = false
   }
 }
+
+// Clear slug error when user modifies the slug
+watch(
+  () => formData.value.slug,
+  () => {
+    if (slugError.value) {
+      slugError.value = ""
+    }
+  }
+)
 
 // Load races on mount
 onMounted(async () => {
