@@ -17,6 +17,6 @@ const websiteId = computed(() => route.params.id)
     </Html>
     <h1 class="mb-6">Manage Your Group Settings</h1>
     <Divider class="my-7" />
-    <WebsitesManageWebsite :website-id="websiteId" />
+    <GroupsManageGroup :website-id="websiteId" />
   </div>
 </template>

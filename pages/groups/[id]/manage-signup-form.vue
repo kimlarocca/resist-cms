@@ -13,11 +13,11 @@ const websiteId = computed(() => route.params.id)
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Manage Your Signup Form</Title>
+        <Title>Resist CMS | Manage Your Group's Signup Form</Title>
       </Head>
     </Html>
-    <h1>Manage Your Signup Form</h1>
+    <h1>Manage Your Group's Signup Form</h1>
     <Divider class="my-7" />
-    <WebsitesManageSignupForm :website-id="websiteId" />
+    <GroupsManageSignupForm :website-id="websiteId" />
   </div>
 </template>

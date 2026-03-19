@@ -88,7 +88,7 @@ onMounted(() => {
 
       <!-- Visibility Brigade Content -->
       <div v-if="website.type === 'visibility-brigade' && visibilityBrigadeContentId">
-        <WebsitesManageVisibilityBrigade :content-id="visibilityBrigadeContentId" />
+        <GroupsManageVisibilityBrigade :content-id="visibilityBrigadeContentId" />
       </div>
 
       <!-- No type assigned -->
