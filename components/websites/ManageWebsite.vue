@@ -7,6 +7,77 @@
     />
   </div>
   <div v-else-if="website">
+    <!-- User Management - super_admin only -->
+    <div v-if="isSuperAdmin" class="border-blue p-4 mb-6">
+      <Tag value="Super Admin" class="mb-6 w-fit" />
+      <h3 class="text-lg font-bold mb-4">Manage User Access</h3>
+
+      <Message
+        v-if="userManagementError"
+        severity="error"
+        class="mb-4"
+        @close="userManagementError = ''"
+      >
+        {{ userManagementError }}
+      </Message>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-2">Add User to Website</label>
+        <div class="flex gap-2">
+          <Select
+            v-model="selectedUser"
+            :options="availableUsers"
+            optionLabel="displayName"
+            optionValue="id"
+            placeholder="Select a user"
+            filter
+            class="w-full"
+            :loading="loadingProfiles"
+          />
+          <Button
+            icon="pi pi-plus"
+            label="Add"
+            @click="addUserToWebsite"
+            :disabled="!selectedUser || addingUser"
+            :loading="addingUser"
+          />
+        </div>
+      </div>
+
+      <div v-if="loadingAssignments" class="flex justify-center py-4">
+        <ProgressSpinner style="width: 30px; height: 30px" />
+      </div>
+
+      <div v-else-if="assignedUsers.length > 0">
+        <label class="block text-sm font-medium mb-2">Users with Access</label>
+        <DataTable :value="assignedUsers" class="p-datatable-sm">
+          <Column field="full_name" header="Name" />
+          <Column field="role" header="Role">
+            <template #body="{ data }">
+              <Tag
+                :value="data.role"
+                :severity="data.role === 'super_admin' ? 'danger' : 'info'"
+              />
+            </template>
+          </Column>
+          <Column style="width: 5rem">
+            <template #body="{ data }">
+              <Button
+                icon="pi pi-trash"
+                severity="danger"
+                size="small"
+                text
+                @click="confirmRemoveUser(data)"
+                v-tooltip.top="'Remove Access'"
+              />
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+      <div v-else>
+        <p class="text-sm text-gray-500">No users assigned to this website yet.</p>
+      </div>
+    </div>
     <h3 class="text-lg font-bold mt-6 mb-4">Basic Information</h3>
     <!-- Type field - editable for super_admin only -->
     <div v-if="isSuperAdmin" class="border-blue p-4 mb-6">
@@ -260,6 +331,36 @@
         Your changes have been saved.
       </Message>
     </div>
+
+    <!-- Confirm Remove User Dialog -->
+    <Dialog
+      v-model:visible="removeUserDialogVisible"
+      header="Confirm Remove User"
+      :modal="true"
+      :style="{ width: '450px' }"
+    >
+      <div class="flex items-center gap-3">
+        <i class="pi pi-exclamation-triangle text-red-500" style="font-size: 2rem"></i>
+        <span>
+          Are you sure you want to remove
+          <strong>{{ userToRemove?.full_name || userToRemove?.email }}</strong> from this
+          website? They will no longer be able to manage it.
+        </span>
+      </div>
+      <template #footer>
+        <Button
+          label="Cancel"
+          severity="secondary"
+          @click="removeUserDialogVisible = false"
+        />
+        <Button
+          label="Remove"
+          severity="danger"
+          @click="removeUserFromWebsite"
+          :loading="removingUser"
+        />
+      </template>
+    </Dialog>
   </div>
   <div v-else-if="!loading">
     <p class="text-sm">No website associated with your account.</p>
@@ -281,6 +382,7 @@ const supabase = useSupabaseClient()
 const website = ref(null)
 const loading = ref(true)
 const successMessage = ref(false)
+const userManagementError = ref("")
 
 // Error states for URL validation
 const tiktokError = ref(null)
@@ -291,6 +393,17 @@ const youtubeError = ref(null)
 const threadsError = ref(null)
 const linktreeError = ref(null)
 const slugError = ref(null)
+
+// User management refs
+const assignedUsers = ref([])
+const allProfiles = ref([])
+const selectedUser = ref(null)
+const loadingAssignments = ref(false)
+const loadingProfiles = ref(false)
+const addingUser = ref(false)
+const removingUser = ref(false)
+const userToRemove = ref(null)
+const removeUserDialogVisible = ref(false)
 
 // Check if user is super_admin
 const isSuperAdmin = computed(() => {
@@ -330,6 +443,18 @@ const product = ref(null)
 // Compute the effective website ID to use
 const effectiveWebsiteId = computed(() => {
   return props.websiteId || currentUserProfile.value?.website_id
+})
+
+// Filter out users who are already assigned
+const availableUsers = computed(() => {
+  const assignedIds = assignedUsers.value.map((u) => u.id)
+  const available = allProfiles.value
+    .filter((profile) => !assignedIds.includes(profile.id))
+    .map((profile) => ({
+      id: profile.id,
+      displayName: profile.full_name || "No Name",
+    }))
+  return available
 })
 
 // Check if slug already exists
@@ -527,12 +652,152 @@ watch(
   }
 )
 
+// Fetch users assigned to this website
+const fetchAssignedUsers = async () => {
+  if (!effectiveWebsiteId.value) return
+
+  loadingAssignments.value = true
+
+  try {
+    const { data, error } = await supabase
+      .from("websites_users")
+      .select(
+        `
+        user_id,
+        profiles:user_id (
+          id,
+          full_name,
+          role
+        )
+      `
+      )
+      .eq("website_id", effectiveWebsiteId.value)
+
+    if (error) throw error
+
+    assignedUsers.value =
+      data?.map((item) => ({
+        id: item.profiles.id,
+        full_name: item.profiles.full_name,
+        role: item.profiles.role,
+      })) || []
+  } catch (error) {
+    console.error("Error fetching assigned users:", error)
+  } finally {
+    loadingAssignments.value = false
+  }
+}
+
+// Fetch all profiles for user selection
+const fetchAllProfiles = async () => {
+  loadingProfiles.value = true
+
+  try {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, full_name, role")
+      .order("full_name", { ascending: true })
+
+    if (error) throw error
+
+    allProfiles.value = data || []
+  } catch (error) {
+    console.error("Error fetching profiles:", error)
+  } finally {
+    loadingProfiles.value = false
+  }
+}
+
+// Add user to website
+const addUserToWebsite = async () => {
+  if (!selectedUser.value || !effectiveWebsiteId.value) return
+
+  addingUser.value = true
+  userManagementError.value = ""
+
+  try {
+    const { error } = await supabase.from("websites_users").insert({
+      website_id: effectiveWebsiteId.value,
+      user_id: selectedUser.value,
+    })
+
+    if (error) throw error
+
+    successMessage.value = true
+    setTimeout(() => {
+      successMessage.value = false
+    }, 3000)
+
+    selectedUser.value = null
+    await fetchAssignedUsers()
+  } catch (error) {
+    console.error("Error adding user to website:", error)
+    userManagementError.value =
+      error.message || "Failed to add user. They may already have access."
+  } finally {
+    addingUser.value = false
+  }
+}
+
+// Confirm remove user
+const confirmRemoveUser = (user) => {
+  userToRemove.value = user
+  removeUserDialogVisible.value = true
+}
+
+// Remove user from website
+const removeUserFromWebsite = async () => {
+  if (!userToRemove.value || !effectiveWebsiteId.value) return
+
+  removingUser.value = true
+  userManagementError.value = ""
+
+  try {
+    const { error } = await supabase
+      .from("websites_users")
+      .delete()
+      .eq("website_id", effectiveWebsiteId.value)
+      .eq("user_id", userToRemove.value.id)
+
+    if (error) throw error
+
+    successMessage.value = true
+    setTimeout(() => {
+      successMessage.value = false
+    }, 3000)
+
+    removeUserDialogVisible.value = false
+    await fetchAssignedUsers()
+  } catch (error) {
+    console.error("Error removing user from website:", error)
+    userManagementError.value = error.message || "Failed to remove user."
+    removeUserDialogVisible.value = false
+  } finally {
+    removingUser.value = false
+  }
+}
+
 // Watch for changes in websiteId prop and refetch
 watch(
   () => props.websiteId,
   () => {
     fetchWebsite()
+    if (isSuperAdmin.value) {
+      fetchAssignedUsers()
+    }
   }
+)
+
+// Watch for super admin status to load user management data
+watch(
+  [() => isSuperAdmin.value, () => effectiveWebsiteId.value],
+  ([isAdmin, websiteId]) => {
+    if (isAdmin && websiteId) {
+      fetchAllProfiles()
+      fetchAssignedUsers()
+    }
+  },
+  { immediate: true }
 )
 
 // Fetch website data on component mount

@@ -70,7 +70,7 @@ onMounted(() => {
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Manage Your Website Content</Title>
+        <Title>Resist CMS | Manage Your Group's Content</Title>
       </Head>
     </Html>
 
@@ -79,7 +79,7 @@ onMounted(() => {
     </div>
 
     <div v-else-if="website">
-      <h1 class="mb-6">Manage Your Website Content</h1>
+      <h1 class="mb-6">Manage Your Group's Content</h1>
 
       <NuxtLink :to="website.url" target="_blank">
         {{ website.url }}<i class="pi pi-external-link plain ml-2" />
@@ -94,7 +94,7 @@ onMounted(() => {
       <!-- No type assigned -->
       <div v-else-if="!website.type">
         <p class="text-sm">
-          No website type assigned. Please set a type in the website settings.
+          No group type assigned. Please set a type in the group settings.
         </p>
       </div>
 
