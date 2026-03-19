@@ -30,11 +30,27 @@
 
     <!-- Form Questions Management -->
     <div v-else>
+      <div class="mb-12">
+        <h2 class="mb-4">Introduction Text</h2>
+        <p class="mb-4">
+          This text is optional and, if entered, will appear at the top of your signup
+          form.
+        </p>
+        <SimpleEditor v-model="signupFormText" height="150px" />
+        <Button
+          label="Save Changes"
+          @click="saveIntroTextManually"
+          :loading="savingIntroText"
+          class="mt-3"
+        />
+      </div>
+
+      <h2 class="mb-4">Form Questions</h2>
       <div class="flex justify-between items-center mb-6">
         <p class="text-gray-600">
           Drag the ≡ handle to reorder rows, or edit the sort order number directly.
         </p>
-        <Button label="Add Question" icon="pi pi-plus" @click="openDialog()" />
+        <Button label="Add New Question" icon="pi pi-plus" @click="openDialog()" />
       </div>
 
       <DataTable
@@ -277,9 +293,11 @@ const loading = ref(true)
 const saving = ref(false)
 const deleting = ref(false)
 const activating = ref(false)
+const savingIntroText = ref(false)
 const formActivated = ref(false)
 const errorMessage = ref("")
 const successMessage = ref("")
+const signupFormText = ref("")
 
 const dialogVisible = ref(false)
 const deleteDialogVisible = ref(false)
@@ -775,9 +793,74 @@ const deleteQuestion = async () => {
   }
 }
 
+// Fetch signup form text from visibility-brigade-content table
+const fetchSignupFormText = async () => {
+  try {
+    const { data, error } = await client
+      .from("visibility-brigade-content")
+      .select("signup_form_text")
+      .eq("id", props.websiteId)
+      .single()
+
+    if (error) throw error
+    signupFormText.value = data?.signup_form_text || ""
+  } catch (error) {
+    console.error("Error fetching signup form text:", error)
+  }
+}
+
+// Save signup form text to visibility-brigade-content table
+let saveTimeout = null
+const saveSignupFormText = async () => {
+  try {
+    const { error } = await client
+      .from("visibility-brigade-content")
+      .update({ signup_form_text: signupFormText.value })
+      .eq("id", props.websiteId)
+
+    if (error) throw error
+  } catch (error) {
+    console.error("Error saving signup form text:", error)
+    errorMessage.value = "Failed to save introduction text."
+  }
+}
+
+// Manual save handler with user feedback
+const saveIntroTextManually = async () => {
+  savingIntroText.value = true
+  errorMessage.value = ""
+
+  try {
+    const { error } = await client
+      .from("visibility-brigade-content")
+      .update({ signup_form_text: signupFormText.value })
+      .eq("id", props.websiteId)
+
+    if (error) throw error
+
+    successMessage.value = "Introduction text saved successfully!"
+    setTimeout(() => {
+      successMessage.value = ""
+    }, 3000)
+  } catch (error) {
+    console.error("Error saving signup form text:", error)
+    errorMessage.value = "Failed to save introduction text."
+  } finally {
+    savingIntroText.value = false
+  }
+}
+
+// Debounced auto-save when text changes
+watch(signupFormText, () => {
+  if (!formActivated.value) return
+  clearTimeout(saveTimeout)
+  saveTimeout = setTimeout(saveSignupFormText, 1000)
+})
+
 // Load questions on mount
 onMounted(() => {
   fetchQuestions()
+  fetchSignupFormText()
 })
 </script>
 
