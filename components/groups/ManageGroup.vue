@@ -194,7 +194,7 @@
 
     <h3 class="text-lg font-bold mt-6 mb-4">Social Media Links</h3>
 
-    <div class="mb-4">
+    <div class="mb-4" v-if="tiktok || showAllSocial">
       <FloatLabel variant="on">
         <InputText
           id="tiktok"
@@ -207,9 +207,10 @@
         <label for="tiktok">TikTok</label>
       </FloatLabel>
       <small v-if="tiktokError" class="text-red">{{ tiktokError }}</small>
+      <small v-else class="text-gray-400">e.g. https://www.tiktok.com/@username</small>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-4" v-if="bluesky || showAllSocial">
       <FloatLabel variant="on">
         <InputText
           id="bluesky"
@@ -222,9 +223,10 @@
         <label for="bluesky">Bluesky</label>
       </FloatLabel>
       <small v-if="blueskyError" class="text-red">{{ blueskyError }}</small>
+      <small v-else class="text-gray-400">e.g. https://bsky.app/profile/username</small>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-4" v-if="facebook || showAllSocial">
       <FloatLabel variant="on">
         <InputText
           id="facebook"
@@ -237,9 +239,10 @@
         <label for="facebook">Facebook</label>
       </FloatLabel>
       <small v-if="facebookError" class="text-red">{{ facebookError }}</small>
+      <small v-else class="text-gray-400">e.g. https://www.facebook.com/username</small>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-4" v-if="instagram || showAllSocial">
       <FloatLabel variant="on">
         <InputText
           id="instagram"
@@ -252,9 +255,10 @@
         <label for="instagram">Instagram</label>
       </FloatLabel>
       <small v-if="instagramError" class="text-red">{{ instagramError }}</small>
+      <small v-else class="text-gray-400">e.g. https://www.instagram.com/username</small>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-4" v-if="youtube || showAllSocial">
       <FloatLabel variant="on">
         <InputText
           id="youtube"
@@ -267,9 +271,10 @@
         <label for="youtube">YouTube</label>
       </FloatLabel>
       <small v-if="youtubeError" class="text-red">{{ youtubeError }}</small>
+      <small v-else class="text-gray-400">e.g. https://www.youtube.com/@username</small>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-4" v-if="threads || showAllSocial">
       <FloatLabel variant="on">
         <InputText
           id="threads"
@@ -282,9 +287,10 @@
         <label for="threads">Threads</label>
       </FloatLabel>
       <small v-if="threadsError" class="text-red">{{ threadsError }}</small>
+      <small v-else class="text-gray-400">e.g. https://www.threads.net/@username</small>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-4" v-if="linktree || showAllSocial">
       <FloatLabel variant="on">
         <InputText
           id="linktree"
@@ -297,9 +303,49 @@
         <label for="linktree">Linktree</label>
       </FloatLabel>
       <small v-if="linktreeError" class="text-red">{{ linktreeError }}</small>
+      <small v-else class="text-gray-400">e.g. https://linktr.ee/username</small>
     </div>
 
-    <!-- URL field - editable for super_admin only -->
+    <div class="mb-4" v-if="twitter || showAllSocial">
+      <FloatLabel variant="on">
+        <InputText
+          id="twitter"
+          class="w-full"
+          v-model="twitter"
+          type="url"
+          :class="{ 'p-invalid': twitterError }"
+          @blur="validateUrl('twitter')"
+        />
+        <label for="twitter">X / Twitter</label>
+      </FloatLabel>
+      <small v-if="twitterError" class="text-red">{{ twitterError }}</small>
+      <small v-else class="text-gray-400">e.g. https://x.com/username</small>
+    </div>
+
+    <div class="mb-4" v-if="substack || showAllSocial">
+      <FloatLabel variant="on">
+        <InputText
+          id="substack"
+          class="w-full"
+          v-model="substack"
+          type="url"
+          :class="{ 'p-invalid': substackError }"
+          @blur="validateUrl('substack')"
+        />
+        <label for="substack">Substack</label>
+      </FloatLabel>
+      <small v-if="substackError" class="text-red">{{ substackError }}</small>
+      <small v-else class="text-gray-400">e.g. https://username.substack.com</small>
+    </div>
+
+    <Button
+      :label="showAllSocial ? 'Show Less' : 'Add More Social Networks'"
+      :icon="showAllSocial ? 'pi pi-chevron-up' : 'pi pi-plus'"
+      severity="secondary"
+      text
+      class="mb-4"
+      @click="showAllSocial = !showAllSocial"
+    />
     <div v-if="isPaidUser" class="border-blue p-4 my-6">
       <Tag value="Paid Users Only" class="mb-6 w-fit" />
       <h3 class="text-lg font-bold mb-4">Privacy Policy</h3>
@@ -308,15 +354,15 @@
       <h3 class="text-lg font-bold mt-6 mb-4">Terms &amp; Conditions</h3>
       <SimpleEditor id="terms" v-model="terms" rows="4" class="mb-4" />
     </div>
-
-    <Button
-      label="Save Changes"
-      icon="pi pi-check"
-      class="mt-4"
-      @click="updateWebsite"
-      :disabled="!!slugError"
-    />
-
+    <div>
+      <Button
+        label="Save Changes"
+        icon="pi pi-check"
+        class="mt-4"
+        @click="updateWebsite"
+        :disabled="!!slugError"
+      />
+    </div>
     <div class="changes-saved-toast">
       <Message
         v-if="successMessage"
@@ -389,6 +435,8 @@ const instagramError = ref(null)
 const youtubeError = ref(null)
 const threadsError = ref(null)
 const linktreeError = ref(null)
+const twitterError = ref(null)
+const substackError = ref(null)
 const slugError = ref(null)
 
 // User management refs
@@ -431,6 +479,9 @@ const instagram = ref(null)
 const youtube = ref(null)
 const threads = ref(null)
 const linktree = ref(null)
+const twitter = ref(null)
+const substack = ref(null)
+const showAllSocial = ref(false)
 const privacyPolicy = ref(null)
 const terms = ref(null)
 const logo = ref(null)
@@ -491,6 +542,43 @@ const validateSlug = async () => {
 }
 
 // Validate social media URLs
+const normalizeSocialUrl = (field) => {
+  const baseUrls = {
+    tiktok: { prefix: "https://www.tiktok.com/@", stripAt: true },
+    bluesky: { prefix: "https://bsky.app/profile/", stripAt: true },
+    facebook: { prefix: "https://www.facebook.com/", stripAt: false },
+    instagram: { prefix: "https://www.instagram.com/", stripAt: true },
+    youtube: { prefix: "https://www.youtube.com/@", stripAt: true },
+    threads: { prefix: "https://www.threads.net/@", stripAt: true },
+    linktree: { prefix: "https://linktr.ee/", stripAt: false },
+    twitter: { prefix: "https://x.com/", stripAt: true },
+    substack: null, // subdomain-based, can't auto-normalize
+  }
+
+  const valueMap = {
+    tiktok,
+    bluesky,
+    facebook,
+    instagram,
+    youtube,
+    threads,
+    linktree,
+    twitter,
+    substack,
+  }
+  const fieldRef = valueMap[field]
+  const config = baseUrls[field]
+
+  if (!fieldRef.value || !config) return
+
+  const val = fieldRef.value.trim()
+  if (!val || val.startsWith("http")) return
+
+  // Strip leading @ if the platform doesn't use it in its URL
+  const handle = config.stripAt ? val.replace(/^@/, "") : val
+  fieldRef.value = config.prefix + handle
+}
+
 const validateUrl = (field) => {
   const errorMap = {
     tiktok: tiktokError,
@@ -500,6 +588,8 @@ const validateUrl = (field) => {
     youtube: youtubeError,
     threads: threadsError,
     linktree: linktreeError,
+    twitter: twitterError,
+    substack: substackError,
   }
 
   const valueMap = {
@@ -510,11 +600,14 @@ const validateUrl = (field) => {
     youtube: youtube,
     threads: threads,
     linktree: linktree,
+    twitter: twitter,
+    substack: substack,
   }
 
   const error = errorMap[field]
   const value = valueMap[field]
 
+  normalizeSocialUrl(field)
   error.value = null
 
   if (value.value && value.value.trim() !== "") {
@@ -566,6 +659,8 @@ const fetchWebsite = async () => {
     youtube.value = data.youtube
     threads.value = data.threads
     linktree.value = data.linktree
+    twitter.value = data.twitter
+    substack.value = data.substack
     privacyPolicy.value = data.privacy_policy
     terms.value = data.terms
     logo.value = data.logo
@@ -614,6 +709,8 @@ const updateWebsite = async () => {
     youtube: youtube.value,
     threads: threads.value,
     linktree: linktree.value,
+    twitter: twitter.value,
+    substack: substack.value,
     privacy_policy: privacyPolicy.value,
     terms: terms.value,
     logo: logo.value,
