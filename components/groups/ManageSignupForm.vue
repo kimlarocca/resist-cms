@@ -105,6 +105,7 @@
           <template #body="{ data }">
             <ToggleSwitch
               v-model="data.visible"
+              :disabled="data.field_type === 'email'"
               @update:modelValue="updateQuestion(data)"
             />
           </template>
@@ -114,6 +115,7 @@
           <template #body="{ data }">
             <ToggleSwitch
               v-model="data.required"
+              :disabled="data.field_type === 'email'"
               @update:modelValue="updateQuestion(data)"
             />
           </template>
@@ -123,6 +125,7 @@
           <template #body="{ data }">
             <div class="flex gap-2">
               <Button
+                v-if="data.field_type !== 'email'"
                 icon="pi pi-pencil"
                 severity="info"
                 size="small"
@@ -130,6 +133,7 @@
                 v-tooltip.top="'Edit'"
               />
               <Button
+                v-if="data.field_type !== 'email'"
                 icon="pi pi-trash"
                 severity="danger"
                 size="small"
@@ -567,7 +571,11 @@ const fetchQuestions = async () => {
 
     if (error) throw error
 
-    questions.value = data || []
+    // Email field always first
+    const raw = data || []
+    const emailIdx = raw.findIndex((q) => q.field_type === "email")
+    if (emailIdx > 0) raw.unshift(raw.splice(emailIdx, 1)[0])
+    questions.value = raw
     formActivated.value = questions.value.length > 0
   } catch (error) {
     console.error("Error fetching form questions:", error)
@@ -609,7 +617,11 @@ const activateForm = async () => {
 
 // Handle row reorder via drag and drop
 const onRowReorder = async (event) => {
-  questions.value = event.value
+  // Keep email field locked in first position
+  const reordered = event.value
+  const emailIdx = reordered.findIndex((q) => q.field_type === "email")
+  if (emailIdx > 0) reordered.unshift(reordered.splice(emailIdx, 1)[0])
+  questions.value = reordered
 
   // Update sort_order for all rows based on new position
   const updates = questions.value.map((q, index) => ({
