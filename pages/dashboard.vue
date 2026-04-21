@@ -30,6 +30,7 @@ const fetchUserWebsites = async () => {
           id,
           title,
           url,
+          slug,
           email,
           type
         )
@@ -207,6 +208,17 @@ onMounted(() => {
                 {{ website.url }}
               </a>
             </p>
+
+            <p v-if="website.slug" class="mb-1">
+              <a
+                :href="`https://resistcms.com/${website.slug}`"
+                target="_blank"
+                class="text-blue-600 hover:underline"
+              >
+                {{ `https://resistcms.com/${website.slug}` }}
+              </a>
+            </p>
+
             <p v-if="website.email">Email Address: {{ website.email }}</p>
           </div>
 

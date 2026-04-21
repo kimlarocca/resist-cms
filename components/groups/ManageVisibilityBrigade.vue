@@ -7,6 +7,14 @@
     />
   </div>
   <div v-else-if="content">
+    <div class="mb-6 flex items-center gap-3">
+      <ToggleSwitch v-model="published" @change="updatePublished" inputId="published" />
+      <label for="published" class="font-medium cursor-pointer">
+        {{ published ? "Site is Published" : "Site is Unpublished" }}
+      </label>
+    </div>
+    <Divider class="my-6" />
+
     <h3 class="text-lg font-bold mt-6 mb-4">Hero Section</h3>
 
     <div class="mb-4">
@@ -49,12 +57,36 @@
     <h3 class="text-lg font-bold mt-6 mb-4">Call To Action (CTA)</h3>
 
     <div class="mb-4">
+      <Button
+        v-if="!signupFormActivated"
+        label="Activate Signup Form"
+        icon="pi pi-check-circle"
+        severity="success"
+        @click="navigateTo(`/groups/${websiteId}/manage-signup-form`)"
+      />
+      <Button
+        v-else
+        label="Manage Signup Form"
+        icon="pi pi-list"
+        severity="secondary"
+        @click="navigateTo(`/groups/${websiteId}/manage-signup-form`)"
+      />
+    </div>
+    <div class="mb-4">
       <label for="cta_text" class="block text-sm font-medium mb-2">CTA Text</label>
       <InputText id="cta_text" v-model="ctaText" @change="updateContent" class="w-full" />
     </div>
 
     <div class="mb-4">
-      <label for="cta_link" class="block text-sm font-medium mb-2">CTA Link</label>
+      <label for="cta_link" class="block text-sm font-medium mb-2">
+        3rd Party Signup Link
+        <i
+          class="pi pi-info-circle ml-1 text-sm"
+          v-tooltip="
+            'This will be used as fallback for your signup form link if you do not want to use the ResistCMS Signup Form'
+          "
+        />
+      </label>
       <InputText
         id="cta_link"
         class="w-full"
@@ -190,6 +222,8 @@ const loading = ref(true)
 const successMessage = ref(false)
 const ctaLinkError = ref(null)
 const websiteId = ref(null)
+const signupFormActivated = ref(false)
+const published = ref(false)
 
 // Check if user is super_admin
 const isSuperAdmin = computed(() => {
@@ -232,6 +266,10 @@ const fetchContent = async () => {
   } else if (data) {
     content.value = data
     websiteId.value = data.website_id
+    await Promise.all([
+      checkSignupFormActivated(data.website_id),
+      fetchPublished(data.website_id),
+    ])
     // Populate form fields
     heroHeadline.value = data.hero_headline
     heroText.value = data.hero_text
@@ -250,6 +288,38 @@ const fetchContent = async () => {
   }
 
   loading.value = false
+}
+
+// Fetch published status from websites table
+const fetchPublished = async (wId) => {
+  const { data } = await supabase
+    .from("websites")
+    .select("published")
+    .eq("id", wId)
+    .single()
+  published.value = data?.published ?? false
+}
+
+// Update published status on the websites table
+const updatePublished = async () => {
+  const { error } = await supabase
+    .from("websites")
+    .update({ published: published.value })
+    .eq("id", websiteId.value)
+  if (error) {
+    console.error("Error updating published status:", error)
+    // Revert on failure
+    published.value = !published.value
+  }
+}
+
+// Check if the signup form has been activated for this website
+const checkSignupFormActivated = async (wId) => {
+  const { count } = await supabase
+    .from("visibility-brigade-forms")
+    .select("id", { count: "exact", head: true })
+    .eq("website_id", wId)
+  signupFormActivated.value = (count ?? 0) > 0
 }
 
 // Validate CTA Link URL

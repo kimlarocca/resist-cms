@@ -40,6 +40,7 @@ const { data: website, pending, error } = await useAsyncData(
       .single()
 
     if (error) throw error
+    if (!data?.published) return null
     return data
   }
 )

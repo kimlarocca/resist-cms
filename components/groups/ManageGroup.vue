@@ -79,19 +79,14 @@
       </div>
     </div>
     <h3 class="text-lg font-bold mt-6 mb-4">Basic Information</h3>
-    <!-- Type field - editable for super_admin only -->
     <div v-if="isSuperAdmin" class="border-blue p-4 mb-6">
       <Tag value="Super Admin" class="mb-6 w-fit" />
+      <!-- URL field - editable for super_admin only -->
       <FloatLabel variant="on" class="mb-6">
-        <Select
-          class="w-full"
-          id="type"
-          v-model="type"
-          :options="typeOptions"
-          @change="updateWebsite"
-        />
-        <label for="type">Type</label>
+        <InputText id="url" v-model="url" @change="updateWebsite" />
+        <label for="url">Website URL</label>
       </FloatLabel>
+      <!-- Slug field - editable for super_admin only -->
       <FloatLabel variant="on" class="mb-6">
         <InputText
           id="slug"
@@ -104,6 +99,17 @@
       <small v-if="slugError" class="text-red-500 block -mt-4 mb-4">{{
         slugError
       }}</small>
+      <!-- Type field - editable for super_admin only -->
+      <FloatLabel variant="on" class="mb-6">
+        <Select
+          class="w-full"
+          id="type"
+          v-model="type"
+          :options="typeOptions"
+          @change="updateWebsite"
+        />
+        <label for="type">Type</label>
+      </FloatLabel>
       <FloatLabel variant="on">
         <Select
           class="w-full"
@@ -112,16 +118,7 @@
           :options="productOptions"
           @change="updateWebsite"
         />
-        <label for="product">Product</label>
-      </FloatLabel>
-    </div>
-
-    <!-- URL field - editable for super_admin only -->
-    <div v-if="isSuperAdmin" class="border-blue p-4 mb-6">
-      <Tag value="Super Admin" class="mb-6 w-fit" />
-      <FloatLabel variant="on">
-        <InputText id="url" v-model="url" @change="updateWebsite" />
-        <label for="url">Website URL</label>
+        <label for="product">Product Tier</label>
       </FloatLabel>
     </div>
 
@@ -476,6 +473,7 @@ const validateSlug = async () => {
   slugError.value = null
 
   if (!slug.value || slug.value.trim() === "") {
+    updateWebsite()
     return
   }
 
@@ -484,6 +482,8 @@ const validateSlug = async () => {
 
     if (exists) {
       slugError.value = "This slug is already in use. Please choose a different one."
+    } else {
+      updateWebsite()
     }
   } catch (error) {
     console.error("Error validating slug:", error)
