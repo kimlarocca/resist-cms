@@ -35,7 +35,7 @@
     </div>
 
     <div class="mb-4">
-      <label class="block text-sm font-medium mb-2">Hero Image</label>
+      <label class="block text-sm font-medium mb-2">Hero Background Image</label>
       <SupabaseImageUploader
         v-model="heroImage"
         bucket="visibility_brigade"
@@ -45,7 +45,7 @@
     </div>
 
     <div class="mb-4">
-      <label class="block text-sm font-medium mb-2">Hero Sub Image</label>
+      <label class="block text-sm font-medium mb-2">Small Hero Image</label>
       <SupabaseImageUploader
         v-model="heroSubImage"
         bucket="visibility_brigade"
@@ -83,7 +83,7 @@
         <i
           class="pi pi-info-circle ml-1 text-sm"
           v-tooltip="
-            'This will be used as fallback for your signup form link if you do not want to use the ResistCMS Signup Form'
+            'This will be used as fallback for your signup form link if you have not activated the ResistCMS Signup Form'
           "
         />
       </label>

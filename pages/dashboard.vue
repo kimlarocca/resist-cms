@@ -251,9 +251,9 @@ onMounted(() => {
             >
               <div>
                 <i class="pi pi-book text-2xl mb-2" />
-                <h3 class="mb-3">Website Content</h3>
+                <h3 class="mb-3">Public Website Content</h3>
                 <p class="mb-5">
-                  Manage your group's website content including text and images.
+                  Manage your group's public website content including text and images.
                 </p>
               </div>
               <Button label="Manage Content" class="w-fit p-button-sm" />
@@ -265,10 +265,10 @@ onMounted(() => {
             >
               <div>
                 <i class="pi pi-file-edit text-2xl mb-2" />
-                <h3 class="mb-3">Signup Form</h3>
+                <h3 class="mb-3">Public Signup Form</h3>
                 <p class="mb-5">
-                  Manage your group's signup form introduction, questions, and display
-                  order.
+                  Manage your group's public signup form introduction, questions, and
+                  display order.
                 </p>
               </div>
               <Button label="Manage Signup Form" class="w-fit p-button-sm" />
