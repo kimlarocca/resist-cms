@@ -1,4 +1,5 @@
 <script setup>
+const route = useRoute()
 const currentYear = new Date().getFullYear()
 
 const { data: socialLinks } = await useAsyncData("social-links", () => getSocialLinks())
@@ -15,11 +16,17 @@ const { data: contentData } = await useAsyncData("content-data-footer", () =>
 const emailAddress = computed(() => websiteData.value?.email || "")
 const companyName = computed(() => websiteData.value?.title || "")
 const description = computed(() => contentData.value?.hero_text || "")
+const termsUrl = computed(() =>
+  websiteData.value?.terms ? `/${route.params.slug}/terms` : null
+)
+const privacyUrl = computed(() =>
+  websiteData.value?.privacy_policy ? `/${route.params.slug}/privacy` : null
+)
 </script>
 
 <template>
   <div class="contrast py-16">
-    <footer class="container p-4">
+    <footer class="p-6">
       <div class="grid lg:grid-cols-4 gap-16 mb-12">
         <div class="col-span-1 lg:col-span-2">
           <div class="p-5 bg-white rounded-lg w-fit">
@@ -66,6 +73,12 @@ const description = computed(() => contentData.value?.hero_text || "")
       </div>
       <p class="small">
         Copyright © {{ currentYear }} {{ companyName }}. All Rights Reserved.
+        <span v-if="termsUrl || privacyUrl" class="ml-4">
+          <NuxtLink v-if="termsUrl" :to="termsUrl" class="mr-4"
+            >Terms of Service</NuxtLink
+          >
+          <NuxtLink v-if="privacyUrl" :to="privacyUrl">Privacy Policy</NuxtLink>
+        </span>
       </p>
     </footer>
   </div>
