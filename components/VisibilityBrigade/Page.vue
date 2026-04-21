@@ -24,7 +24,7 @@
               'We provide physical messaging in the real world to connect with and activate voters to demonstrate that resistance is possible.'
             "
           />
-          <NuxtLink :to="content?.cta_link || '#'" class="plain">
+          <NuxtLink :to="ctaLink" class="plain">
             <Button :label="content?.cta_text || 'Join The Resistance'" class="white" />
           </NuxtLink>
         </div>
@@ -82,22 +82,17 @@
           />
           <p class="mb-8">
             Visit our
-            <a :href="content?.cta_link || '#'" target="_blank" rel="nofollow noreferrer">
+            <a :href="ctaLink" target="_blank" rel="nofollow noreferrer">
               new member request form</a
             >
             to get started. Together, we can make a difference!
           </p>
-          <NuxtLink :to="content?.cta_link || '#'" class="plain">
+          <NuxtLink :to="ctaLink" class="plain">
             <Button :label="content?.cta_text || 'Join The Resistance'" class="white" />
           </NuxtLink>
         </div>
         <div>
-          <NuxtLink
-            :to="content?.cta_link || '#'"
-            target="_blank"
-            rel="nofollow noreferrer"
-            class="plain"
-          >
+          <NuxtLink :to="ctaLink" target="_blank" rel="nofollow noreferrer" class="plain">
             <img
               :src="
                 content?.get_involved_image || '/images/join-the-visibility-brigade.jpg'
@@ -127,6 +122,22 @@ const { data: content } = await useAsyncData("visibility-content", () =>
 const { data: websiteData } = await useAsyncData("website-data", () =>
   getWebsiteData(props.websiteId)
 )
+
+// Check if signup form is activated
+const supabase = useSupabaseClient()
+const { count: formCount } = await supabase
+  .from("visibility-brigade-forms")
+  .select("id", { count: "exact", head: true })
+  .eq("website_id", props.websiteId)
+
+const formActivated = (formCount ?? 0) > 0
+
+const ctaLink = computed(() => {
+  if (formActivated && websiteData.value?.slug) {
+    return `/${websiteData.value.slug}/signup`
+  }
+  return content.value?.cta_link || "#"
+})
 
 const embedSection = ref(null)
 
