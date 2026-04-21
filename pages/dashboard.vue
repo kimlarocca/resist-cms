@@ -32,7 +32,8 @@ const fetchUserWebsites = async () => {
           url,
           slug,
           email,
-          type
+          type,
+          published
         )
       `
       )
@@ -198,7 +199,13 @@ onMounted(() => {
       <div v-else>
         <div v-for="website in userWebsites" :key="website.id" class="mb-12">
           <h2 class="mb-3">{{ website.title || "Untitled" }}</h2>
+
           <div class="mb-6">
+            <Tag
+              :value="website.published ? 'Published' : 'Unpublished'"
+              :severity="website.published ? 'success' : 'secondary'"
+              class="mb-3"
+            />
             <p v-if="website.url" class="mb-1">
               <a
                 :href="website.url"
