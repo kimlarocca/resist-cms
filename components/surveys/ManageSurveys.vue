@@ -1,11 +1,18 @@
 <template>
   <div class="manage-surveys">
-    <div class="mb-4 flex justify-between items-center">
+    <div class="mb-4 flex items-center gap-2">
       <Button
         v-if="isSuperAdmin"
         label="Create New Survey"
         icon="pi pi-plus"
         @click="openCreateDialog"
+      />
+      <Button
+        v-if="isSuperAdmin"
+        label="Manage Categories"
+        icon="pi pi-tags"
+        severity="secondary"
+        @click="navigateTo('/surveys/categories')"
       />
     </div>
 

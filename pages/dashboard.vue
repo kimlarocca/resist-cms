@@ -115,7 +115,20 @@ onMounted(() => {
             class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
           />
           <h2 class="mb-3">Manage Key Links</h2>
-          <p>Manage all key links for elections and candidates.</p>
+          <p><a>Click here</a> to manage all key links for elections and candidates.</p>
+        </div>
+      </div>
+      <div
+        class="flex relative flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
+        @click="$router.push('/surveys/categories')"
+      >
+        <div>
+          <Tag
+            value="Super Admin"
+            class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
+          />
+          <h2 class="mb-3">Manage Survey Categories</h2>
+          <p><a>Click here</a> to manage global survey categories.</p>
         </div>
       </div>
     </div>

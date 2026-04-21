@@ -20,18 +20,8 @@ npm run dev
 
 View the styleguide on `http://localhost:3000/styleguide`
 
-## Production
+## Testing Notes
 
-Build the application for production:
+If you update your user's role (or anything in your profiles table row) in Supabase, you will have to log out and log back in for that to go into effect.
 
-```bash
-npm run build
-```
-
-Locally preview production build:
-
-```bash
-npm run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+The websites_users table controls which users have access to manage which groups/websites.
