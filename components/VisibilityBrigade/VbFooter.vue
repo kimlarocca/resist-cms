@@ -85,6 +85,9 @@ a {
   display: flex;
   align-items: center;
   color: white;
+  max-width: 22px;
+  width: 22px;
+  height: 22px;
 }
 .custom {
   max-width: 22px;

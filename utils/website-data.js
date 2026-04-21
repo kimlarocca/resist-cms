@@ -81,6 +81,8 @@ export async function getSocialLinks (websiteId = 1) {
         { key: "threads", icon: "pi pi-at", label: "Threads" },
         { key: "bluesky", icon: "custom", iconSrc: "/bluesky.svg", label: "Bluesky" },
         { key: "linktree", icon: "pi pi-link", label: "Linktree" },
+        { key: "twitter", icon: "pi pi-twitter", label: "X / Twitter" },
+        { key: "substack", icon: "custom", iconSrc: "/substack.svg", label: "Substack" },
     ]
 
     const links = []
