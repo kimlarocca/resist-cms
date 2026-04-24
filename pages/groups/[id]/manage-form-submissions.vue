@@ -12,6 +12,9 @@ const loading = ref(true)
 const errorMessage = ref("")
 const selectedSubmission = ref(null)
 const dialogVisible = ref(false)
+const submissionToDelete = ref(null)
+const deleteDialogVisible = ref(false)
+const deleting = ref(false)
 const emailSearch = ref("")
 
 const filteredSubmissions = computed(() => {
@@ -40,9 +43,62 @@ const fetchSubmissions = async () => {
   loading.value = false
 }
 
+const statusOptions = [
+  { label: "Pending", value: "pending" },
+  { label: "Approved", value: "approved" },
+  { label: "Denied", value: "denied" },
+]
+
+const statusSeverity = (status) => {
+  if (status === "approved") return "success"
+  if (status === "denied") return "danger"
+  return "warn"
+}
+
+const updateStatus = async (submission, status) => {
+  const { error } = await supabase
+    .from("visibility-brigade-submissions")
+    .update({ status })
+    .eq("id", submission.id)
+
+  if (error) {
+    console.error("Error updating status:", error)
+  } else {
+    submission.status = status
+  }
+}
+
 const viewSubmission = (submission) => {
   selectedSubmission.value = submission
   dialogVisible.value = true
+}
+
+const confirmDelete = (submission) => {
+  submissionToDelete.value = submission
+  deleteDialogVisible.value = true
+}
+
+const deleteSubmission = async () => {
+  deleting.value = true
+  const { error } = await supabase
+    .from("visibility-brigade-submissions")
+    .delete()
+    .eq("id", submissionToDelete.value.id)
+
+  if (error) {
+    console.error("Error deleting submission:", error)
+  } else {
+    submissions.value = submissions.value.filter(
+      (s) => s.id !== submissionToDelete.value.id
+    )
+    if (selectedSubmission.value?.id === submissionToDelete.value.id) {
+      dialogVisible.value = false
+      selectedSubmission.value = null
+    }
+    deleteDialogVisible.value = false
+    submissionToDelete.value = null
+  }
+  deleting.value = false
 }
 
 const formatDate = (dateStr) => {
@@ -115,15 +171,49 @@ onMounted(() => {
               {{ formatDate(data.created_at) }}
             </template>
           </Column>
-          <Column header="" style="width: 7rem">
+          <Column field="status" header="Status" sortable style="min-width: 10rem">
             <template #body="{ data }">
-              <Button
-                label="View"
-                icon="pi pi-eye"
-                size="small"
-                severity="secondary"
-                @click="viewSubmission(data)"
-              />
+              <Select
+                :model-value="data.status || 'pending'"
+                :options="statusOptions"
+                option-label="label"
+                option-value="value"
+                @update:model-value="updateStatus(data, $event)"
+                class="status-select"
+                :pt="{
+                  root: { class: 'border-0 shadow-none p-0 bg-transparent' },
+                  label: { class: 'p-0' },
+                  dropdown: { class: 'hidden' },
+                }"
+              >
+                <template #value="{ value }">
+                  <Tag
+                    :value="value"
+                    :severity="statusSeverity(value)"
+                    class="capitalize cursor-pointer"
+                  />
+                </template>
+              </Select>
+            </template>
+          </Column>
+          <Column header="" style="width: 9rem">
+            <template #body="{ data }">
+              <div class="flex gap-2">
+                <Button
+                  label="View"
+                  icon="pi pi-eye"
+                  size="small"
+                  severity="secondary"
+                  @click="viewSubmission(data)"
+                />
+                <Button
+                  icon="pi pi-trash"
+                  size="small"
+                  severity="danger"
+                  @click="confirmDelete(data)"
+                  v-tooltip.top="'Delete'"
+                />
+              </div>
             </template>
           </Column>
         </DataTable>
@@ -139,8 +229,21 @@ onMounted(() => {
       :closable="true"
     >
       <div v-if="selectedSubmission">
-        <div class="mb-4 text-sm text-gray-500">
-          Submitted: {{ formatDate(selectedSubmission.created_at) }}
+        <div class="flex items-center justify-between mb-4">
+          <div class="text-sm text-gray-500">
+            Submitted: {{ formatDate(selectedSubmission.created_at) }}
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-medium">Status:</span>
+            <Select
+              :model-value="selectedSubmission.status || 'pending'"
+              :options="statusOptions"
+              option-label="label"
+              option-value="value"
+              @update:model-value="updateStatus(selectedSubmission, $event)"
+              class="w-36"
+            />
+          </div>
         </div>
         <DataTable :value="formDataEntries" class="p-datatable-sm" stripedRows>
           <Column field="key" header="Question" style="width: 40%; font-weight: 600" />
@@ -150,7 +253,45 @@ onMounted(() => {
             style="width: 60%; word-break: break-word"
           />
         </DataTable>
+        <div class="flex justify-end mt-6">
+          <Button
+            label="Delete Submission"
+            icon="pi pi-trash"
+            severity="danger"
+            @click="confirmDelete(selectedSubmission)"
+          />
+        </div>
       </div>
+    </Dialog>
+
+    <!-- Delete Confirmation Dialog -->
+    <Dialog
+      v-model:visible="deleteDialogVisible"
+      modal
+      header="Confirm Delete"
+      :style="{ width: '28rem' }"
+    >
+      <div class="flex items-center gap-3">
+        <i class="pi pi-exclamation-triangle text-red-500" style="font-size: 2rem" />
+        <span>
+          Are you sure you want to delete the submission from
+          <strong>{{ submissionToDelete?.email }}</strong
+          >? This cannot be undone.
+        </span>
+      </div>
+      <template #footer>
+        <Button
+          label="Cancel"
+          severity="secondary"
+          @click="deleteDialogVisible = false"
+        />
+        <Button
+          label="Delete"
+          severity="danger"
+          :loading="deleting"
+          @click="deleteSubmission"
+        />
+      </template>
     </Dialog>
   </div>
 </template>

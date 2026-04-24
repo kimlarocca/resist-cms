@@ -116,21 +116,28 @@ const props = defineProps({
   },
 })
 
-const { data: content } = await useAsyncData("visibility-content", () =>
-  getVisibilityBrigadeContent(props.websiteId)
+const { data: content } = await useAsyncData(
+  `visibility-content-${props.websiteId}`,
+  () => getVisibilityBrigadeContent(props.websiteId)
 )
-const { data: websiteData } = await useAsyncData("website-data", () =>
+const { data: websiteData } = await useAsyncData(`website-data-${props.websiteId}`, () =>
   getWebsiteData(props.websiteId)
 )
 
 // Check if signup form is activated
 const supabase = useSupabaseClient()
-const { count: formCount } = await supabase
-  .from("visibility-brigade-forms")
-  .select("id", { count: "exact", head: true })
-  .eq("website_id", props.websiteId)
+const { data: formActivatedData } = await useAsyncData(
+  `form-activated-${props.websiteId}`,
+  async () => {
+    const { count } = await supabase
+      .from("visibility-brigade-forms")
+      .select("id", { count: "exact", head: true })
+      .eq("website_id", props.websiteId)
+    return (count ?? 0) > 0
+  }
+)
 
-const formActivated = (formCount ?? 0) > 0
+const formActivated = computed(() => formActivatedData.value ?? false)
 
 const ctaLink = computed(() => {
   if (formActivated && websiteData.value?.slug) {
