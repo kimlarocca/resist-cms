@@ -14,7 +14,7 @@
       <div class="p-6 h-full flex flex-col justify-between">
         <h1 class="like-h1 text-white mb-12">Join The Resistance</h1>
         <div class="mb-12">
-          <p
+          <div
             v-if="content?.signup_form_text"
             class="mb-6 text-xl sm:text-2xl font-semibold text-white"
             v-html="content?.signup_form_text"
