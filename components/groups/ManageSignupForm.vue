@@ -50,7 +50,15 @@
         <p class="text-gray-600">
           Drag the ≡ handle to reorder rows, or edit the sort order number directly.
         </p>
-        <Button label="Add New Question" icon="pi pi-plus" @click="openDialog()" />
+        <div class="flex gap-2">
+          <Button
+            label="Preview Form"
+            icon="pi pi-eye"
+            severity="secondary"
+            @click="previewVisible = true"
+          />
+          <Button label="Add New Question" icon="pi pi-plus" @click="openDialog()" />
+        </div>
       </div>
 
       <DataTable
@@ -251,6 +259,16 @@
       </form>
     </Dialog>
 
+    <!-- Preview Dialog -->
+    <Dialog
+      v-model:visible="previewVisible"
+      header="Form Preview"
+      :modal="true"
+      :style="{ width: '80vw', maxWidth: '95vw' }"
+    >
+      <VisibilityBrigadeSignupForm :website-id="Number(props.websiteId)" />
+    </Dialog>
+
     <!-- Delete Confirmation Dialog -->
     <Dialog
       v-model:visible="deleteDialogVisible"
@@ -305,6 +323,7 @@ const signupFormText = ref("")
 
 const dialogVisible = ref(false)
 const deleteDialogVisible = ref(false)
+const previewVisible = ref(false)
 const editingQuestion = ref(null)
 const questionToDelete = ref(null)
 
