@@ -41,21 +41,24 @@
   .like-h2 {
     font-family: var(--font-family-header);
     font-weight: 400;
-    font-size: 25px;
-    line-height: 25px;
+    font-size: 35px;
+    line-height: 35px;
     @screen lg {
-      font-size: 30px;
-      line-height: 30px;
+      font-size: 40px;
+      line-height: 40px;
     }
   }
 
   h3,
   .like-h3 {
     font-family: var(--font-family-header);
-    font-style: normal;
     font-weight: 400;
-    font-size: 22px;
-    line-height: 22px;
+    font-size: 25px;
+    line-height: 25px;
+    @screen lg {
+      font-size: 30px;
+      line-height: 30px;
+    }
   }
 
   h4,

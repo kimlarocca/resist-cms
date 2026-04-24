@@ -64,6 +64,11 @@ const manageSignupForm = (websiteId) => {
   router.push(`/groups/${websiteId}/manage-signup-form`)
 }
 
+// Navigate to manage form submissions
+const manageFormSubmissions = (websiteId) => {
+  router.push(`/groups/${websiteId}/manage-form-submissions`)
+}
+
 // Watch for currentUserProfile to become available
 watch(
   () => currentUserProfile.value?.id,
@@ -92,7 +97,7 @@ onMounted(() => {
     <!-- super admins only -->
     <div
       v-if="currentUserProfile?.role === 'super_admin'"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16"
     >
       <div
         class="flex relative flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
@@ -103,7 +108,7 @@ onMounted(() => {
             value="Super Admin"
             class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
           />
-          <h2 class="mb-3">Manage Groups</h2>
+          <h3 class="mb-3">Groups</h3>
           <p><a>Click here</a> to manage all Resist CMS groups.</p>
         </div>
       </div>
@@ -116,7 +121,7 @@ onMounted(() => {
             value="Super Admin"
             class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
           />
-          <h2 class="mb-3">Manage Key Links</h2>
+          <h3 class="mb-3">Key Links</h3>
           <p><a>Click here</a> to manage all key links for elections and candidates.</p>
         </div>
       </div>
@@ -129,7 +134,7 @@ onMounted(() => {
             value="Super Admin"
             class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
           />
-          <h2 class="mb-3">Manage Survey Categories</h2>
+          <h3 class="mb-3">Survey Categories</h3>
           <p><a>Click here</a> to manage global survey categories.</p>
         </div>
       </div>
@@ -141,7 +146,7 @@ onMounted(() => {
         currentUserProfile?.role === 'super_admin' ||
         currentUserProfile?.role === 'election_manager'
       "
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16"
     >
       <div
         class="flex flex-col relative justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
@@ -152,7 +157,7 @@ onMounted(() => {
           class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
         />
         <div>
-          <h2 class="mb-4">My Elections</h2>
+          <h3 class="mb-4">My Elections</h3>
           <p>
             <a>Click here</a> to manage your elections and key links for your elections.
           </p>
@@ -167,7 +172,7 @@ onMounted(() => {
             value="Election Managers"
             class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
           />
-          <h2 class="mb-4">My Candidates</h2>
+          <h3 class="mb-4">My Candidates</h3>
           <p>
             <a>Click here</a> to manage the candidates in your races and their key clinks.
           </p>
@@ -182,7 +187,7 @@ onMounted(() => {
             value="Election Managers"
             class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
           />
-          <h2 class="mb-4">My Surveys</h2>
+          <h3 class="mb-4">My Surveys</h3>
           <p>
             <a>Click here</a> to manage your surveys and their questions and categories.
           </p>
@@ -229,49 +234,48 @@ onMounted(() => {
             <p v-if="website.email">Email Address: {{ website.email }}</p>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div
-              class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
+              class="flex flex-col rounded-xl bg-gray p-8 shadow-lg clickable"
               @click="editGroupSettings(website.id)"
             >
-              <div>
-                <i class="pi pi-cog text-2xl mb-2" />
-                <h3 class="mb-3">Group Settings</h3>
-                <p class="mb-5">
-                  Manage your group's settings including contact information, logo, social
-                  media, and more.
-                </p>
-              </div>
-              <Button label="Manage Settings" class="w-fit p-button-sm" />
+              <h3 class="mb-3">Group Settings</h3>
+              <p>
+                <a>Click here</a> to manage your group's settings including contact
+                information, logo, social media, and more.
+              </p>
             </div>
 
             <div
-              class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
+              class="flex flex-col rounded-xl bg-gray p-8 shadow-lg clickable"
               @click="manageContent(website.id)"
             >
-              <div>
-                <i class="pi pi-book text-2xl mb-2" />
-                <h3 class="mb-3">Public Website Content</h3>
-                <p class="mb-5">
-                  Manage your group's public website content including text and images.
-                </p>
-              </div>
-              <Button label="Manage Content" class="w-fit p-button-sm" />
+              <h3 class="mb-3">Public Website Content</h3>
+              <p>
+                <a>Click here</a> to manage your group's public website content including
+                text and images.
+              </p>
             </div>
 
             <div
-              class="flex flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
+              class="flex flex-col rounded-xl bg-gray p-8 shadow-lg clickable"
               @click="manageSignupForm(website.id)"
             >
-              <div>
-                <i class="pi pi-file-edit text-2xl mb-2" />
-                <h3 class="mb-3">Public Signup Form</h3>
-                <p class="mb-5">
-                  Manage your group's public signup form introduction, questions, and
-                  display order.
-                </p>
-              </div>
-              <Button label="Manage Signup Form" class="w-fit p-button-sm" />
+              <h3 class="mb-3">Public Signup Form</h3>
+              <p>
+                <a>Click here</a> to manage your group's public signup form introduction,
+                questions, and display order.
+              </p>
+            </div>
+
+            <div
+              class="flex flex-col rounded-xl bg-gray p-8 shadow-lg clickable"
+              @click="manageFormSubmissions(website.id)"
+            >
+              <h3 class="mb-3">Form Submissions</h3>
+              <p>
+                <a>Click here</a> to manage your group's public signup form submissions.
+              </p>
             </div>
           </div>
         </div>
