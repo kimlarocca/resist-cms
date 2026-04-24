@@ -79,11 +79,11 @@
 
     <div class="mb-4">
       <label for="cta_link" class="block text-sm font-medium mb-2">
-        3rd Party Signup Link
+        3rd Party Signup Link (If Signup Form Not Activated)
         <i
           class="pi pi-info-circle ml-1 text-sm"
           v-tooltip="
-            'This will be used as fallback for your signup form link if you have not activated the ResistCMS Signup Form'
+            'This will be used as fallback for your signup form link if you have not activated the ResistCMS Signup Form yet.'
           "
         />
       </label>
