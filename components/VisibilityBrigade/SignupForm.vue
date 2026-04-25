@@ -123,7 +123,15 @@
         {{ errorMessage }}
       </Message>
 
-      <Button type="submit" label="Submit" :loading="submitting" class="mt-2" />
+      <NuxtTurnstile v-model="turnstileToken" class="mb-4" />
+
+      <Button
+        type="submit"
+        label="Submit"
+        :loading="submitting"
+        :disabled="!turnstileToken"
+        class="mt-2"
+      />
 
       <Message v-if="hasValidationErrors" severity="warn" class="mt-4">
         Please fix the errors above before submitting.
@@ -153,6 +161,7 @@ const loading = ref(true)
 const submitting = ref(false)
 const submitted = ref(false)
 const errorMessage = ref("")
+const turnstileToken = ref("")
 
 const hasValidationErrors = computed(() => Object.keys(errors.value).length > 0)
 
@@ -235,6 +244,12 @@ const submitForm = async () => {
   errorMessage.value = ""
 
   try {
+    // Verify captcha
+    await $fetch("/api/verify-turnstile", {
+      method: "POST",
+      body: { token: turnstileToken.value },
+    })
+
     // Build named form_data object using field labels as keys
     const formData = {}
     fields.value.forEach((field) => {

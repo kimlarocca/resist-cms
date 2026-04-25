@@ -38,7 +38,11 @@ export default defineNuxtConfig({
 
   css: ['primeicons/primeicons.css', '~/assets/scss/main.scss'],
 
-  modules: ['@primevue/nuxt-module', '@nuxtjs/tailwindcss', '@nuxtjs/supabase'],
+  modules: ['@primevue/nuxt-module', '@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@nuxtjs/turnstile'],
+
+  turnstile: {
+    siteKey: process.env.TURNSTILE_SITE_KEY,
+  },
 
   supabase: {
     key: 'sb_publishable_hfb4cBZp-dppxuSEFkidtw_XdBFGbK2',
@@ -63,6 +67,9 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    turnstile: {
+      secretKey: process.env.TURNSTILE_SECRET_KEY,
+    },
     public: {
       environment: process.env.environment ?? 'local',
       gtagId: 'G-K6YTWGEB2Q',

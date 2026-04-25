@@ -27,3 +27,7 @@ If you update your user's role (or anything in your profiles table row) in Supab
 The websites_users table controls which users have access to manage which groups/websites.
 
 On survey completion rates: if you have test candidates in multiple races/surveys, it will take that into account. For example, with my test candidate Kim-Larocca, I'm in 4 surveys with 400+ questions total and 75% answered. So my completion rate is 75% across all surveys, not 100% for one survey and 0% for the others.
+
+## Turnstile Widget
+
+https://dash.cloudflare.com/41f61a73d75ea48112b464ceefec0c9e/turnstile
