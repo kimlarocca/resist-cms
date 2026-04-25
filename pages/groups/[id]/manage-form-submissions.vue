@@ -16,11 +16,27 @@ const submissionToDelete = ref(null)
 const deleteDialogVisible = ref(false)
 const deleting = ref(false)
 const emailSearch = ref("")
+const statusFilter = ref(null)
+
+const statusSortOrder = { pending: 0, approved: 1, denied: 2 }
 
 const filteredSubmissions = computed(() => {
-  if (!emailSearch.value.trim()) return submissions.value
-  const q = emailSearch.value.trim().toLowerCase()
-  return submissions.value.filter((s) => s.email?.toLowerCase().includes(q))
+  return submissions.value
+    .filter((s) => {
+      const matchesEmail =
+        !emailSearch.value.trim() ||
+        s.email?.toLowerCase().includes(emailSearch.value.trim().toLowerCase())
+      const matchesStatus =
+        !statusFilter.value || (s.status || "pending") === statusFilter.value
+      return matchesEmail && matchesStatus
+    })
+    .sort((a, b) => {
+      const statusDiff =
+        (statusSortOrder[a.status || "pending"] ?? 0) -
+        (statusSortOrder[b.status || "pending"] ?? 0)
+      if (statusDiff !== 0) return statusDiff
+      return (a.email || "").localeCompare(b.email || "")
+    })
 })
 
 const fetchSubmissions = async () => {
@@ -55,16 +71,17 @@ const statusSeverity = (status) => {
   return "warn"
 }
 
-const updateStatus = async (submission, status) => {
+const updateStatus = async (submissionId, status) => {
   const { error } = await supabase
     .from("visibility-brigade-submissions")
     .update({ status })
-    .eq("id", submission.id)
+    .eq("id", submissionId)
 
   if (error) {
     console.error("Error updating status:", error)
   } else {
-    submission.status = status
+    const match = submissions.value.find((s) => s.id === submissionId)
+    if (match) match.status = status
   }
 }
 
@@ -119,6 +136,11 @@ const formDataEntries = computed(() => {
   }))
 })
 
+const clearFilters = () => {
+  emailSearch.value = ""
+  statusFilter.value = null
+}
+
 onMounted(() => {
   fetchSubmissions()
 })
@@ -145,7 +167,26 @@ onMounted(() => {
     <div v-else>
       <p v-if="submissions.length === 0">You have not had any form submissions yet.</p>
       <template v-else>
-        <InputText v-model="emailSearch" placeholder="Filter by email..." class="mb-6" />
+        <div class="flex items-center gap-3 mb-6">
+          <InputText v-model="emailSearch" placeholder="Filter by email..." />
+          <Select
+            v-model="statusFilter"
+            :options="[{ label: 'All Statuses', value: null }, ...statusOptions]"
+            option-label="label"
+            option-value="value"
+            placeholder="Filter By Status"
+            class="w-60"
+          />
+          <Button
+            v-if="emailSearch || statusFilter"
+            label="Clear"
+            severity="secondary"
+            size="small"
+            icon="pi pi-times"
+            @click="clearFilters"
+            class="px-4"
+          />
+        </div>
         <DataTable
           :value="filteredSubmissions"
           :paginator="submissions.length > 25"
@@ -155,7 +196,6 @@ onMounted(() => {
           class="p-datatable-sm"
           emptyMessage="No submissions yet."
         >
-          <Column field="id" header="ID" sortable style="width: 5rem" />
           <Column field="email" header="Email" sortable style="min-width: 14rem" />
           <Column header="Name" style="min-width: 12rem">
             <template #body="{ data }">
@@ -174,11 +214,12 @@ onMounted(() => {
           <Column field="status" header="Status" sortable style="min-width: 10rem">
             <template #body="{ data }">
               <Select
+                :key="data.id"
                 :model-value="data.status || 'pending'"
                 :options="statusOptions"
                 option-label="label"
                 option-value="value"
-                @update:model-value="updateStatus(data, $event)"
+                @update:model-value="updateStatus(data.id, $event)"
                 class="status-select"
                 :pt="{
                   root: { class: 'border-0 shadow-none p-0 bg-transparent' },
@@ -240,7 +281,7 @@ onMounted(() => {
               :options="statusOptions"
               option-label="label"
               option-value="value"
-              @update:model-value="updateStatus(selectedSubmission, $event)"
+              @update:model-value="updateStatus(selectedSubmission?.id, $event)"
               class="w-36"
             />
           </div>
