@@ -162,6 +162,8 @@ const submitting = ref(false)
 const submitted = ref(false)
 const errorMessage = ref("")
 const turnstileToken = ref("")
+const websiteEmail = ref(null)
+const websiteTitle = ref(null)
 
 const hasValidationErrors = computed(() => Object.keys(errors.value).length > 0)
 
@@ -278,6 +280,19 @@ const submitForm = async () => {
     }
 
     submitted.value = true
+
+    // Send notification email to website owner (best-effort, don't block on failure)
+    if (emailValue && websiteEmail.value) {
+      $fetch("/api/send-submission-notification", {
+        method: "POST",
+        body: {
+          toEmail: websiteEmail.value,
+          websiteTitle: websiteTitle.value || "your group",
+          submitterEmail: emailValue,
+          formData,
+        },
+      }).catch((err) => console.error("Failed to send notification email:", err))
+    }
   } catch (error) {
     console.error("Error submitting form:", error)
     errorMessage.value = "Something went wrong. Please try again."
@@ -288,5 +303,16 @@ const submitForm = async () => {
 
 onMounted(() => {
   fetchFields()
+
+  // Fetch website contact email and title for notification
+  supabase
+    .from("websites")
+    .select("email, title")
+    .eq("id", props.websiteId)
+    .single()
+    .then(({ data }) => {
+      websiteEmail.value = data?.email || null
+      websiteTitle.value = data?.title || null
+    })
 })
 </script>

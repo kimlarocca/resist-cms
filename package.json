@@ -26,6 +26,7 @@
     "@tiptap/vue-3": "^3.19.0",
     "nuxt": "^3.16.0",
     "nuxt-turnstile": "^0.1.1",
+    "resend": "^6.12.2",
     "survey-vue3-ui": "^2.3.16",
     "tailwindcss-primeui": "^0.5.1"
   },

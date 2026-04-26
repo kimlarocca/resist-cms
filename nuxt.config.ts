@@ -70,6 +70,7 @@ export default defineNuxtConfig({
     turnstile: {
       secretKey: process.env.TURNSTILE_SECRET_KEY,
     },
+    resendApiKey: process.env.RESEND_API_KEY,
     public: {
       environment: process.env.environment ?? 'local',
       gtagId: 'G-K6YTWGEB2Q',
