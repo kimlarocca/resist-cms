@@ -5,9 +5,9 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, message: "Missing captcha token." })
     }
 
-    const { verified } = await verifyTurnstileToken(token)
+    const result = await verifyTurnstileToken(token)
 
-    if (!verified) {
+    if (!result.success) {
         throw createError({ statusCode: 400, message: "Captcha verification failed." })
     }
 
