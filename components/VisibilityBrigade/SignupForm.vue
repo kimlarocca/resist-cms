@@ -50,6 +50,7 @@
           :id="`field-${field.id}`"
           v-model="formValues[field.id]"
           type="tel"
+          inputmode="tel"
           :placeholder="field.placeholder || ''"
           :class="{ 'p-invalid': errors[field.id] }"
           class="w-full"
@@ -231,6 +232,14 @@ const validate = () => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(val)) {
         errors.value[field.id] = "Please enter a valid email address."
+        valid = false
+      }
+    }
+
+    if (field.field_type === "phone" && val) {
+      const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,3}[)]?[-\s.]?[0-9]{3,4}[-\s.]?[0-9]{3,4}$/
+      if (!phoneRegex.test(val.replace(/\s/g, ""))) {
+        errors.value[field.id] = "Please enter a valid phone number."
         valid = false
       }
     }
