@@ -346,14 +346,12 @@
       class="mb-4"
       @click="showAllSocial = !showAllSocial"
     />
-    <div v-if="isPaidUser" class="border-blue p-4 my-6">
-      <Tag value="Paid Users Only" class="mb-8 w-fit" />
-      <h3 class="text-lg font-bold mb-4">Privacy Policy</h3>
-      <SimpleEditor id="privacy_policy" v-model="privacyPolicy" rows="4" class="mb-4" />
+    <h3 class="text-lg font-bold mb-4">Privacy Policy</h3>
+    <SimpleEditor id="privacy_policy" v-model="privacyPolicy" rows="4" class="mb-4" />
 
-      <h3 class="text-lg font-bold mt-12 mb-4">Terms &amp; Conditions</h3>
-      <SimpleEditor id="terms" v-model="terms" rows="4" class="mb-4" />
-    </div>
+    <h3 class="text-lg font-bold mt-12 mb-4">Terms &amp; Conditions</h3>
+    <SimpleEditor id="terms" v-model="terms" rows="4" class="mb-4" />
+
     <Divider />
     <div>
       <Button

@@ -46,7 +46,7 @@ export async function getAllWebsiteData (websiteId = 1) {
 // Fetch navigation links with dynamic CTA
 export async function getNavigationLinks (websiteId = 1) {
     const contentData = await getVisibilityBrigadeContent(websiteId)
-
+console.log("Content Data:", contentData) // Debug log to check content data
     const links = [{ label: "About Us", href: "/", hash: "#about-us", target: "" }]
 
     // Only include Photo Gallery if instagram_widget_id exists

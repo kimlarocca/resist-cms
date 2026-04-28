@@ -4,30 +4,36 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-})
-const route = useRoute()
-const currentYear = new Date().getFullYear()
+});
+const route = useRoute();
+const currentYear = new Date().getFullYear();
 
-const { data: socialLinks } = await useAsyncData(`social-links-${props.websiteId}`, () => getSocialLinks(props.websiteId))
-const { data: navigationLinks } = await useAsyncData(`navigation-links-${props.websiteId}`, () =>
+const { data: socialLinks } = await useAsyncData(`social-links-${props.websiteId}`, () =>
+  getSocialLinks(props.websiteId)
+);
+const {
+  data: navigationLinks,
+} = await useAsyncData(`navigation-links-${props.websiteId}`, () =>
   getNavigationLinks(props.websiteId)
-)
-const { data: websiteData } = await useAsyncData(`website-data-footer-${props.websiteId}`, () =>
-  getWebsiteData(props.websiteId)
-)
-const { data: contentData } = await useAsyncData(`content-data-footer-${props.websiteId}`, () =>
-  getVisibilityBrigadeContent(props.websiteId)
-)
+);
+const { data: websiteData } = await useAsyncData(
+  `website-data-footer-${props.websiteId}`,
+  () => getWebsiteData(props.websiteId)
+);
+const { data: contentData } = await useAsyncData(
+  `content-data-footer-${props.websiteId}`,
+  () => getVisibilityBrigadeContent(props.websiteId)
+);
 
-const emailAddress = computed(() => websiteData.value?.email || "")
-const companyName = computed(() => websiteData.value?.title || "")
-const description = computed(() => contentData.value?.hero_text || "")
+const emailAddress = computed(() => websiteData.value?.email || "");
+const companyName = computed(() => websiteData.value?.title || "");
+const description = computed(() => contentData.value?.hero_text || "");
 const termsUrl = computed(() =>
   websiteData.value?.terms ? `/${route.params.slug}/terms` : null
-)
+);
 const privacyUrl = computed(() =>
   websiteData.value?.privacy_policy ? `/${route.params.slug}/privacy` : null
-)
+);
 </script>
 
 <template>
@@ -35,8 +41,8 @@ const privacyUrl = computed(() =>
     <footer class="p-6">
       <div class="grid lg:grid-cols-4 gap-16 mb-12">
         <div class="col-span-1 lg:col-span-2">
-            <VisibilityBrigadeLogo :website-id="props.websiteId" class="inverse" />
-          <p class="mt-5">{{ description }}</p>
+          <VisibilityBrigadeLogo :website-id="props.websiteId" class="inverse" />
+          <p class="mt-5" v-html="description" />
         </div>
         <div class="col-span-1">
           <p class="like-h4 mb-4">Quick Links</p>

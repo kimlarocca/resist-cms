@@ -74,19 +74,12 @@
             {{ content?.get_involved_sub_header || "We Host Weekly Events!" }}
           </h3>
           <p
-            class="mb-4"
+            class="mb-12"
             v-html="
               content?.get_involved_text ||
               'We typically meet up on high-traffic pedestrian bridges during rush hour with pre-determined messages and stand over our messages, waving at passing cars.'
             "
           />
-          <p class="mb-8">
-            Visit our
-            <a :href="ctaLink" target="_blank" rel="nofollow noreferrer">
-              new member request form</a
-            >
-            to get started. Together, we can make a difference!
-          </p>
           <NuxtLink :to="ctaLink" class="plain block">
             <Button :label="content?.cta_text || 'Join The Resistance'" class="white" />
           </NuxtLink>
