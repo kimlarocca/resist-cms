@@ -56,7 +56,7 @@ const privacyUrl = computed(() =>
         </div>
         <div class="col-span-1">
           <p class="like-h4 mb-5">Connect</p>
-          <p class="mb-5">
+          <p v-if="emailAddress" class="mb-5">
             <i class="pi pi-envelope mr-2" />
             <a :href="`mailto:${emailAddress}`">
               {{ emailAddress }}
