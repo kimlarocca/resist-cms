@@ -1,24 +1,24 @@
 <script setup>
-import { useCurrentUserProfile } from "~/composables/states"
+import { useCurrentUserProfile } from "~/composables/states";
 definePageMeta({
   middleware: "auth",
-})
-const currentUserProfile = useCurrentUserProfile()
-const supabase = useSupabaseClient()
-const router = useRouter()
+});
+const currentUserProfile = useCurrentUserProfile();
+const supabase = useSupabaseClient();
+const router = useRouter();
 
 // User's websites/groups
-const userWebsites = ref([])
-const loadingWebsites = ref(true)
+const userWebsites = ref([]);
+const loadingWebsites = ref(true);
 
 // Fetch websites user has permission to manage
 const fetchUserWebsites = async () => {
   if (!currentUserProfile.value?.id) {
-    loadingWebsites.value = false
-    return
+    loadingWebsites.value = false;
+    return;
   }
 
-  loadingWebsites.value = true
+  loadingWebsites.value = true;
 
   try {
     const { data, error } = await supabase
@@ -37,53 +37,53 @@ const fetchUserWebsites = async () => {
         )
       `
       )
-      .eq("user_id", currentUserProfile.value.id)
+      .eq("user_id", currentUserProfile.value.id);
 
-    if (error) throw error
+    if (error) throw error;
 
-    userWebsites.value = data?.map((item) => item.websites).filter(Boolean) || []
+    userWebsites.value = data?.map((item) => item.websites).filter(Boolean) || [];
   } catch (error) {
-    console.error("Error fetching user websites:", error)
+    console.error("Error fetching user websites:", error);
   } finally {
-    loadingWebsites.value = false
+    loadingWebsites.value = false;
   }
-}
+};
 
 // Navigate to edit group settings
 const editGroupSettings = (websiteId) => {
-  router.push(`/groups/${websiteId}`)
-}
+  router.push(`/groups/${websiteId}`);
+};
 
 // Navigate to manage content
 const manageContent = (websiteId) => {
-  router.push(`/groups/${websiteId}/manage-content`)
-}
+  router.push(`/groups/${websiteId}/manage-content`);
+};
 
 // Navigate to manage signup form
 const manageSignupForm = (websiteId) => {
-  router.push(`/groups/${websiteId}/manage-signup-form`)
-}
+  router.push(`/groups/${websiteId}/manage-signup-form`);
+};
 
 // Navigate to manage form submissions
 const manageFormSubmissions = (websiteId) => {
-  router.push(`/groups/${websiteId}/manage-form-submissions`)
-}
+  router.push(`/groups/${websiteId}/manage-form-submissions`);
+};
 
 // Watch for currentUserProfile to become available
 watch(
   () => currentUserProfile.value?.id,
   (newId) => {
     if (newId) {
-      fetchUserWebsites()
+      fetchUserWebsites();
     }
   },
   { immediate: true }
-)
+);
 
 // Fetch user websites on mount
 onMounted(() => {
-  fetchUserWebsites()
-})
+  fetchUserWebsites();
+});
 </script>
 <template>
   <div class="container p-4">
@@ -221,7 +221,7 @@ onMounted(() => {
               </a>
             </p>
 
-            <p v-if="website.slug" class="mb-1">
+            <p v-else-if="website.slug" class="mb-1">
               <a
                 :href="`https://resistcms.com/${website.slug}`"
                 target="_blank"

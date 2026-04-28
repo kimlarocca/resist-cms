@@ -188,6 +188,20 @@
       />
     </div>
 
+    <div class="mt-8">
+      <Button
+        label="Save Changes"
+        icon="pi pi-save"
+        @click="updateContent"
+        :disabled="!!ctaLinkError"
+      />
+      <div class="mt-6">
+        <NuxtLink to="/dashboard">
+          <i class="pi pi-arrow-left mr-2" />Back to the Dashboard
+        </NuxtLink>
+      </div>
+    </div>
+
     <div class="changes-saved-toast">
       <Message
         v-if="successMessage"
@@ -212,83 +226,83 @@ const props = defineProps({
     type: [String, Number],
     required: true,
   },
-})
+});
 
-const supabase = useSupabaseClient()
-const currentUserProfile = useCurrentUserProfile()
+const supabase = useSupabaseClient();
+const currentUserProfile = useCurrentUserProfile();
 
-const content = ref(null)
-const loading = ref(true)
-const successMessage = ref(false)
-const ctaLinkError = ref(null)
-const websiteId = ref(null)
-const signupFormActivated = ref(false)
-const published = ref(false)
+const content = ref(null);
+const loading = ref(true);
+const successMessage = ref(false);
+const ctaLinkError = ref(null);
+const websiteId = ref(null);
+const signupFormActivated = ref(false);
+const published = ref(false);
 
 // Check if user is super_admin
 const isSuperAdmin = computed(() => {
-  return currentUserProfile.value?.role === "super_admin"
-})
+  return currentUserProfile.value?.role === "super_admin";
+});
 
 // Reactive form fields
-const heroHeadline = ref(null)
-const heroText = ref(null)
-const heroImage = ref(null)
-const heroSubImage = ref(null)
-const ctaText = ref(null)
-const ctaLink = ref(null)
-const aboutUsHeadline = ref(null)
-const aboutUsText = ref(null)
-const getInvolvedHeadline = ref(null)
-const getInvolvedSubHeader = ref(null)
-const getInvolvedText = ref(null)
-const getInvolvedImage = ref(null)
-const socialEmbedCode = ref(null)
-const instagramWidgetId = ref(null)
+const heroHeadline = ref(null);
+const heroText = ref(null);
+const heroImage = ref(null);
+const heroSubImage = ref(null);
+const ctaText = ref(null);
+const ctaLink = ref(null);
+const aboutUsHeadline = ref(null);
+const aboutUsText = ref(null);
+const getInvolvedHeadline = ref(null);
+const getInvolvedSubHeader = ref(null);
+const getInvolvedText = ref(null);
+const getInvolvedImage = ref(null);
+const socialEmbedCode = ref(null);
+const instagramWidgetId = ref(null);
 
 // Fetch the content data based on content_id
 const fetchContent = async () => {
   if (!props.contentId) {
-    loading.value = false
-    return
+    loading.value = false;
+    return;
   }
 
-  loading.value = true
+  loading.value = true;
 
   const { data, error } = await supabase
     .from("visibility-brigade-content")
     .select("*")
     .eq("id", props.contentId)
-    .single()
+    .single();
 
   if (error) {
-    console.error("Error fetching content:", error)
+    console.error("Error fetching content:", error);
   } else if (data) {
-    content.value = data
-    websiteId.value = data.website_id
+    content.value = data;
+    websiteId.value = data.website_id;
     await Promise.all([
       checkSignupFormActivated(data.website_id),
       fetchPublished(data.website_id),
-    ])
+    ]);
     // Populate form fields
-    heroHeadline.value = data.hero_headline
-    heroText.value = data.hero_text
-    heroImage.value = data.hero_image
-    heroSubImage.value = data.hero_sub_image
-    ctaText.value = data.cta_text
-    ctaLink.value = data.cta_link
-    aboutUsHeadline.value = data.about_us_headline
-    aboutUsText.value = data.about_us_text
-    getInvolvedHeadline.value = data.get_involved_headline
-    getInvolvedSubHeader.value = data.get_involved_sub_header
-    getInvolvedText.value = data.get_involved_text
-    getInvolvedImage.value = data.get_involved_image
-    socialEmbedCode.value = data.social_embed_code
-    instagramWidgetId.value = data.instagram_widget_id
+    heroHeadline.value = data.hero_headline;
+    heroText.value = data.hero_text;
+    heroImage.value = data.hero_image;
+    heroSubImage.value = data.hero_sub_image;
+    ctaText.value = data.cta_text;
+    ctaLink.value = data.cta_link;
+    aboutUsHeadline.value = data.about_us_headline;
+    aboutUsText.value = data.about_us_text;
+    getInvolvedHeadline.value = data.get_involved_headline;
+    getInvolvedSubHeader.value = data.get_involved_sub_header;
+    getInvolvedText.value = data.get_involved_text;
+    getInvolvedImage.value = data.get_involved_image;
+    socialEmbedCode.value = data.social_embed_code;
+    instagramWidgetId.value = data.instagram_widget_id;
   }
 
-  loading.value = false
-}
+  loading.value = false;
+};
 
 // Fetch published status from websites table
 const fetchPublished = async (wId) => {
@@ -296,60 +310,60 @@ const fetchPublished = async (wId) => {
     .from("websites")
     .select("published")
     .eq("id", wId)
-    .single()
-  published.value = data?.published ?? false
-}
+    .single();
+  published.value = data?.published ?? false;
+};
 
 // Update published status on the websites table
 const updatePublished = async () => {
   const { error } = await supabase
     .from("websites")
     .update({ published: published.value })
-    .eq("id", websiteId.value)
+    .eq("id", websiteId.value);
   if (error) {
-    console.error("Error updating published status:", error)
+    console.error("Error updating published status:", error);
     // Revert on failure
-    published.value = !published.value
+    published.value = !published.value;
   }
-}
+};
 
 // Check if the signup form has been activated for this website
 const checkSignupFormActivated = async (wId) => {
   const { count } = await supabase
     .from("visibility-brigade-forms")
     .select("id", { count: "exact", head: true })
-    .eq("website_id", wId)
-  signupFormActivated.value = (count ?? 0) > 0
-}
+    .eq("website_id", wId);
+  signupFormActivated.value = (count ?? 0) > 0;
+};
 
 // Validate CTA Link URL
 const validateCtaLink = () => {
-  ctaLinkError.value = null
+  ctaLinkError.value = null;
 
   if (ctaLink.value && ctaLink.value.trim() !== "") {
     try {
-      const url = new URL(ctaLink.value)
+      const url = new URL(ctaLink.value);
       if (!url.protocol.startsWith("http")) {
-        ctaLinkError.value = "URL must start with http:// or https://"
+        ctaLinkError.value = "URL must start with http:// or https://";
       }
     } catch {
-      ctaLinkError.value = "Please enter a valid URL"
+      ctaLinkError.value = "Please enter a valid URL";
     }
   }
 
   // If valid, update content
   if (!ctaLinkError.value) {
-    updateContent()
+    updateContent();
   }
-}
+};
 
 // Update content data
 const updateContent = async () => {
   if (!props.contentId) {
-    return
+    return;
   }
 
-  successMessage.value = false
+  successMessage.value = false;
 
   const updateData = {
     hero_headline: heroHeadline.value,
@@ -366,33 +380,33 @@ const updateContent = async () => {
     get_involved_image: getInvolvedImage.value,
     social_embed_code: socialEmbedCode.value,
     instagram_widget_id: instagramWidgetId.value,
-  }
+  };
 
   const { error } = await supabase
     .from("visibility-brigade-content")
     .update(updateData)
-    .eq("id", props.contentId)
+    .eq("id", props.contentId);
 
   if (error) {
-    console.error("Error updating content:", error)
+    console.error("Error updating content:", error);
   } else {
-    successMessage.value = true
+    successMessage.value = true;
     setTimeout(() => {
-      successMessage.value = false
-    }, 3000)
+      successMessage.value = false;
+    }, 3000);
   }
-}
+};
 
 // Watch for changes in contentId prop and refetch
 watch(
   () => props.contentId,
   () => {
-    fetchContent()
+    fetchContent();
   }
-)
+);
 
 // Fetch content data on component mount
-fetchContent()
+fetchContent();
 </script>
 
 <style scoped>
