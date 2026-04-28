@@ -87,7 +87,7 @@
             >
             to get started. Together, we can make a difference!
           </p>
-          <NuxtLink :to="ctaLink" class="plain">
+          <NuxtLink :to="ctaLink" class="plain block">
             <Button :label="content?.cta_text || 'Join The Resistance'" class="white" />
           </NuxtLink>
         </div>
@@ -114,70 +114,70 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-})
+});
 
 const { data: content } = await useAsyncData(
   `visibility-content-${props.websiteId}`,
   () => getVisibilityBrigadeContent(props.websiteId)
-)
+);
 const { data: websiteData } = await useAsyncData(`website-data-${props.websiteId}`, () =>
   getWebsiteData(props.websiteId)
-)
+);
 
 // Check if signup form is activated
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient();
 const { data: formActivatedData } = await useAsyncData(
   `form-activated-${props.websiteId}`,
   async () => {
     const { count } = await supabase
       .from("visibility-brigade-forms")
       .select("id", { count: "exact", head: true })
-      .eq("website_id", props.websiteId)
-    return (count ?? 0) > 0
+      .eq("website_id", props.websiteId);
+    return (count ?? 0) > 0;
   }
-)
+);
 
-const formActivated = computed(() => formActivatedData.value ?? false)
+const formActivated = computed(() => formActivatedData.value ?? false);
 
 const ctaLink = computed(() => {
   if (formActivated && websiteData.value?.slug) {
-    return `/${websiteData.value.slug}/signup`
+    return `/${websiteData.value.slug}/signup`;
   }
-  return content.value?.cta_link || "#"
-})
+  return content.value?.cta_link || "#";
+});
 
-const embedSection = ref(null)
+const embedSection = ref(null);
 
 // Handle embedding code with scripts
 onMounted(() => {
   if (content.value?.social_embed_code && embedSection.value) {
-    const tempDiv = document.createElement("div")
-    tempDiv.innerHTML = content.value.social_embed_code
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = content.value.social_embed_code;
 
     // Extract and execute script tags
-    const scripts = tempDiv.querySelectorAll("script")
-    const fragment = document.createDocumentFragment()
+    const scripts = tempDiv.querySelectorAll("script");
+    const fragment = document.createDocumentFragment();
 
     // Add non-script elements first
     Array.from(tempDiv.childNodes).forEach((node) => {
       if (node.nodeName !== "SCRIPT") {
-        fragment.appendChild(node.cloneNode(true))
+        fragment.appendChild(node.cloneNode(true));
       }
-    })
+    });
 
-    embedSection.value.appendChild(fragment)
+    embedSection.value.appendChild(fragment);
 
     // Execute scripts
     scripts.forEach((oldScript) => {
-      const newScript = document.createElement("script")
+      const newScript = document.createElement("script");
       Array.from(oldScript.attributes).forEach((attr) => {
-        newScript.setAttribute(attr.name, attr.value)
-      })
-      newScript.textContent = oldScript.textContent
-      embedSection.value.appendChild(newScript)
-    })
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      newScript.textContent = oldScript.textContent;
+      embedSection.value.appendChild(newScript);
+    });
   }
-})
+});
 </script>
 
 <style lang="scss" scoped>
