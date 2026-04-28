@@ -8,9 +8,9 @@
   </div>
   <div v-else-if="website">
     <!-- User Management - super_admin only -->
-    <div v-if="isSuperAdmin" class="border-blue p-4 mb-6">
-      <Tag value="Super Admin" class="mb-6 w-fit" />
-      <h3 class="text-lg font-bold mb-4">Manage User Access</h3>
+    <div v-if="isSuperAdmin" class="border-blue p-4 mb-12">
+      <Tag value="Super Admin" class="mb-8 w-fit" />
+      <h3 class="mb-4">Manage User Access</h3>
 
       <Message
         v-if="userManagementError"
@@ -78,29 +78,16 @@
         <p class="text-sm text-gray-500">No users assigned to this website yet.</p>
       </div>
     </div>
-    <h3 class="text-lg font-bold mt-6 mb-4">Basic Information</h3>
-    <div v-if="isSuperAdmin" class="border-blue p-4 mb-6">
-      <Tag value="Super Admin" class="mb-6 w-fit" />
+    <h3 class="mb-4">Basic Information</h3>
+    <div v-if="isSuperAdmin" class="border-blue p-4 mb-8">
+      <Tag value="Super Admin" class="mb-8 w-fit" />
       <!-- URL field - editable for super_admin only -->
-      <FloatLabel variant="on" class="mb-6">
+      <FloatLabel variant="on" class="mb-8">
         <InputText id="url" v-model="url" @change="updateWebsite" />
         <label for="url">Website URL</label>
       </FloatLabel>
-      <!-- Slug field - editable for super_admin only -->
-      <FloatLabel variant="on" class="mb-6">
-        <InputText
-          id="slug"
-          v-model="slug"
-          @blur="validateSlug"
-          :class="{ 'p-invalid': slugError }"
-        />
-        <label for="slug">Slug</label>
-      </FloatLabel>
-      <small v-if="slugError" class="text-red-500 block -mt-4 mb-4">{{
-        slugError
-      }}</small>
       <!-- Type field - editable for super_admin only -->
-      <FloatLabel variant="on" class="mb-6">
+      <FloatLabel variant="on" class="mb-8">
         <Select
           class="w-full"
           id="type"
@@ -129,23 +116,30 @@
     </p>
 
     <div class="mb-8">
-      <label class="block text-sm font-medium mb-2">Logo Image</label>
-      <SupabaseImageUploader
-        v-model="logo"
-        bucket="logos"
-        :website-id="effectiveWebsiteId"
-        @update:modelValue="updateWebsite"
-      />
+      <FloatLabel variant="on">
+        <InputText
+          id="slug"
+          v-model="slug"
+          @blur="validateSlug"
+          :class="{ 'p-invalid': slugError }"
+        />
+        <label for="slug"> Website Address (Slug) </label>
+      </FloatLabel>
+      <small v-if="slugError" class="text-red-500 block mt-2">{{ slugError }}</small>
+      <Message severity="info" icon="pi pi-info-circle" class="mt-2">
+        The slug is the custom part of your website's address. For example, a slug of
+        my-group makes your site live at <strong>resistcms.com/my-group</strong>.
+      </Message>
     </div>
 
-    <div class="mb-6">
+    <div class="mb-8">
       <FloatLabel variant="on">
         <InputText id="email" v-model="email" type="email" @change="updateWebsite" />
         <label for="email">Email Address</label>
       </FloatLabel>
     </div>
 
-    <div class="mb-6">
+    <div class="mb-8">
       <FloatLabel variant="on">
         <InputText id="title" v-model="title" @change="updateWebsite" />
         <label for="title">Title</label>
@@ -192,7 +186,15 @@
       </p>
     </div>
 
-    <h3 class="text-lg font-bold mt-6 mb-4">Social Media Links</h3>
+    <h3 class="mt-12 mb-4">Logo Image</h3>
+    <SupabaseImageUploader
+      v-model="logo"
+      bucket="logos"
+      :website-id="effectiveWebsiteId"
+      @update:modelValue="updateWebsite"
+    />
+
+    <h3 class="mt-12 mb-4">Social Media Links</h3>
 
     <div class="mb-4" v-if="tiktok || showAllSocial">
       <FloatLabel variant="on">
@@ -341,19 +343,18 @@
     <Button
       :label="showAllSocial ? 'Show Less' : 'Add More Social Networks'"
       :icon="showAllSocial ? 'pi pi-chevron-up' : 'pi pi-plus'"
-      severity="secondary"
-      text
       class="mb-4"
       @click="showAllSocial = !showAllSocial"
     />
     <div v-if="isPaidUser" class="border-blue p-4 my-6">
-      <Tag value="Paid Users Only" class="mb-6 w-fit" />
+      <Tag value="Paid Users Only" class="mb-8 w-fit" />
       <h3 class="text-lg font-bold mb-4">Privacy Policy</h3>
       <SimpleEditor id="privacy_policy" v-model="privacyPolicy" rows="4" class="mb-4" />
 
-      <h3 class="text-lg font-bold mt-6 mb-4">Terms &amp; Conditions</h3>
+      <h3 class="text-lg font-bold mt-12 mb-4">Terms &amp; Conditions</h3>
       <SimpleEditor id="terms" v-model="terms" rows="4" class="mb-4" />
     </div>
+    <Divider />
     <div>
       <Button
         label="Save Changes"
@@ -364,7 +365,8 @@
       />
       <div class="mt-6">
         <NuxtLink to="/dashboard">
-          <i class="pi pi-arrow-left mr-2" />Back to the Dashboard
+          <i class="pi pi-arrow-left mr-2" />
+          Back to the Dashboard
         </NuxtLink>
       </div>
     </div>
