@@ -23,7 +23,7 @@ const navItems = [
       <NuxtLink to="/dashboard" class="plain">
         <Logo />
       </NuxtLink>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-4">
         <nuxt-link to="/settings" class="plain clickable" aria-label="manage profile">
           <Avatar
             v-if="currentUserProfile && currentUserProfile.avatar_url"
@@ -40,10 +40,17 @@ const navItems = [
             aria-label="user avatar image"
           />
         </nuxt-link>
-        <i class="pi pi-bars text-2xl cursor-pointer" @click="visible = true" />
+        <NuxtLink
+          to="/logout"
+          class="plain clickable flex items-center gap-1"
+          aria-label="logout"
+        >
+          <i class="pi pi-sign-out text-2xl" /> Logout
+        </NuxtLink>
+        <!-- <i class="pi pi-bars text-2xl cursor-pointer" @click="visible = true" /> -->
       </div>
     </div>
-    <Drawer v-model:visible="visible" position="right" header=" ">
+    <!-- <Drawer v-model:visible="visible" position="right" header=" ">
       <Logo class="mb-3 ml-1" />
       <hr class="w-44 ml-0 mb-8" />
       <p v-for="item in navItems" :key="item.label" class="mb-5">
@@ -51,6 +58,6 @@ const navItems = [
           {{ item.label }}
         </NuxtLink>
       </p>
-    </Drawer>
+    </Drawer> -->
   </header>
 </template>

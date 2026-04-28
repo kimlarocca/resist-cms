@@ -1,24 +1,24 @@
 <script setup>
-import { useCurrentUserProfile } from "~/composables/states";
+import { useCurrentUserProfile } from "~/composables/states"
 definePageMeta({
   middleware: "auth",
-});
-const currentUserProfile = useCurrentUserProfile();
-const supabase = useSupabaseClient();
-const router = useRouter();
+})
+const currentUserProfile = useCurrentUserProfile()
+const supabase = useSupabaseClient()
+const router = useRouter()
 
 // User's websites/groups
-const userWebsites = ref([]);
-const loadingWebsites = ref(true);
+const userWebsites = ref([])
+const loadingWebsites = ref(true)
 
 // Fetch websites user has permission to manage
 const fetchUserWebsites = async () => {
   if (!currentUserProfile.value?.id) {
-    loadingWebsites.value = false;
-    return;
+    loadingWebsites.value = false
+    return
   }
 
-  loadingWebsites.value = true;
+  loadingWebsites.value = true
 
   try {
     const { data, error } = await supabase
@@ -37,53 +37,53 @@ const fetchUserWebsites = async () => {
         )
       `
       )
-      .eq("user_id", currentUserProfile.value.id);
+      .eq("user_id", currentUserProfile.value.id)
 
-    if (error) throw error;
+    if (error) throw error
 
-    userWebsites.value = data?.map((item) => item.websites).filter(Boolean) || [];
+    userWebsites.value = data?.map((item) => item.websites).filter(Boolean) || []
   } catch (error) {
-    console.error("Error fetching user websites:", error);
+    console.error("Error fetching user websites:", error)
   } finally {
-    loadingWebsites.value = false;
+    loadingWebsites.value = false
   }
-};
+}
 
 // Navigate to edit group settings
 const editGroupSettings = (websiteId) => {
-  router.push(`/groups/${websiteId}`);
-};
+  router.push(`/groups/${websiteId}`)
+}
 
 // Navigate to manage content
 const manageContent = (websiteId) => {
-  router.push(`/groups/${websiteId}/manage-content`);
-};
+  router.push(`/groups/${websiteId}/manage-content`)
+}
 
 // Navigate to manage signup form
 const manageSignupForm = (websiteId) => {
-  router.push(`/groups/${websiteId}/manage-signup-form`);
-};
+  router.push(`/groups/${websiteId}/manage-signup-form`)
+}
 
 // Navigate to manage form submissions
 const manageFormSubmissions = (websiteId) => {
-  router.push(`/groups/${websiteId}/manage-form-submissions`);
-};
+  router.push(`/groups/${websiteId}/manage-form-submissions`)
+}
 
 // Watch for currentUserProfile to become available
 watch(
   () => currentUserProfile.value?.id,
   (newId) => {
     if (newId) {
-      fetchUserWebsites();
+      fetchUserWebsites()
     }
   },
   { immediate: true }
-);
+)
 
 // Fetch user websites on mount
 onMounted(() => {
-  fetchUserWebsites();
-});
+  fetchUserWebsites()
+})
 </script>
 <template>
   <div class="container p-4">
@@ -92,51 +92,28 @@ onMounted(() => {
         <Title>Resist CMS | Dashboard</Title>
       </Head>
     </Html>
-    <h1 class="mb-12">Dashboard</h1>
+    <h1 class="mb-6">Dashboard</h1>
+    <p class="mb-12">Welcome back, {{ currentUserProfile?.full_name }}!</p>
 
     <!-- super admins only -->
     <div
       v-if="currentUserProfile?.role === 'super_admin'"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16"
+      class="relative rounded-xl bg-gray shadow-xl p-8 mb-16"
     >
-      <div
-        class="flex relative flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
-        @click="$router.push('/groups')"
-      >
-        <div>
-          <Tag
-            value="Super Admin"
-            class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
-          />
-          <h3 class="mb-3">Groups</h3>
-          <p><a>Click here</a> to manage all Resist CMS groups.</p>
-        </div>
-      </div>
-      <div
-        class="flex relative flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
-        @click="$router.push('/key-links')"
-      >
-        <div>
-          <Tag
-            value="Super Admin"
-            class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
-          />
-          <h3 class="mb-3">Key Links</h3>
-          <p><a>Click here</a> to manage all key links for elections and candidates.</p>
-        </div>
-      </div>
-      <div
-        class="flex relative flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
-        @click="$router.push('/surveys/categories')"
-      >
-        <div>
-          <Tag
-            value="Super Admin"
-            class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
-          />
-          <h3 class="mb-3">Survey Categories</h3>
-          <p><a>Click here</a> to manage global survey categories.</p>
-        </div>
+      <Tag
+        value="Super Admin Quick Links"
+        class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
+      />
+      <div class="flex items-center gap-4">
+        <NuxtLink to="/groups" class="plain block">
+          <Button label="Manage Groups" class="white" />
+        </NuxtLink>
+        <NuxtLink to="/key-links" class="plain block">
+          <Button label="Manage Key Links" class="white" />
+        </NuxtLink>
+        <NuxtLink to="/surveys/categories" class="plain block">
+          <Button label="Manage Survey Categories" class="white" />
+        </NuxtLink>
       </div>
     </div>
 
@@ -146,52 +123,22 @@ onMounted(() => {
         currentUserProfile?.role === 'super_admin' ||
         currentUserProfile?.role === 'election_manager'
       "
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16"
+      class="relative rounded-xl bg-gray shadow-xl p-8 mb-16"
     >
-      <div
-        class="flex flex-col relative justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
-        @click="$router.push('/elections')"
-      >
-        <Tag
-          value="Election Managers"
-          class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
-        />
-        <div>
-          <h3 class="mb-4">My Elections</h3>
-          <p>
-            <a>Click here</a> to manage your elections and key links for your elections.
-          </p>
-        </div>
-      </div>
-      <div
-        class="flex relative flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
-        @click="$router.push('/candidates/')"
-      >
-        <div>
-          <Tag
-            value="Election Managers"
-            class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
-          />
-          <h3 class="mb-4">My Candidates</h3>
-          <p>
-            <a>Click here</a> to manage the candidates in your races and their key clinks.
-          </p>
-        </div>
-      </div>
-      <div
-        class="flex relative flex-col justify-between rounded-xl bg-gray p-8 shadow-lg clickable"
-        @click="$router.push('/surveys')"
-      >
-        <div>
-          <Tag
-            value="Election Managers"
-            class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
-          />
-          <h3 class="mb-4">My Surveys</h3>
-          <p>
-            <a>Click here</a> to manage your surveys and their questions and categories.
-          </p>
-        </div>
+      <Tag
+        value="Election Manager Quick Links"
+        class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
+      />
+      <div class="flex items-center gap-4">
+        <NuxtLink to="/elections" class="plain block">
+          <Button label="My Elections" class="white" />
+        </NuxtLink>
+        <NuxtLink to="/candidates/" class="plain block">
+          <Button label="My Candidates" class="white" />
+        </NuxtLink>
+        <NuxtLink to="/surveys" class="plain block">
+          <Button label="My Surveys" class="white" />
+        </NuxtLink>
       </div>
     </div>
 
@@ -202,79 +149,59 @@ onMounted(() => {
       </div>
 
       <div v-else>
-        <div v-for="website in userWebsites" :key="website.id" class="mb-12">
-          <h2 class="mb-3">{{ website.title || "Untitled" }}</h2>
-
-          <div class="mb-6">
-            <Tag
-              :value="website.published ? 'Published' : 'Unpublished'"
-              :severity="website.published ? 'success' : 'secondary'"
-              class="mb-3"
-            />
-            <p v-if="website.url" class="mb-1">
-              <a
-                :href="website.url"
-                target="_blank"
-                class="text-blue-600 hover:underline"
-              >
-                {{ website.url }}
-              </a>
-            </p>
-
-            <p v-else-if="website.slug" class="mb-1">
-              <a
-                :href="`https://resistcms.com/${website.slug}`"
-                target="_blank"
-                class="text-blue-600 hover:underline"
-              >
-                {{ `https://resistcms.com/${website.slug}` }}
-              </a>
-            </p>
-
-            <p v-if="website.email">Email Address: {{ website.email }}</p>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <h2 class="mb-8">My Groups</h2>
+        <div>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             <div
-              class="flex flex-col rounded-xl bg-gray p-8 shadow-lg clickable"
-              @click="editGroupSettings(website.id)"
+              v-for="website in userWebsites"
+              :key="website.id"
+              class="flex flex-col rounded-xl bg-gray shadow-xl p-8"
             >
-              <h3 class="mb-3">Group Settings</h3>
-              <p>
-                <a>Click here</a> to manage your group's settings including contact
-                information, logo, social media, and more.
+              <h3 class="mb-3">{{ website.title || "Untitled" }}</h3>
+              <Tag
+                :value="website.published ? 'Published' : 'Unpublished'"
+                :severity="website.published ? 'success' : 'secondary'"
+                class="mb-3 w-fit"
+              />
+              <p v-if="website.url" class="small mb-1">
+                <a
+                  :href="website.url"
+                  target="_blank"
+                  class="text-blue-600 hover:underline"
+                >
+                  View Public Site <i class="pi pi-arrow-right text-xs ml-1" />
+                </a>
               </p>
-            </div>
-
-            <div
-              class="flex flex-col rounded-xl bg-gray p-8 shadow-lg clickable"
-              @click="manageContent(website.id)"
-            >
-              <h3 class="mb-3">Public Website Content</h3>
-              <p>
-                <a>Click here</a> to manage your group's public website content including
-                text and images.
+              <p v-else-if="website.slug" class="small mb-1">
+                <a :href="`https://resistcms.com/${website.slug}`" target="_blank">
+                  View Public Site <i class="pi pi-arrow-right text-xs ml-1" />
+                </a>
               </p>
-            </div>
 
-            <div
-              class="flex flex-col rounded-xl bg-gray p-8 shadow-lg clickable"
-              @click="manageSignupForm(website.id)"
-            >
-              <h3 class="mb-3">Public Signup Form</h3>
-              <p>
-                <a>Click here</a> to manage your group's public signup form introduction,
-                questions, and display order.
-              </p>
-            </div>
-
-            <div
-              class="flex flex-col rounded-xl bg-gray p-8 shadow-lg clickable"
-              @click="manageFormSubmissions(website.id)"
-            >
-              <h3 class="mb-3">Form Submissions</h3>
-              <p>
-                <a>Click here</a> to manage your group's public signup form submissions.
+              <Divider class="darker" />
+              <h4>Admin Links</h4>
+              <p class="text-sm flex flex-col space-y-1 mt-4">
+                <NuxtLink :to="`/groups/${website.id}`" class="plain block">
+                  Edit Group Settings
+                </NuxtLink>
+                <NuxtLink
+                  :to="`/groups/${website.id}/manage-content`"
+                  class="plain block"
+                >
+                  Manage Public Website Content
+                </NuxtLink>
+                <NuxtLink
+                  :to="`/groups/${website.id}/manage-signup-form`"
+                  class="plain block"
+                >
+                  Manage Public Signup Form
+                </NuxtLink>
+                <NuxtLink
+                  :to="`/groups/${website.id}/manage-form-submissions`"
+                  class="plain block"
+                >
+                  Manage Form Submissions
+                </NuxtLink>
               </p>
             </div>
           </div>
