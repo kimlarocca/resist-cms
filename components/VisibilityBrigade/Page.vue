@@ -58,7 +58,7 @@
     <section
       v-if="content?.social_embed_code"
       ref="embedSection"
-      class="social-embed mx-6 mt-8 lg:mt-16 mb-32"
+      class="social-embed px-6 mt-8 lg:mt-16 mb-32 m-auto w-fit"
     />
 
     <section
