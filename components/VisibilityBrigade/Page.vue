@@ -6,7 +6,7 @@
         <Meta :name="'description'" :content="websiteData.description" />
       </Head>
     </Html>
-    <VisibilityBrigadeVbHeader />
+    <VisibilityBrigadeVbHeader :website-id="props.websiteId" />
     <section
       class="hero inverse pt-32"
       :style="{ backgroundImage: `url(${content?.hero_image || '/images/hero.jpg'})` }"
@@ -105,7 +105,7 @@
       </div>
     </section>
   </div>
-  <VisibilityBrigadeVbFooter />
+  <VisibilityBrigadeVbFooter :website-id="props.websiteId" />
 </template>
 
 <script setup>

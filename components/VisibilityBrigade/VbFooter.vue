@@ -1,16 +1,22 @@
 <script setup>
+const props = defineProps({
+  websiteId: {
+    type: Number,
+    required: true,
+  },
+})
 const route = useRoute()
 const currentYear = new Date().getFullYear()
 
-const { data: socialLinks } = await useAsyncData("social-links", () => getSocialLinks())
-const { data: navigationLinks } = await useAsyncData("navigation-links", () =>
-  getNavigationLinks()
+const { data: socialLinks } = await useAsyncData(`social-links-${props.websiteId}`, () => getSocialLinks(props.websiteId))
+const { data: navigationLinks } = await useAsyncData(`navigation-links-${props.websiteId}`, () =>
+  getNavigationLinks(props.websiteId)
 )
-const { data: websiteData } = await useAsyncData("website-data-footer", () =>
-  getWebsiteData()
+const { data: websiteData } = await useAsyncData(`website-data-footer-${props.websiteId}`, () =>
+  getWebsiteData(props.websiteId)
 )
-const { data: contentData } = await useAsyncData("content-data-footer", () =>
-  getVisibilityBrigadeContent()
+const { data: contentData } = await useAsyncData(`content-data-footer-${props.websiteId}`, () =>
+  getVisibilityBrigadeContent(props.websiteId)
 )
 
 const emailAddress = computed(() => websiteData.value?.email || "")
@@ -29,9 +35,7 @@ const privacyUrl = computed(() =>
     <footer class="p-6">
       <div class="grid lg:grid-cols-4 gap-16 mb-12">
         <div class="col-span-1 lg:col-span-2">
-          <div class="p-5 bg-white rounded-lg w-fit">
-            <VisibilityBrigadeLogo class="black" />
-          </div>
+            <VisibilityBrigadeLogo :website-id="props.websiteId" class="inverse" />
           <p class="mt-5">{{ description }}</p>
         </div>
         <div class="col-span-1">

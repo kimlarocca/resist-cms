@@ -1,30 +1,40 @@
 <script setup>
-const { data: websiteData } = await useAsyncData("website-data", () => getWebsiteData())
-const websiteTitle = computed(() => websiteData.value?.title || "")
+const props = defineProps({
+  websiteId: {
+    type: Number,
+    required: true,
+  },
+});
+const { data: websiteData } = await useAsyncData(`website-data-${props.websiteId}`, () =>
+  getWebsiteData(props.websiteId)
+);
+const websiteTitle = computed(() => websiteData.value?.title || "");
 </script>
 
 <template>
-  <NuxtLink :to="`/${websiteData?.slug}`" class="logo plain clickable" aria-label="home">
-    <img
-      v-if="websiteData?.logo"
-      :src="websiteData.logo"
-      :alt="`${websiteTitle} logo`"
-      class="logo-image"
-    />
-    <p v-else class="like-h3">{{ websiteTitle }}</p>
-  </NuxtLink>
+  <div class="logo">
+    <NuxtLink :to="`/${websiteData?.slug}`" class="plain clickable" aria-label="home">
+      <img
+        v-if="websiteData?.logo"
+        :src="websiteData.logo"
+        :alt="`${websiteTitle} logo`"
+        class="logo-image"
+      />
+      <p v-else class="w-fit p-5 rounded-lg like-h3">{{ websiteTitle }}</p>
+    </NuxtLink>
+  </div>
 </template>
 
 <style lang="scss" scoped>
 .logo {
   p {
-    background: transparent;
-    color: #fff;
-    margin-top: -5px;
+    background: black;
+    color: white;
   }
-  &.black {
+  &.inverse {
     p {
-      color: #000;
+      background: white;
+      color: black;
     }
   }
 }
