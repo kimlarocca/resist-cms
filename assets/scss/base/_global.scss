@@ -175,6 +175,11 @@ a {
     font-size: 14px !important;
 }
 
+.p-drawer {
+    color: var(--white) !important;
+    background: var(--black) !important;
+}
+
 // accessibility
 // hide outline when using a mouse but not when using a keyboard
 .js-focus-visible :focus:not(.focus-visible) {
