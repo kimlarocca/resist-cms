@@ -5,9 +5,7 @@ const props = defineProps({
     required: true,
   },
 });
-const { data: websiteData } = await useAsyncData(`website-data-${props.websiteId}`, () =>
-  getWebsiteData(props.websiteId)
-);
+const { data: websiteData } = useNuxtData(`website-data-${props.websiteId}`);
 const websiteTitle = computed(() => websiteData.value?.title || "");
 </script>
 

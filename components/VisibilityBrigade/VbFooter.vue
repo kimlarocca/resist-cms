@@ -4,36 +4,36 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-});
-const route = useRoute();
-const currentYear = new Date().getFullYear();
+})
+const route = useRoute()
+const currentYear = new Date().getFullYear()
 
 const { data: socialLinks } = await useAsyncData(`social-links-${props.websiteId}`, () =>
   getSocialLinks(props.websiteId)
-);
+)
 const {
   data: navigationLinks,
 } = await useAsyncData(`navigation-links-${props.websiteId}`, () =>
-  getNavigationLinks(props.websiteId)
-);
+  getVisibilityBrigadeNavigationLinks(props.websiteId)
+)
 const { data: websiteData } = await useAsyncData(
   `website-data-footer-${props.websiteId}`,
   () => getWebsiteData(props.websiteId)
-);
+)
 const { data: contentData } = await useAsyncData(
   `content-data-footer-${props.websiteId}`,
   () => getVisibilityBrigadeContent(props.websiteId)
-);
+)
 
-const emailAddress = computed(() => websiteData.value?.email || "");
-const companyName = computed(() => websiteData.value?.title || "");
-const description = computed(() => contentData.value?.hero_text || "");
+const emailAddress = computed(() => websiteData.value?.email || "")
+const companyName = computed(() => websiteData.value?.title || "")
+const description = computed(() => contentData.value?.hero_text || "")
 const termsUrl = computed(() =>
   websiteData.value?.terms ? `/${route.params.slug}/terms` : null
-);
+)
 const privacyUrl = computed(() =>
   websiteData.value?.privacy_policy ? `/${route.params.slug}/privacy` : null
-);
+)
 </script>
 
 <template>
@@ -48,7 +48,7 @@ const privacyUrl = computed(() =>
           <p class="like-h4 mb-4">Quick Links</p>
           <div v-for="link in navigationLinks" :key="link.label">
             <p class="mb-2">
-              <NuxtLink :to="link.href + link.hash" :target="link.target">
+              <NuxtLink :to="link.anchor">
                 {{ link.label }}
               </NuxtLink>
             </p>
@@ -57,7 +57,7 @@ const privacyUrl = computed(() =>
         <div class="col-span-1">
           <p class="like-h4 mb-5">Connect</p>
           <p v-if="emailAddress" class="mb-5">
-            <i class="pi pi-envelope mr-2" />
+            <i class="pi pi-envelope mr-2 text-2xl" />
             <a :href="`mailto:${emailAddress}`">
               {{ emailAddress }}
             </a>

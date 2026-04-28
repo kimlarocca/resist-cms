@@ -44,25 +44,18 @@ export async function getAllWebsiteData (websiteId = 1) {
 }
 
 // Fetch navigation links with dynamic CTA
-export async function getNavigationLinks (websiteId = 1) {
-    const contentData = await getVisibilityBrigadeContent(websiteId)
-console.log("Content Data:", contentData) // Debug log to check content data
-    const links = [{ label: "About Us", href: "/", hash: "#about-us", target: "" }]
+export async function getVisibilityBrigadeNavigationLinks (websiteId = 1) {
+    const links = [{ label: "About Us", anchor: "#about-us"}, { label: "Get Involved", anchor: "#get-involved" }]
 
-    // Only include Photo Gallery if instagram_widget_id exists
-    if (contentData?.instagram_widget_id) {
-        links.push({ label: "Photo Gallery", href: "/", hash: "#gallery", target: "" })
-    }
-
-    links.push(
-        { label: "Get Involved", href: "/", hash: "#get-involved", target: "" },
-        {
-            label: contentData?.cta_text || "Join Us Today",
-            href: contentData?.cta_link || "",
-            hash: "",
-            target: "_blank",
+    try {
+        // Only include Photo Gallery if instagram_widget_id exists
+        const contentData = await getVisibilityBrigadeContent(websiteId)
+        if (contentData?.instagram_widget_id) {
+            links.push({ label: "Photo Gallery", anchor: "#gallery" })
         }
-    )
+    } catch (e) {
+        console.error("Error fetching navigation links content:", e)
+    }
 
     return links
 }

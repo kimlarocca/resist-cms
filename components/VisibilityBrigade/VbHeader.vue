@@ -5,21 +5,20 @@ const props = defineProps({
     required: true,
   },
 })
+
 const visible = ref(false)
-const { data: navigationLinks } = await useAsyncData(
-  `navigation-links-header-${props.websiteId}`,
-  () => getNavigationLinks(props.websiteId)
-)
-const { data: websiteData } = await useAsyncData(
-  `website-data-${props.websiteId}`,
-  () => getWebsiteData(props.websiteId)
+
+const {
+  data: navigationLinks,
+} = await useAsyncData(`navigation-links-header-${props.websiteId}`, () =>
+  getVisibilityBrigadeNavigationLinks(props.websiteId)
 )
 </script>
 
 <template>
   <header class="visibility-brigade-header rounded-lg">
     <div class="flex justify-between gap-4 items-center">
-        <VisibilityBrigadeLogo :website-id="props.websiteId" />
+      <VisibilityBrigadeLogo :website-id="props.websiteId" />
       <i
         v-if="navigationLinks"
         class="bg-black p-4 rounded-full pi pi-bars text-xl text-white clickable"
@@ -32,8 +31,8 @@ const { data: websiteData } = await useAsyncData(
         </NuxtLink>
         <p v-for="(item, index) in navigationLinks" :key="index" class="mb-4">
           <NuxtLink
-            :to="item.href + item.hash"
-            class="font-medium decoration-none text-white"
+            :to="item.anchor"
+            class="font-medium decoration-none text-white clickable"
             @click="visible = false"
           >
             {{ item.label }}

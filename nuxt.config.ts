@@ -63,7 +63,8 @@ export default defineNuxtConfig({
           darkModeSelector: ".dark-mode",
         }
       }
-    }
+    },
+    importIcons: false,
   },
 
   runtimeConfig: {
