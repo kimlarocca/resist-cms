@@ -30,9 +30,8 @@ const { data: websiteData } = await useAsyncData(
         <NuxtLink to="/" class="plain clickable" aria-label="home">
           <VisibilityBrigadeLogo :website-id="props.websiteId" class="minimal mb-8" />
         </NuxtLink>
-        <p v-for="item in navigationLinks" class="mb-4">
+        <p v-for="(item, index) in navigationLinks" :key="index" class="mb-4">
           <NuxtLink
-            :key="item.label"
             :to="item.href + item.hash"
             class="font-medium decoration-none text-white"
             @click="visible = false"

@@ -257,7 +257,7 @@ const saveNewWebsite = async () => {
     fetchWebsites()
     // Navigate to edit the new website
     if (data?.id) {
-      router.push(`/${data.id}`)
+      router.push(`/groups/${data.id}`)
     }
   }
 
@@ -278,6 +278,32 @@ const confirmDelete = (website) => {
 // Delete website
 const deleteWebsite = async () => {
   if (!websiteToDelete.value) return
+
+  // First delete related rows in websites_users
+  const { error: usersError } = await supabase
+    .from("websites_users")
+    .delete()
+    .eq("website_id", websiteToDelete.value.id)
+
+  if (usersError) {
+    console.error("Error deleting website users:", usersError)
+    deleteDialogVisible.value = false
+    websiteToDelete.value = null
+    return
+  }
+
+  // Delete related rows in visibility-brigade-content
+  const { error: contentError } = await supabase
+    .from("visibility-brigade-content")
+    .delete()
+    .eq("website_id", websiteToDelete.value.id)
+
+  if (contentError) {
+    console.error("Error deleting visibility brigade content:", contentError)
+    deleteDialogVisible.value = false
+    websiteToDelete.value = null
+    return
+  }
 
   const { error } = await supabase
     .from("websites")
