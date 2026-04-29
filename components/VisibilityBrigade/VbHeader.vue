@@ -6,6 +6,7 @@ const props = defineProps({
   },
 })
 
+const route = useRoute()
 const visible = ref(false)
 
 const {
@@ -16,7 +17,8 @@ const {
 </script>
 
 <template>
-  <header class="visibility-brigade-header rounded-lg">
+  <ProgressSpinner v-if="!navigationLinks" class="m-auto mt-32" />
+  <header v-else class="visibility-brigade-header rounded-lg">
     <div class="flex justify-between gap-4 items-center">
       <VisibilityBrigadeLogo :website-id="props.websiteId" />
       <i
@@ -31,7 +33,7 @@ const {
         </NuxtLink>
         <p v-for="(item, index) in navigationLinks" :key="index" class="mb-4">
           <NuxtLink
-            :to="item.anchor"
+            :to="`/${route.params.slug}/${item.anchor}`"
             class="font-medium decoration-none text-white clickable"
             @click="visible = false"
           >

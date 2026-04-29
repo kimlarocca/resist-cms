@@ -46,7 +46,7 @@ export async function getAllWebsiteData (websiteId = 1) {
 // Fetch navigation links with dynamic CTA
 export async function getVisibilityBrigadeNavigationLinks (websiteId = 1) {
     const supabase = useSupabaseClient()
-    const links = [{ label: "About Us", anchor: "#about-us"}, { label: "Get Involved", anchor: "#get-involved" }]
+    const links = [{ label: "Home", anchor: ""},{ label: "About Us", anchor: "#about-us"}, { label: "Get Involved", anchor: "#get-involved" }]
 
     try {
         // Only include Photo Gallery if instagram_widget_id exists

@@ -1,36 +1,34 @@
 <template>
-  <div class="visibility-brigade">
-    <Html lang="en">
-      <Head>
-        <Title>{{ websiteData.title }} | Join The Resistance</Title>
-        <Meta :name="'description'" :content="websiteData.description" />
-      </Head>
-    </Html>
-    <VisibilityBrigadeVbHeader />
-    <section
-      class="hero inverse py-8"
-      :style="{ backgroundImage: `url(${content?.hero_image || '/images/hero.jpg'})` }"
-    >
-      <div class="p-6 h-full flex flex-col justify-between">
-        <h1 class="like-h1 text-white mb-12">Join The Resistance</h1>
-        <div class="mb-12">
-          <div
-            v-if="content?.signup_form_text"
-            class="mb-6 text-xl sm:text-2xl font-semibold text-white"
-            v-html="content?.signup_form_text"
-          />
-          <p v-else>Please fill out the form below to join the resistance.</p>
-          <NuxtLink to="#form" class="plain">
-            <Button label="Get Started" class="white" />
-          </NuxtLink>
+  <ProgressSpinner v-if="!website || !content || !websiteData" class="m-auto mt-32" />
+  <template v-else>
+    <div class="visibility-brigade">
+      <Html lang="en">
+        <Head>
+          <Title>{{ websiteData.title }} | Join The Resistance</Title>
+          <Meta :name="'description'" :content="websiteData.description" />
+        </Head>
+      </Html>
+      <VisibilityBrigadeVbHeader :website-id="websiteId" />
+      <section
+        class="hero inverse py-8"
+        :style="{ backgroundImage: `url(${content?.hero_image || '/images/hero.jpg'})` }"
+      >
+        <div class="p-6 h-full flex flex-col justify-between">
+          <h1 class="like-h1 text-white">
+            {{ content?.signup_form_h1_text || "Join The Resistance" }}
+          </h1>
         </div>
-      </div>
-    </section>
-    <section class="p-6 py-16" id="form">
-      <VisibilityBrigadeSignupForm :website-id="websiteId" />
-    </section>
-  </div>
-  <VisibilityBrigadeVbFooter />
+      </section>
+      <section class="p-6 py-16" id="form">
+        <div class="mb-12">
+          <div v-if="content?.signup_form_text" v-html="content?.signup_form_text" />
+          <p v-else>Please fill out the form below to join the resistance.</p>
+        </div>
+        <VisibilityBrigadeSignupForm :website-id="websiteId" />
+      </section>
+    </div>
+    <VisibilityBrigadeVbFooter :website-id="websiteId" />
+  </template>
 </template>
 
 <script setup>
@@ -42,13 +40,14 @@ const route = useRoute()
 const supabase = useSupabaseClient()
 const slug = computed(() => route.params.slug)
 
-const { data: website } = await useAsyncData(`signup-website-${slug.value}`, async () => {
+const { data: website } = await useAsyncData(`website-${slug.value}`, async () => {
   const { data, error } = await supabase
     .from("websites")
-    .select("id, title, description, type")
+    .select("*")
     .eq("slug", slug.value)
     .single()
   if (error) throw error
+  if (!data?.published) return null
   return data
 })
 

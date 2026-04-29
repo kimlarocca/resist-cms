@@ -123,7 +123,7 @@
           @blur="validateSlug"
           :class="{ 'p-invalid': slugError }"
         />
-        <label for="slug"> Website Address (Slug) </label>
+        <label for="slug"> Website Slug</label>
       </FloatLabel>
       <small v-if="slugError" class="text-red-500 block mt-2">{{ slugError }}</small>
       <Message severity="info" icon="pi pi-info-circle" class="mt-2">
@@ -135,14 +135,14 @@
     <div class="mb-8">
       <FloatLabel variant="on">
         <InputText id="email" v-model="email" type="email" @change="updateWebsite" />
-        <label for="email">Email Address</label>
+        <label for="email">Public Email Address</label>
       </FloatLabel>
     </div>
 
     <div class="mb-8">
       <FloatLabel variant="on">
         <InputText id="title" v-model="title" @change="updateWebsite" />
-        <label for="title">Title</label>
+        <label for="title">Website Title</label>
       </FloatLabel>
       <p class="text-sm mt-3 text-gray-600">
         <em>
@@ -168,7 +168,7 @@
           rows="3"
           @change="updateWebsite"
         />
-        <label for="description">Description</label>
+        <label for="description">Website Description</label>
       </FloatLabel>
       <p class="text-sm mt-3 text-gray-600">
         <em>
@@ -422,129 +422,129 @@ const props = defineProps({
     type: [String, Number],
     default: null,
   },
-});
+})
 
-const currentUserProfile = useCurrentUserProfile();
-const supabase = useSupabaseClient();
+const currentUserProfile = useCurrentUserProfile()
+const supabase = useSupabaseClient()
 
-const website = ref(null);
-const loading = ref(true);
-const successMessage = ref(false);
-const userManagementError = ref("");
+const website = ref(null)
+const loading = ref(true)
+const successMessage = ref(false)
+const userManagementError = ref("")
 
 // Error states for URL validation
-const tiktokError = ref(null);
-const blueskyError = ref(null);
-const facebookError = ref(null);
-const instagramError = ref(null);
-const youtubeError = ref(null);
-const threadsError = ref(null);
-const linktreeError = ref(null);
-const twitterError = ref(null);
-const substackError = ref(null);
-const slugError = ref(null);
+const tiktokError = ref(null)
+const blueskyError = ref(null)
+const facebookError = ref(null)
+const instagramError = ref(null)
+const youtubeError = ref(null)
+const threadsError = ref(null)
+const linktreeError = ref(null)
+const twitterError = ref(null)
+const substackError = ref(null)
+const slugError = ref(null)
 
 // User management refs
-const assignedUsers = ref([]);
-const allProfiles = ref([]);
-const selectedUser = ref(null);
-const loadingAssignments = ref(false);
-const loadingProfiles = ref(false);
-const addingUser = ref(false);
-const removingUser = ref(false);
-const userToRemove = ref(null);
-const removeUserDialogVisible = ref(false);
+const assignedUsers = ref([])
+const allProfiles = ref([])
+const selectedUser = ref(null)
+const loadingAssignments = ref(false)
+const loadingProfiles = ref(false)
+const addingUser = ref(false)
+const removingUser = ref(false)
+const userToRemove = ref(null)
+const removeUserDialogVisible = ref(false)
 
 // Check if user is super_admin
 const isSuperAdmin = computed(() => {
-  return currentUserProfile.value?.role === "super_admin";
-});
+  return currentUserProfile.value?.role === "super_admin"
+})
 
 // Check if website is not free (paid user)
 const isPaidUser = computed(() => {
-  return website.value?.product !== "free" || product.value === "paid";
-});
+  return website.value?.product !== "free" || product.value === "paid"
+})
 
 // Type options for the select menu
-const typeOptions = ref(["visibility-brigade"]);
+const typeOptions = ref(["visibility-brigade"])
 
 // Product options for the select menu
-const productOptions = ref(["free", "paid"]);
+const productOptions = ref(["free", "paid"])
 
 // Reactive form fields
-const type = ref(null);
-const url = ref(null);
-const title = ref(null);
-const description = ref(null);
-const email = ref(null);
-const tiktok = ref(null);
-const bluesky = ref(null);
-const facebook = ref(null);
-const instagram = ref(null);
-const youtube = ref(null);
-const threads = ref(null);
-const linktree = ref(null);
-const twitter = ref(null);
-const substack = ref(null);
-const showAllSocial = ref(false);
-const privacyPolicy = ref(null);
-const terms = ref(null);
-const logo = ref(null);
-const slug = ref(null);
-const product = ref(null);
+const type = ref(null)
+const url = ref(null)
+const title = ref(null)
+const description = ref(null)
+const email = ref(null)
+const tiktok = ref(null)
+const bluesky = ref(null)
+const facebook = ref(null)
+const instagram = ref(null)
+const youtube = ref(null)
+const threads = ref(null)
+const linktree = ref(null)
+const twitter = ref(null)
+const substack = ref(null)
+const showAllSocial = ref(false)
+const privacyPolicy = ref(null)
+const terms = ref(null)
+const logo = ref(null)
+const slug = ref(null)
+const product = ref(null)
 
 // Compute the effective website ID to use
 const effectiveWebsiteId = computed(() => {
-  return props.websiteId || currentUserProfile.value?.website_id;
-});
+  return props.websiteId || currentUserProfile.value?.website_id
+})
 
 // Filter out users who are already assigned
 const availableUsers = computed(() => {
-  const assignedIds = assignedUsers.value.map((u) => u.id);
+  const assignedIds = assignedUsers.value.map((u) => u.id)
   const available = allProfiles.value
     .filter((profile) => !assignedIds.includes(profile.id))
     .map((profile) => ({
       id: profile.id,
       displayName: profile.full_name || "No Name",
-    }));
-  return available;
-});
+    }))
+  return available
+})
 
 // Check if slug already exists
 const checkSlugExists = async (slug, excludeId = null) => {
-  const query = supabase.from("websites").select("id").eq("slug", slug);
+  const query = supabase.from("websites").select("id").eq("slug", slug)
 
   if (excludeId) {
-    query.neq("id", excludeId);
+    query.neq("id", excludeId)
   }
 
-  const { data, error } = await query;
+  const { data, error } = await query
 
-  if (error) throw error;
-  return data && data.length > 0;
-};
+  if (error) throw error
+  return data && data.length > 0
+}
 
 // Validate slug on blur
 const validateSlug = async () => {
-  slugError.value = null;
+  slugError.value = null
 
   if (!slug.value || slug.value.trim() === "") {
-    updateWebsite();
-    return;
+    updateWebsite()
+    return
   }
 
   try {
-    const exists = await checkSlugExists(slug.value, effectiveWebsiteId.value);
+    const exists = await checkSlugExists(slug.value, effectiveWebsiteId.value)
 
     if (exists) {
-      slugError.value = "This slug is already in use. Please choose a different one.";
+      slugError.value = "This slug is already in use. Please choose a different one."
     } else {
-      updateWebsite();
+      updateWebsite()
     }
   } catch (error) {
-    console.error("Error validating slug:", error);
+    console.error("Error validating slug:", error)
   }
-};
+}
 
 // Validate social media URLs
 const normalizeSocialUrl = (field) => {
@@ -558,7 +558,7 @@ const normalizeSocialUrl = (field) => {
     linktree: { prefix: "https://linktr.ee/", stripAt: false },
     twitter: { prefix: "https://x.com/", stripAt: true },
     substack: null, // subdomain-based, can't auto-normalize
-  };
+  }
 
   const valueMap = {
     tiktok,
@@ -570,19 +570,19 @@ const normalizeSocialUrl = (field) => {
     linktree,
     twitter,
     substack,
-  };
-  const fieldRef = valueMap[field];
-  const config = baseUrls[field];
+  }
+  const fieldRef = valueMap[field]
+  const config = baseUrls[field]
 
-  if (!fieldRef.value || !config) return;
+  if (!fieldRef.value || !config) return
 
-  const val = fieldRef.value.trim();
-  if (!val || val.startsWith("http")) return;
+  const val = fieldRef.value.trim()
+  if (!val || val.startsWith("http")) return
 
   // Strip leading @ if the platform doesn't use it in its URL
-  const handle = config.stripAt ? val.replace(/^@/, "") : val;
-  fieldRef.value = config.prefix + handle;
-};
+  const handle = config.stripAt ? val.replace(/^@/, "") : val
+  fieldRef.value = config.prefix + handle
+}
 
 const validateUrl = (field) => {
   const errorMap = {
@@ -595,7 +595,7 @@ const validateUrl = (field) => {
     linktree: linktreeError,
     twitter: twitterError,
     substack: substackError,
-  };
+  }
 
   const valueMap = {
     tiktok: tiktok,
@@ -607,101 +607,101 @@ const validateUrl = (field) => {
     linktree: linktree,
     twitter: twitter,
     substack: substack,
-  };
+  }
 
-  const error = errorMap[field];
-  const value = valueMap[field];
+  const error = errorMap[field]
+  const value = valueMap[field]
 
-  normalizeSocialUrl(field);
-  error.value = null;
+  normalizeSocialUrl(field)
+  error.value = null
 
   if (value.value && value.value.trim() !== "") {
     try {
-      const url = new URL(value.value);
+      const url = new URL(value.value)
       if (!url.protocol.startsWith("http")) {
-        error.value = "URL must start with http:// or https://";
-        return;
+        error.value = "URL must start with http:// or https://"
+        return
       }
     } catch {
-      error.value = "Please enter a valid URL";
-      return;
+      error.value = "Please enter a valid URL"
+      return
     }
   }
 
   // If valid or empty, update website
-  updateWebsite();
-};
+  updateWebsite()
+}
 
 // Fetch the website data based on website_id from props or currentUserProfile
 const fetchWebsite = async () => {
   if (!effectiveWebsiteId.value) {
-    loading.value = false;
-    return;
+    loading.value = false
+    return
   }
 
-  loading.value = true;
+  loading.value = true
 
   const { data, error } = await supabase
     .from("websites")
     .select("*")
     .eq("id", effectiveWebsiteId.value)
-    .single();
+    .single()
 
   if (error) {
-    console.error("Error fetching website:", error);
+    console.error("Error fetching website:", error)
   } else if (data) {
-    website.value = data;
+    website.value = data
     // Populate form fields
-    type.value = data.type;
-    url.value = data.url;
-    title.value = data.title;
-    description.value = data.description;
-    email.value = data.email;
-    tiktok.value = data.tiktok;
-    bluesky.value = data.bluesky;
-    facebook.value = data.facebook;
-    instagram.value = data.instagram;
-    youtube.value = data.youtube;
-    threads.value = data.threads;
-    linktree.value = data.linktree;
-    twitter.value = data.twitter;
-    substack.value = data.substack;
-    privacyPolicy.value = data.privacy_policy;
-    terms.value = data.terms;
-    logo.value = data.logo;
-    slug.value = data.slug;
-    product.value = data.product;
+    type.value = data.type
+    url.value = data.url
+    title.value = data.title
+    description.value = data.description
+    email.value = data.email
+    tiktok.value = data.tiktok
+    bluesky.value = data.bluesky
+    facebook.value = data.facebook
+    instagram.value = data.instagram
+    youtube.value = data.youtube
+    threads.value = data.threads
+    linktree.value = data.linktree
+    twitter.value = data.twitter
+    substack.value = data.substack
+    privacyPolicy.value = data.privacy_policy
+    terms.value = data.terms
+    logo.value = data.logo
+    slug.value = data.slug
+    product.value = data.product
   }
 
-  loading.value = false;
-};
+  loading.value = false
+}
 
 // Update website data
 const updateWebsite = async () => {
   if (!effectiveWebsiteId.value) {
-    return;
+    return
   }
 
   // Prevent save if slug is invalid
   if (slugError.value) {
-    return;
+    return
   }
 
   // Validate slug uniqueness if super admin is updating it
   if (isSuperAdmin.value && slug.value) {
     try {
-      const slugExists = await checkSlugExists(slug.value, effectiveWebsiteId.value);
+      const slugExists = await checkSlugExists(slug.value, effectiveWebsiteId.value)
       if (slugExists) {
-        slugError.value = "This slug is already in use. Please choose a different one.";
-        return;
+        slugError.value = "This slug is already in use. Please choose a different one."
+        return
       }
     } catch (error) {
-      console.error("Error checking slug:", error);
-      return;
+      console.error("Error checking slug:", error)
+      return
     }
   }
 
-  successMessage.value = false;
+  successMessage.value = false
 
   const updateData = {
     title: title.value,
@@ -719,46 +719,46 @@ const updateWebsite = async () => {
     privacy_policy: privacyPolicy.value,
     terms: terms.value,
     logo: logo.value,
-  };
+  }
 
   // Only super_admin can update these fields
   if (isSuperAdmin.value) {
-    updateData.type = type.value;
-    updateData.url = url.value;
-    updateData.slug = slug.value;
-    updateData.product = product.value;
+    updateData.type = type.value
+    updateData.url = url.value
+    updateData.slug = slug.value
+    updateData.product = product.value
   }
 
   const { error } = await supabase
     .from("websites")
     .update(updateData)
-    .eq("id", effectiveWebsiteId.value);
+    .eq("id", effectiveWebsiteId.value)
 
   if (error) {
-    console.error("Error updating website:", error);
+    console.error("Error updating website:", error)
   } else {
-    successMessage.value = true;
+    successMessage.value = true
     setTimeout(() => {
-      successMessage.value = false;
-    }, 3000);
+      successMessage.value = false
+    }, 3000)
   }
-};
+}
 
 // Clear slug error when user modifies the slug
 watch(
   () => slug.value,
   () => {
     if (slugError.value) {
-      slugError.value = null;
+      slugError.value = null
     }
   }
-);
+)
 
 // Fetch users assigned to this website
 const fetchAssignedUsers = async () => {
-  if (!effectiveWebsiteId.value) return;
+  if (!effectiveWebsiteId.value) return
 
-  loadingAssignments.value = true;
+  loadingAssignments.value = true
 
   try {
     const { data, error } = await supabase
@@ -773,137 +773,137 @@ const fetchAssignedUsers = async () => {
         )
       `
       )
-      .eq("website_id", effectiveWebsiteId.value);
+      .eq("website_id", effectiveWebsiteId.value)
 
-    if (error) throw error;
+    if (error) throw error
 
     assignedUsers.value =
       data?.map((item) => ({
         id: item.profiles.id,
         full_name: item.profiles.full_name,
         role: item.profiles.role,
-      })) || [];
+      })) || []
   } catch (error) {
-    console.error("Error fetching assigned users:", error);
+    console.error("Error fetching assigned users:", error)
   } finally {
-    loadingAssignments.value = false;
+    loadingAssignments.value = false
   }
-};
+}
 
 // Fetch all profiles for user selection
 const fetchAllProfiles = async () => {
-  loadingProfiles.value = true;
+  loadingProfiles.value = true
 
   try {
     const { data, error } = await supabase
       .from("profiles")
       .select("id, full_name, role")
-      .order("full_name", { ascending: true });
+      .order("full_name", { ascending: true })
 
-    if (error) throw error;
+    if (error) throw error
 
-    allProfiles.value = data || [];
+    allProfiles.value = data || []
   } catch (error) {
-    console.error("Error fetching profiles:", error);
+    console.error("Error fetching profiles:", error)
   } finally {
-    loadingProfiles.value = false;
+    loadingProfiles.value = false
   }
-};
+}
 
 // Add user to website
 const addUserToWebsite = async () => {
-  if (!selectedUser.value || !effectiveWebsiteId.value) return;
+  if (!selectedUser.value || !effectiveWebsiteId.value) return
 
-  addingUser.value = true;
-  userManagementError.value = "";
+  addingUser.value = true
+  userManagementError.value = ""
 
   try {
     const { error } = await supabase.from("websites_users").insert({
       website_id: effectiveWebsiteId.value,
       user_id: selectedUser.value,
-    });
+    })
 
-    if (error) throw error;
+    if (error) throw error
 
-    successMessage.value = true;
+    successMessage.value = true
     setTimeout(() => {
-      successMessage.value = false;
-    }, 3000);
+      successMessage.value = false
+    }, 3000)
 
-    selectedUser.value = null;
-    await fetchAssignedUsers();
+    selectedUser.value = null
+    await fetchAssignedUsers()
   } catch (error) {
-    console.error("Error adding user to website:", error);
+    console.error("Error adding user to website:", error)
     userManagementError.value =
-      error.message || "Failed to add user. They may already have access.";
+      error.message || "Failed to add user. They may already have access."
   } finally {
-    addingUser.value = false;
+    addingUser.value = false
   }
-};
+}
 
 // Confirm remove user
 const confirmRemoveUser = (user) => {
-  userToRemove.value = user;
-  removeUserDialogVisible.value = true;
-};
+  userToRemove.value = user
+  removeUserDialogVisible.value = true
+}
 
 // Remove user from website
 const removeUserFromWebsite = async () => {
-  if (!userToRemove.value || !effectiveWebsiteId.value) return;
+  if (!userToRemove.value || !effectiveWebsiteId.value) return
 
-  removingUser.value = true;
-  userManagementError.value = "";
+  removingUser.value = true
+  userManagementError.value = ""
 
   try {
     const { error } = await supabase
       .from("websites_users")
       .delete()
       .eq("website_id", effectiveWebsiteId.value)
-      .eq("user_id", userToRemove.value.id);
+      .eq("user_id", userToRemove.value.id)
 
-    if (error) throw error;
+    if (error) throw error
 
-    successMessage.value = true;
+    successMessage.value = true
     setTimeout(() => {
-      successMessage.value = false;
-    }, 3000);
+      successMessage.value = false
+    }, 3000)
 
-    removeUserDialogVisible.value = false;
-    await fetchAssignedUsers();
+    removeUserDialogVisible.value = false
+    await fetchAssignedUsers()
   } catch (error) {
-    console.error("Error removing user from website:", error);
-    userManagementError.value = error.message || "Failed to remove user.";
-    removeUserDialogVisible.value = false;
+    console.error("Error removing user from website:", error)
+    userManagementError.value = error.message || "Failed to remove user."
+    removeUserDialogVisible.value = false
   } finally {
-    removingUser.value = false;
+    removingUser.value = false
   }
-};
+}
 
 // Watch for changes in websiteId prop and refetch
 watch(
   () => props.websiteId,
   () => {
-    fetchWebsite();
+    fetchWebsite()
     if (isSuperAdmin.value) {
-      fetchAssignedUsers();
+      fetchAssignedUsers()
     }
   }
-);
+)
 
 // Watch for super admin status to load user management data
 watch(
   [() => isSuperAdmin.value, () => effectiveWebsiteId.value],
   ([isAdmin, websiteId]) => {
     if (isAdmin && websiteId) {
-      fetchAllProfiles();
-      fetchAssignedUsers();
+      fetchAllProfiles()
+      fetchAssignedUsers()
     }
   },
   { immediate: true }
-);
+)
 
 // Fetch website data on component mount
-fetchWebsite();
+fetchWebsite()
 </script>
 
 <style scoped>

@@ -27,7 +27,7 @@ const { data: contentData } = await useAsyncData(
 
 const emailAddress = computed(() => websiteData.value?.email || "")
 const companyName = computed(() => websiteData.value?.title || "")
-const description = computed(() => contentData.value?.hero_text || "")
+const footerText = computed(() => contentData.value?.footer_text || "")
 const termsUrl = computed(() =>
   websiteData.value?.terms ? `/${route.params.slug}/terms` : null
 )
@@ -37,18 +37,22 @@ const privacyUrl = computed(() =>
 </script>
 
 <template>
-  <div class="contrast py-16">
+  <ProgressSpinner
+    v-if="!socialLinks || !navigationLinks || !websiteData || !contentData"
+    class="m-auto mt-32"
+  />
+  <div v-else class="contrast py-16">
     <footer class="p-6">
       <div class="grid lg:grid-cols-4 gap-16 mb-12">
         <div class="col-span-1 lg:col-span-2">
           <VisibilityBrigadeLogo :website-id="props.websiteId" class="inverse" />
-          <p class="mt-5" v-html="description" />
+          <div class="mt-5" v-html="footerText" />
         </div>
         <div class="col-span-1">
           <p class="like-h4 mb-4">Quick Links</p>
           <div v-for="link in navigationLinks" :key="link.label">
             <p class="mb-2">
-              <NuxtLink :to="link.anchor">
+              <NuxtLink :to="`/${route.params.slug}/${link.anchor}`">
                 {{ link.label }}
               </NuxtLink>
             </p>

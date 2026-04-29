@@ -31,6 +31,18 @@
     <!-- Form Questions Management -->
     <div v-else>
       <div class="mb-12">
+        <h2 class="mb-4">Form Heading</h2>
+        <p class="mb-4">
+          This is the main heading displayed at the top of your signup form.
+        </p>
+        <InputText
+          v-model="signupFormH1Text"
+          @blur="saveIntroTextManually"
+          class="w-full"
+        />
+      </div>
+
+      <div class="mb-12">
         <h2 class="mb-4">Introduction Text</h2>
         <p class="mb-4">
           This text is optional and, if entered, will appear at the top of your signup
@@ -320,6 +332,7 @@ const formActivated = ref(false)
 const errorMessage = ref("")
 const successMessage = ref("")
 const signupFormText = ref("")
+const signupFormH1Text = ref("")
 
 const dialogVisible = ref(false)
 const deleteDialogVisible = ref(false)
@@ -829,12 +842,13 @@ const fetchSignupFormText = async () => {
   try {
     const { data, error } = await client
       .from("visibility-brigade-content")
-      .select("signup_form_text")
+      .select("signup_form_text, signup_form_h1_text")
       .eq("id", props.websiteId)
       .single()
 
     if (error) throw error
     signupFormText.value = data?.signup_form_text || ""
+    signupFormH1Text.value = data?.signup_form_h1_text || ""
   } catch (error) {
     console.error("Error fetching signup form text:", error)
   }
@@ -846,7 +860,10 @@ const saveSignupFormText = async () => {
   try {
     const { error } = await client
       .from("visibility-brigade-content")
-      .update({ signup_form_text: signupFormText.value })
+      .update({
+        signup_form_text: signupFormText.value,
+        signup_form_h1_text: signupFormH1Text.value,
+      })
       .eq("id", props.websiteId)
 
     if (error) throw error
@@ -864,7 +881,10 @@ const saveIntroTextManually = async () => {
   try {
     const { error } = await client
       .from("visibility-brigade-content")
-      .update({ signup_form_text: signupFormText.value })
+      .update({
+        signup_form_text: signupFormText.value,
+        signup_form_h1_text: signupFormH1Text.value,
+      })
       .eq("id", props.websiteId)
 
     if (error) throw error
@@ -882,7 +902,7 @@ const saveIntroTextManually = async () => {
 }
 
 // Debounced auto-save when text changes
-watch(signupFormText, () => {
+watch([signupFormText, signupFormH1Text], () => {
   if (!formActivated.value) return
   clearTimeout(saveTimeout)
   saveTimeout = setTimeout(saveSignupFormText, 1000)

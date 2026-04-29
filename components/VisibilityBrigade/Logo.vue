@@ -4,9 +4,9 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-});
-const { data: websiteData } = useNuxtData(`website-data-${props.websiteId}`);
-const websiteTitle = computed(() => websiteData.value?.title || "");
+})
+const { data: websiteData } = useNuxtData(`website-data-${props.websiteId}`)
+const websiteTitle = computed(() => websiteData.value?.title || "")
 </script>
 
 <template>

@@ -80,14 +80,15 @@ onMounted(() => {
 
     <div v-else-if="website">
       <h1 class="mb-6">Manage Your Group's Content</h1>
-
-      <p v-if="website.url" class="mb-1">
+      <Divider class="my-7" />
+      <h2 v-if="website?.title" class="mb-4">{{ website?.title }}</h2>
+      <p v-if="website.url" class="mb-4">
         <a :href="website.url" target="_blank" class="text-blue-600 hover:underline">
           {{ website.url }}
         </a>
       </p>
 
-      <p v-if="website.slug" class="mb-1">
+      <p v-if="website.slug" class="mb-4">
         <a
           :href="`https://resistcms.com/${website.slug}`"
           target="_blank"
@@ -96,7 +97,6 @@ onMounted(() => {
           {{ `https://resistcms.com/${website.slug}` }}
         </a>
       </p>
-      <Divider class="my-7" />
 
       <!-- Visibility Brigade Content -->
       <div v-if="website.type === 'visibility-brigade' && visibilityBrigadeContentId">

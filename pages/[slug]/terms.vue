@@ -1,37 +1,42 @@
 <template>
-  <div class="visibility-brigade">
+  <div v-if="website" class="visibility-brigade">
     <Html lang="en">
       <Head>
         <Title>{{ website?.title }} | Terms of Service</Title>
       </Head>
     </Html>
-    <VisibilityBrigadeVbHeader />
+    <VisibilityBrigadeVbHeader :website-id="website?.id" />
     <section class="p-6 py-16 pt-32">
       <h1 class="mb-8">Terms of Service</h1>
       <div v-if="website?.terms" v-html="website.terms" class="prose" />
       <p v-else class="text-gray-500">No terms of service available.</p>
     </section>
   </div>
-  <VisibilityBrigadeVbFooter />
+  <VisibilityBrigadeVbFooter :website-id="website?.id" />
 </template>
 
-<script setup>
+<script lang="ts" setup>
 definePageMeta({
   layout: "empty",
 })
 
 const route = useRoute()
 const supabase = useSupabaseClient()
-const slug = computed(() => route.params.slug)
 
-const { data: website } = await useAsyncData(`terms-${slug.value}`, async () => {
-  const { data, error } = await supabase
-    .from("websites")
-    .select("id, title, terms")
-    .eq("slug", slug.value)
-    .single()
+const slug = computed(() => route.params.slug as string)
 
-  if (error) throw error
-  return data
-})
+const { data: website, pending, error } = await useAsyncData(
+  `website-${slug.value}`,
+  async () => {
+    const { data, error } = await supabase
+      .from("websites")
+      .select("*")
+      .eq("slug", slug.value)
+      .single()
+
+    if (error) throw error
+    if (!data?.published) return null
+    return data
+  }
+)
 </script>
