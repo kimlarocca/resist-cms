@@ -31,7 +31,7 @@
     <!-- Form Questions Management -->
     <div v-else>
       <div class="mb-12">
-        <h2 class="mb-4">Form Heading</h2>
+        <h3 class="mb-4">Form Heading</h3>
         <p class="mb-4">
           This is the main heading displayed at the top of your signup form.
         </p>
@@ -43,7 +43,7 @@
       </div>
 
       <div class="mb-12">
-        <h2 class="mb-4">Introduction Text</h2>
+        <h3 class="mb-4">Introduction Text</h3>
         <p class="mb-4">
           This text is optional and, if entered, will appear at the top of your signup
           form.
@@ -57,7 +57,7 @@
         />
       </div>
 
-      <h2 class="mb-4">Form Questions</h2>
+      <h3 class="mb-4">Form Questions</h3>
       <div class="flex justify-between items-center mb-6">
         <p class="text-gray-600">
           Drag the ≡ handle to reorder rows, or edit the sort order number directly.
@@ -125,7 +125,7 @@
           <template #body="{ data }">
             <ToggleSwitch
               v-model="data.visible"
-              :disabled="data.field_type === 'email'"
+              :disabled="isProtectedField(data)"
               @update:modelValue="updateQuestion(data)"
             />
           </template>
@@ -135,7 +135,7 @@
           <template #body="{ data }">
             <ToggleSwitch
               v-model="data.required"
-              :disabled="data.field_type === 'email'"
+              :disabled="isProtectedField(data)"
               @update:modelValue="updateQuestion(data)"
             />
           </template>
@@ -145,7 +145,7 @@
           <template #body="{ data }">
             <div class="flex gap-2">
               <Button
-                v-if="data.field_type !== 'email'"
+                v-if="!isProtectedField(data)"
                 icon="pi pi-pencil"
                 severity="info"
                 size="small"
@@ -153,7 +153,7 @@
                 v-tooltip.top="'Edit'"
               />
               <Button
-                v-if="data.field_type !== 'email'"
+                v-if="!isProtectedField(data)"
                 icon="pi pi-trash"
                 severity="danger"
                 size="small"
@@ -379,6 +379,9 @@ const showDefaultValueField = computed(() =>
   ["text", "email", "phone", "radio"].includes(formData.value.field_type)
 )
 
+const isProtectedField = (data) =>
+  data.field_type === "email" || data.label === "First Name" || data.label === "Last Name"
+
 const formatOptions = (options) => {
   if (!options) return ""
   if (Array.isArray(options)) return options.join(", ")
@@ -603,11 +606,14 @@ const fetchQuestions = async () => {
 
     if (error) throw error
 
-    // Email field always first
+    // Lock protected fields to positions 1, 2, 3
     const raw = data || []
-    const emailIdx = raw.findIndex((q) => q.field_type === "email")
-    if (emailIdx > 0) raw.unshift(raw.splice(emailIdx, 1)[0])
-    questions.value = raw
+    const pinned = ["email", "First Name", "Last Name"]
+    const pinnedItems = pinned
+      .map((key) => raw.find((q) => q.field_type === key || q.label === key))
+      .filter(Boolean)
+    const rest = raw.filter((q) => !pinnedItems.includes(q))
+    questions.value = [...pinnedItems, ...rest]
     formActivated.value = questions.value.length > 0
   } catch (error) {
     console.error("Error fetching form questions:", error)
@@ -649,11 +655,22 @@ const activateForm = async () => {
 
 // Handle row reorder via drag and drop
 const onRowReorder = async (event) => {
-  // Keep email field locked in first position
+  // Keep Email (1), First Name (2), Last Name (3) locked in position
   const reordered = event.value
-  const emailIdx = reordered.findIndex((q) => q.field_type === "email")
-  if (emailIdx > 0) reordered.unshift(reordered.splice(emailIdx, 1)[0])
-  questions.value = reordered
+  const pinned = reordered
+    .filter(
+      (q) =>
+        q.field_type === "email" || q.label === "First Name" || q.label === "Last Name"
+    )
+    .sort((a, b) => {
+      const order = (q) =>
+        q.field_type === "email" ? 0 : q.label === "First Name" ? 1 : 2
+      return order(a) - order(b)
+    })
+  const rest = reordered.filter(
+    (q) => q.field_type !== "email" && q.label !== "First Name" && q.label !== "Last Name"
+  )
+  questions.value = [...pinned, ...rest]
 
   // Update sort_order for all rows based on new position
   const updates = questions.value.map((q, index) => ({

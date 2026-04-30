@@ -15,17 +15,23 @@ const dialogVisible = ref(false)
 const submissionToDelete = ref(null)
 const deleteDialogVisible = ref(false)
 const deleting = ref(false)
-const emailSearch = ref("")
+const search = ref("")
 const statusFilter = ref(null)
 
-const statusSortOrder = { pending: 0, approved: 1, denied: 2 }
+const statusSortOrder = { pending: 0, active: 1, denied: 2 }
 
 const filteredSubmissions = computed(() => {
   return submissions.value
     .filter((s) => {
+      const q = search.value.trim().toLowerCase()
+      const firstName = s.form_data?.["First Name"]?.toLowerCase() || ""
+      const lastName = s.form_data?.["Last Name"]?.toLowerCase() || ""
       const matchesEmail =
-        !emailSearch.value.trim() ||
-        s.email?.toLowerCase().includes(emailSearch.value.trim().toLowerCase())
+        !q ||
+        s.email?.toLowerCase().includes(q) ||
+        firstName.includes(q) ||
+        lastName.includes(q) ||
+        `${firstName} ${lastName}`.includes(q)
       const matchesStatus =
         !statusFilter.value || (s.status || "pending") === statusFilter.value
       return matchesEmail && matchesStatus
@@ -53,7 +59,13 @@ const fetchSubmissions = async () => {
     console.error("Error fetching submissions:", error)
     errorMessage.value = "Failed to load submissions."
   } else {
-    submissions.value = data
+    submissions.value = data.map((s) => ({
+      ...s,
+      full_name:
+        [s.form_data?.["First Name"], s.form_data?.["Last Name"]]
+          .filter(Boolean)
+          .join(" ") || "",
+    }))
   }
 
   loading.value = false
@@ -61,12 +73,21 @@ const fetchSubmissions = async () => {
 
 const statusOptions = [
   { label: "Pending", value: "pending" },
-  { label: "Approved", value: "approved" },
+  { label: "Active", value: "active" },
   { label: "Denied", value: "denied" },
 ]
 
+const statusCounts = computed(() => {
+  const counts = { all: submissions.value.length, pending: 0, active: 0, denied: 0 }
+  for (const s of submissions.value) {
+    const status = s.status || "pending"
+    if (status in counts) counts[status]++
+  }
+  return counts
+})
+
 const statusSeverity = (status) => {
-  if (status === "approved") return "success"
+  if (status === "active") return "success"
   if (status === "denied") return "danger"
   return "warn"
 }
@@ -118,10 +139,6 @@ const deleteSubmission = async () => {
   deleting.value = false
 }
 
-const formatDate = (dateStr) => {
-  return new Date(dateStr).toLocaleString()
-}
-
 const formDataEntries = computed(() => {
   if (!selectedSubmission.value?.form_data) return []
   return Object.entries(selectedSubmission.value.form_data).map(([key, value]) => ({
@@ -137,24 +154,29 @@ const formDataEntries = computed(() => {
 })
 
 const clearFilters = () => {
-  emailSearch.value = ""
+  search.value = ""
   statusFilter.value = null
 }
 
 onMounted(() => {
   fetchSubmissions()
 })
+
+const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
+  getWebsiteData(websiteId.value)
+)
 </script>
 
 <template>
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Manage Form Submissions</Title>
+        <Title>Resist CMS | Signup Form Submissions</Title>
       </Head>
     </Html>
-    <h1>Manage Form Submissions</h1>
+    <h1>Signup Form Submissions</h1>
     <Divider class="my-7" />
+    <h2 v-if="website?.title" class="mb-12">{{ website?.title }}</h2>
 
     <Message v-if="errorMessage" severity="error" class="mb-4">{{
       errorMessage
@@ -165,20 +187,46 @@ onMounted(() => {
     </div>
 
     <div v-else>
-      <p v-if="submissions.length === 0">You have not had any form submissions yet.</p>
+      <p v-if="submissions.length === 0">
+        You have not had any Signup form submissions yet.
+      </p>
       <template v-else>
-        <div class="flex items-center gap-3 mb-6">
-          <InputText v-model="emailSearch" placeholder="Filter by email..." />
-          <Select
-            v-model="statusFilter"
-            :options="[{ label: 'All Statuses', value: null }, ...statusOptions]"
-            option-label="label"
-            option-value="value"
-            placeholder="Filter By Status"
-            class="w-60"
-          />
+        <div class="flex flex-col md:flex-row md:items-center gap-3 mb-6">
+          <IconField iconPosition="left" class="w-full">
+            <InputIcon class="pi pi-search"> </InputIcon>
+            <InputText
+              v-model="search"
+              placeholder="Filter members by name or email..."
+            />
+          </IconField>
+          <div class="flex gap-2 shrink-0 flex-wrap">
+            <Button
+              :label="`All (${statusCounts.all})`"
+              :severity="statusFilter === null ? 'primary' : 'secondary'"
+              size="small"
+              @click="statusFilter = null"
+            />
+            <Button
+              :label="`Pending (${statusCounts.pending})`"
+              :severity="statusFilter === 'pending' ? 'primary' : 'secondary'"
+              size="small"
+              @click="statusFilter = 'pending'"
+            />
+            <Button
+              :label="`Active (${statusCounts.active})`"
+              :severity="statusFilter === 'active' ? 'primary' : 'secondary'"
+              size="small"
+              @click="statusFilter = 'active'"
+            />
+            <Button
+              :label="`Denied (${statusCounts.denied})`"
+              :severity="statusFilter === 'denied' ? 'primary' : 'secondary'"
+              size="small"
+              @click="statusFilter = 'denied'"
+            />
+          </div>
           <Button
-            v-if="emailSearch || statusFilter"
+            v-if="search"
             label="Clear"
             severity="secondary"
             size="small"
@@ -197,13 +245,9 @@ onMounted(() => {
           emptyMessage="No submissions yet."
         >
           <Column field="email" header="Email" sortable style="min-width: 14rem" />
-          <Column header="Name" style="min-width: 12rem">
+          <Column field="full_name" header="Name" sortable style="min-width: 12rem">
             <template #body="{ data }">
-              {{
-                [data.form_data?.["First Name"], data.form_data?.["Last Name"]]
-                  .filter(Boolean)
-                  .join(" ") || "—"
-              }}
+              {{ data.full_name || "—" }}
             </template>
           </Column>
           <Column field="created_at" header="Submitted" sortable style="min-width: 12rem">
@@ -244,7 +288,6 @@ onMounted(() => {
                   label="View"
                   icon="pi pi-eye"
                   size="small"
-                  severity="secondary"
                   @click="viewSubmission(data)"
                 />
                 <Button

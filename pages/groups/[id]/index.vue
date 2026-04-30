@@ -6,6 +6,9 @@ definePageMeta({
 const route = useRoute()
 const client = useSupabaseClient()
 const websiteId = computed(() => route.params.id)
+const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
+  getWebsiteData(websiteId.value)
+)
 </script>
 
 <template>
@@ -17,6 +20,7 @@ const websiteId = computed(() => route.params.id)
     </Html>
     <h1 class="mb-6">Manage Your Group Settings</h1>
     <Divider class="my-7" />
+    <h2 v-if="website?.title" class="mb-12">{{ website?.title }}</h2>
     <GroupsManageGroup :website-id="websiteId" />
   </div>
 </template>

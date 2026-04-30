@@ -182,25 +182,25 @@ onMounted(() => {
               <h4>Admin Links</h4>
               <p class="text-sm flex flex-col space-y-1 mt-4">
                 <NuxtLink :to="`/groups/${website.id}`" class="plain block">
-                  Edit Group Settings
+                  Settings
                 </NuxtLink>
                 <NuxtLink
                   :to="`/groups/${website.id}/manage-content`"
                   class="plain block"
                 >
-                  Manage Public Website Content
+                  Content
                 </NuxtLink>
                 <NuxtLink
                   :to="`/groups/${website.id}/manage-signup-form`"
                   class="plain block"
                 >
-                  Manage Public Signup Form
+                  Signup Form
                 </NuxtLink>
                 <NuxtLink
                   :to="`/groups/${website.id}/manage-form-submissions`"
                   class="plain block"
                 >
-                  Manage Form Submissions
+                  Members
                 </NuxtLink>
               </p>
             </div>

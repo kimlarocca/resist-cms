@@ -1,12 +1,12 @@
 <script setup>
-import { useCurrentUserProfile } from "~/composables/states"
 definePageMeta({
   middleware: "auth",
 })
 const route = useRoute()
-const user = useSupabaseUser()
-const currentUserProfile = useCurrentUserProfile()
 const websiteId = computed(() => route.params.id)
+const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
+  getWebsiteData(websiteId.value)
+)
 </script>
 
 <template>
@@ -18,6 +18,7 @@ const websiteId = computed(() => route.params.id)
     </Html>
     <h1>Manage Your Group's Signup Form</h1>
     <Divider class="my-7" />
+    <h2 v-if="website?.title" class="mb-12">{{ website?.title }}</h2>
     <GroupsManageSignupForm :website-id="websiteId" />
   </div>
 </template>

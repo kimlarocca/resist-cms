@@ -10,3 +10,7 @@ export const truncateText = (text, maxLength) => {
     }
     return text.slice(0, maxLength) + '...'
 }
+
+export const formatDate = (dateStr) => {
+    return new Date(dateStr).toLocaleDateString()
+}
