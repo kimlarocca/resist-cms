@@ -158,11 +158,6 @@ onMounted(() => {
               class="flex flex-col rounded-xl bg-gray shadow-xl p-8"
             >
               <h3 class="mb-3">{{ website.title || "Untitled" }}</h3>
-              <Tag
-                :value="website.published ? 'Published' : 'Unpublished'"
-                :severity="website.published ? 'success' : 'secondary'"
-                class="mb-3 w-fit"
-              />
               <p v-if="website.url" class="mb-1">
                 <a :href="website.url" target="_blank" class="plain text-sm">
                   View Public Site <i class="pi pi-arrow-right text-xs ml-1" />
@@ -200,7 +195,7 @@ onMounted(() => {
                   :to="`/groups/${website.id}/manage-form-submissions`"
                   class="plain block"
                 >
-                  Members
+                  Form Submissions
                 </NuxtLink>
               </p>
             </div>
