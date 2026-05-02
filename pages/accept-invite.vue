@@ -17,14 +17,30 @@ const errorMessage = ref("")
 const ready = ref(false)
 
 // Exchange the PKCE code from the URL query (set by Supabase invite redirect).
-// The module handles this automatically on its callback route, but we also do
-// it here explicitly so this page works reliably as the redirectTo target.
+// Use the user returned directly from the exchange rather than watching the
+// reactive user ref, which may not update after a client-side code exchange.
 onMounted(async () => {
   const code = route.query.code
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (error) {
       errorMessage.value = "This invitation link is invalid or has expired."
+      ready.value = true
+    } else if (data?.user) {
+      email.value = data.user.email || ""
+      fullName.value = data.user.user_metadata?.full_name || ""
+      ready.value = true
+    }
+  } else {
+    // No code in URL — check if already authenticated (e.g. page refresh)
+    const { data } = await supabase.auth.getUser()
+    if (data?.user) {
+      email.value = data.user.email || ""
+      fullName.value = data.user.user_metadata?.full_name || ""
+      ready.value = true
+    } else {
+      errorMessage.value = "This invitation link is invalid or has expired."
+      ready.value = true
     }
   }
 })
@@ -32,7 +48,7 @@ onMounted(async () => {
 watch(
   user,
   (val) => {
-    if (val) {
+    if (val && !ready.value) {
       email.value = val.email || ""
       fullName.value = val.user_metadata?.full_name || ""
       ready.value = true
