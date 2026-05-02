@@ -4,16 +4,22 @@ definePageMeta({
 })
 
 const supabase = useSupabaseClient()
+const route = useRoute()
 
-// Wait for Supabase to process the hash token and sign the user in,
-// then redirect to dashboard where they'll be prompted to set a password.
-onMounted(() => {
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
-    if ((event === "SIGNED_IN" || event === "USER_UPDATED") && newSession) {
-      subscription.unsubscribe()
-      navigateTo("/dashboard")
+// @nuxtjs/supabase v2 defaults to PKCE flow.
+// Invite links arrive with ?code= which must be exchanged for a session.
+onMounted(async () => {
+  const code = route.query.code
+
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(String(code))
+    if (error) {
+      console.error("Error exchanging invite code:", error)
     }
-  })
+  }
+
+  // Redirect regardless — if no code, the session may already exist (e.g. retry)
+  window.location.href = "/dashboard"
 })
 </script>
 
@@ -32,4 +38,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
