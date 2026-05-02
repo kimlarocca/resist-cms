@@ -4,9 +4,6 @@ definePageMeta({
 })
 
 const supabase = useSupabaseClient()
-const user = useSupabaseUser()
-
-const route = useRoute()
 
 const email = ref("")
 const fullName = ref("")
@@ -17,48 +14,52 @@ const errorMessage = ref("")
 const ready = ref(false)
 const session = ref(null)
 
-// Exchange the PKCE code from the URL query (set by Supabase invite redirect).
-// Use the user returned directly from the exchange rather than watching the
-// reactive user ref, which may not update after a client-side code exchange.
+// Supabase invite emails use a hash-based token (#access_token=...&type=invite).
+// The client processes the hash and fires onAuthStateChange with SIGNED_IN.
+// We only accept SIGNED_IN / USER_UPDATED events (not INITIAL_SESSION which
+// can fire first with a stale/empty session and a blank email).
 onMounted(async () => {
-  const code = route.query.code
-  if (code) {
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-    if (error) {
-      errorMessage.value = "This invitation link is invalid or has expired."
-      ready.value = true
-    } else if (data?.user) {
-      session.value = data.session
-      email.value = data.user.email || ""
-      fullName.value = data.user.user_metadata?.full_name || ""
-      ready.value = true
-    }
-  } else {
-    // No code in URL — check if already authenticated (e.g. page refresh)
-    const { data } = await supabase.auth.getSession()
-    if (data?.session?.user) {
-      session.value = data.session
-      email.value = data.session.user.email || ""
-      fullName.value = data.session.user.user_metadata?.full_name || ""
-      ready.value = true
-    } else {
-      errorMessage.value = "This invitation link is invalid or has expired."
-      ready.value = true
-    }
-  }
-})
+  let timer
 
-watch(
-  user,
-  (val) => {
-    if (val && !ready.value) {
-      email.value = val.email || ""
-      fullName.value = val.user_metadata?.full_name || ""
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((event, newSession) => {
+    if (
+      (event === "SIGNED_IN" || event === "USER_UPDATED") &&
+      newSession?.user &&
+      !ready.value
+    ) {
+      clearTimeout(timer)
+      subscription.unsubscribe()
+      session.value = newSession
+      email.value = newSession.user.email || newSession.user.user_metadata?.email || ""
+      fullName.value = newSession.user.user_metadata?.full_name || ""
       ready.value = true
     }
-  },
-  { immediate: true }
-)
+  })
+
+  // Fallback: if the module already exchanged the token before our listener
+  // registered, getSession() will return the populated session immediately.
+  const { data } = await supabase.auth.getSession()
+  if (data?.session?.user?.email) {
+    clearTimeout(timer)
+    subscription.unsubscribe()
+    session.value = data.session
+    email.value = data.session.user.email
+    fullName.value = data.session.user.user_metadata?.full_name || ""
+    ready.value = true
+    return
+  }
+
+  // Last resort: show error after 10 seconds with no valid session
+  timer = setTimeout(() => {
+    if (!ready.value) {
+      subscription.unsubscribe()
+      errorMessage.value = "This invitation link is invalid or has expired."
+      ready.value = true
+    }
+  }, 10000)
+})
 
 const submit = async () => {
   errorMessage.value = ""
