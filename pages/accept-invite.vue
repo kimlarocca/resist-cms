@@ -15,6 +15,7 @@ const confirmPassword = ref("")
 const loading = ref(false)
 const errorMessage = ref("")
 const ready = ref(false)
+const session = ref(null)
 
 // Exchange the PKCE code from the URL query (set by Supabase invite redirect).
 // Use the user returned directly from the exchange rather than watching the
@@ -27,16 +28,18 @@ onMounted(async () => {
       errorMessage.value = "This invitation link is invalid or has expired."
       ready.value = true
     } else if (data?.user) {
+      session.value = data.session
       email.value = data.user.email || ""
       fullName.value = data.user.user_metadata?.full_name || ""
       ready.value = true
     }
   } else {
     // No code in URL — check if already authenticated (e.g. page refresh)
-    const { data } = await supabase.auth.getUser()
-    if (data?.user) {
-      email.value = data.user.email || ""
-      fullName.value = data.user.user_metadata?.full_name || ""
+    const { data } = await supabase.auth.getSession()
+    if (data?.session?.user) {
+      session.value = data.session
+      email.value = data.session.user.email || ""
+      fullName.value = data.session.user.user_metadata?.full_name || ""
       ready.value = true
     } else {
       errorMessage.value = "This invitation link is invalid or has expired."
@@ -72,6 +75,14 @@ const submit = async () => {
 
   loading.value = true
 
+  // Re-set the session to ensure it's active before calling updateUser
+  if (session.value) {
+    await supabase.auth.setSession({
+      access_token: session.value.access_token,
+      refresh_token: session.value.refresh_token,
+    })
+  }
+
   const { error } = await supabase.auth.updateUser({
     password: password.value,
     data: { full_name: fullName.value },
@@ -105,15 +116,15 @@ const submit = async () => {
 
     <template v-else>
       <h1 class="mb-4">Create Your Account</h1>
-      <p class="mb-6 text-gray-500">
-        You've been invited to join Resist CMS. Set your name and password below to
+      <p class="mb-6">
+        You've been invited to join Resist CMS! Set your name and password below to
         activate your account.
       </p>
 
       <form @submit.prevent="submit" class="flex flex-col gap-4 max-w-sm">
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium">Email Address</label>
-          <InputText :value="email" disabled class="opacity-60 cursor-not-allowed" />
+          <p class="font-bold">{{ email }}</p>
         </div>
 
         <div class="flex flex-col gap-1">
