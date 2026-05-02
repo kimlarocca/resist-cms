@@ -17,8 +17,12 @@ const deleteDialogVisible = ref(false)
 const deleting = ref(false)
 const search = ref("")
 const statusFilter = ref(null)
+const inviteDialogVisible = ref(false)
+const submissionToInvite = ref(null)
+const inviting = ref(false)
+const inviteError = ref("")
 
-const statusSortOrder = { pending: 0, active: 1, denied: 2 }
+const statusSortOrder = { pending: 0, invited: 1, active: 2, denied: 3 }
 
 const filteredSubmissions = computed(() => {
   return submissions.value
@@ -73,12 +77,19 @@ const fetchSubmissions = async () => {
 
 const statusOptions = [
   { label: "Pending", value: "pending" },
+  { label: "Invited", value: "invited" },
   { label: "Active", value: "active" },
   { label: "Denied", value: "denied" },
 ]
 
 const statusCounts = computed(() => {
-  const counts = { all: submissions.value.length, pending: 0, active: 0, denied: 0 }
+  const counts = {
+    all: submissions.value.length,
+    pending: 0,
+    invited: 0,
+    active: 0,
+    denied: 0,
+  }
   for (const s of submissions.value) {
     const status = s.status || "pending"
     if (status in counts) counts[status]++
@@ -89,7 +100,39 @@ const statusCounts = computed(() => {
 const statusSeverity = (status) => {
   if (status === "active") return "success"
   if (status === "denied") return "danger"
+  if (status === "invited") return "info"
   return "warn"
+}
+
+const confirmInvite = (submission) => {
+  submissionToInvite.value = submission
+  inviteError.value = ""
+  inviteDialogVisible.value = true
+}
+
+const sendInvite = async () => {
+  inviting.value = true
+  inviteError.value = ""
+
+  const { error } = await useFetch("/api/invite-user", {
+    method: "POST",
+    body: {
+      email: submissionToInvite.value.email,
+      websiteId: websiteId.value,
+      submissionId: submissionToInvite.value.id,
+    },
+  })
+
+  if (error.value) {
+    inviteError.value = error.value?.data?.message || "Failed to send invitation."
+    inviting.value = false
+    return
+  }
+
+  await updateStatus(submissionToInvite.value.id, "invited")
+  inviteDialogVisible.value = false
+  submissionToInvite.value = null
+  inviting.value = false
 }
 
 const updateStatus = async (submissionId, status) => {
@@ -213,6 +256,12 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
               @click="statusFilter = 'pending'"
             />
             <Button
+              :label="`Invited (${statusCounts.invited})`"
+              :severity="statusFilter === 'invited' ? 'primary' : 'secondary'"
+              size="small"
+              @click="statusFilter = 'invited'"
+            />
+            <Button
               :label="`Active (${statusCounts.active})`"
               :severity="statusFilter === 'active' ? 'primary' : 'secondary'"
               size="small"
@@ -281,14 +330,14 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
               </Select>
             </template>
           </Column>
-          <Column header="" style="width: 9rem">
+          <Column header="" style="width: 13rem">
             <template #body="{ data }">
               <div class="flex gap-2">
                 <Button
-                  label="View"
                   icon="pi pi-eye"
                   size="small"
                   @click="viewSubmission(data)"
+                  v-tooltip.top="'View Details'"
                 />
                 <Button
                   icon="pi pi-trash"
@@ -296,6 +345,24 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
                   severity="danger"
                   @click="confirmDelete(data)"
                   v-tooltip.top="'Delete'"
+                />
+                <Button
+                  v-if="(data.status || 'pending') === 'pending'"
+                  label="Invite"
+                  icon="pi pi-envelope"
+                  size="small"
+                  severity="info"
+                  @click="confirmInvite(data)"
+                  v-tooltip.top="'Invite to become a member'"
+                />
+                <Button
+                  v-if="data.status === 'invited'"
+                  label="Resend"
+                  icon="pi pi-refresh"
+                  size="small"
+                  severity="info"
+                  @click="confirmInvite(data)"
+                  v-tooltip.top="'Resend invitation email'"
                 />
               </div>
             </template>
@@ -346,6 +413,52 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
           />
         </div>
       </div>
+    </Dialog>
+
+    <!-- Invite Confirmation Dialog -->
+    <Dialog
+      v-model:visible="inviteDialogVisible"
+      modal
+      :header="
+        submissionToInvite?.status === 'invited' ? 'Resend Invitation' : 'Invite Member'
+      "
+      :style="{ width: '32rem' }"
+    >
+      <div class="flex items-start gap-3">
+        <i class="pi pi-envelope text-blue-500 mt-1" style="font-size: 2rem" />
+        <div>
+          <p v-if="submissionToInvite?.status === 'invited'">
+            Resend the invitation to <strong>{{ submissionToInvite?.email }}</strong
+            >. They will receive a new invitation link to create an account and join this
+            group.
+          </p>
+          <p v-else>
+            Send an invitation to <strong>{{ submissionToInvite?.email }}</strong> to
+            create an account and join this group as a member.
+          </p>
+          <p class="text-sm text-gray-500 mt-2">
+            Once they accept, their profile will be linked to this group automatically.
+          </p>
+          <Message v-if="inviteError" severity="error" class="mt-3">{{
+            inviteError
+          }}</Message>
+        </div>
+      </div>
+      <template #footer>
+        <Button
+          label="Cancel"
+          severity="secondary"
+          @click="inviteDialogVisible = false"
+          :disabled="inviting"
+        />
+        <Button
+          :label="submissionToInvite?.status === 'invited' ? 'Resend' : 'Send Invitation'"
+          icon="pi pi-envelope"
+          severity="info"
+          :loading="inviting"
+          @click="sendInvite"
+        />
+      </template>
     </Dialog>
 
     <!-- Delete Confirmation Dialog -->

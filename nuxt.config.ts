@@ -72,6 +72,7 @@ export default defineNuxtConfig({
       secretKey: process.env.TURNSTILE_SECRET_KEY,
     },
     resendApiKey: process.env.RESEND_API_KEY,
+    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY,
     public: {
       environment: process.env.environment ?? 'local',
       gtagId: 'G-K6YTWGEB2Q',
