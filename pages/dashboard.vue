@@ -5,7 +5,54 @@ definePageMeta({
 })
 const currentUserProfile = useCurrentUserProfile()
 const supabase = useSupabaseClient()
+const user = useSupabaseUser()
 const router = useRouter()
+
+// Complete profile dialog (shown to newly invited users)
+const setupDialogVisible = ref(false)
+const setupFullName = ref("")
+const setupPassword = ref("")
+const setupConfirmPassword = ref("")
+const setupLoading = ref(false)
+const setupError = ref("")
+
+const checkIfNeedsSetup = () => {
+  if (user.value?.invited_at && !user.value?.user_metadata?.profile_complete) {
+    setupFullName.value = user.value.user_metadata?.full_name || ""
+    setupDialogVisible.value = true
+  }
+}
+
+const submitSetup = async () => {
+  setupError.value = ""
+  if (setupPassword.value.length < 8) {
+    setupError.value = "Password must be at least 8 characters."
+    return
+  }
+  if (setupPassword.value !== setupConfirmPassword.value) {
+    setupError.value = "Passwords do not match."
+    return
+  }
+  setupLoading.value = true
+  const { error } = await supabase.auth.updateUser({
+    password: setupPassword.value,
+    data: { full_name: setupFullName.value, profile_complete: true },
+  })
+  if (error) {
+    setupError.value = error.message
+    setupLoading.value = false
+    return
+  }
+  // Also update the profiles table
+  if (currentUserProfile.value?.id) {
+    await supabase
+      .from("profiles")
+      .update({ full_name: setupFullName.value })
+      .eq("id", currentUserProfile.value.id)
+  }
+  setupLoading.value = false
+  setupDialogVisible.value = false
+}
 
 // User's websites/groups
 const userWebsites = ref([])
@@ -83,6 +130,7 @@ watch(
 // Fetch user websites on mount
 onMounted(() => {
   fetchUserWebsites()
+  checkIfNeedsSetup()
 })
 </script>
 <template>
@@ -94,6 +142,64 @@ onMounted(() => {
     </Html>
     <h1 class="mb-6">Dashboard</h1>
     <p class="mb-12">Welcome back, {{ currentUserProfile?.full_name }}!</p>
+
+    <!-- Complete profile dialog for newly invited users -->
+    <Dialog
+      v-model:visible="setupDialogVisible"
+      modal
+      header="Welcome! Set Up Your Account"
+      :closable="false"
+      :style="{ width: '32rem' }"
+    >
+      <p class="mb-4 text-gray-500">
+        You've been invited to join Resist CMS. Please set your name and create a
+        password to complete your account setup.
+      </p>
+      <form @submit.prevent="submitSetup" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium" for="setup-name">Full Name</label>
+          <InputText
+            id="setup-name"
+            v-model="setupFullName"
+            placeholder="Your full name"
+            autocomplete="name"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium" for="setup-password">Password</label>
+          <Password
+            id="setup-password"
+            v-model="setupPassword"
+            placeholder="Choose a password (min 8 characters)"
+            :feedback="true"
+            toggleMask
+            class="w-full"
+            inputClass="w-full"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium" for="setup-confirm">Confirm Password</label>
+          <Password
+            id="setup-confirm"
+            v-model="setupConfirmPassword"
+            placeholder="Confirm your password"
+            :feedback="false"
+            toggleMask
+            class="w-full"
+            inputClass="w-full"
+          />
+        </div>
+        <Message v-if="setupError" severity="error">{{ setupError }}</Message>
+      </form>
+      <template #footer>
+        <Button
+          label="Save & Continue"
+          icon="pi pi-check"
+          :loading="setupLoading"
+          @click="submitSetup"
+        />
+      </template>
+    </Dialog>
 
     <!-- super admins only -->
     <div
