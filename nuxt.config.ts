@@ -48,6 +48,9 @@ export default defineNuxtConfig({
     key: 'sb_publishable_hfb4cBZp-dppxuSEFkidtw_XdBFGbK2',
     url: 'https://udsyxtnbyejnwwvbifjr.supabase.co',
     redirect: false,
+    redirectOptions: {
+      callback: '/accept-invite',
+    },
   },
 
   tailwindcss: {

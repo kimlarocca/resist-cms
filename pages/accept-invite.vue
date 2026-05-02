@@ -6,6 +6,8 @@ definePageMeta({
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
+const route = useRoute()
+
 const email = ref("")
 const fullName = ref("")
 const password = ref("")
@@ -14,8 +16,19 @@ const loading = ref(false)
 const errorMessage = ref("")
 const ready = ref(false)
 
-// Wait for the token in the URL to be exchanged by the Supabase module.
-// Once the user is populated, pre-fill the email and show the form.
+// Exchange the PKCE code from the URL query (set by Supabase invite redirect).
+// The module handles this automatically on its callback route, but we also do
+// it here explicitly so this page works reliably as the redirectTo target.
+onMounted(async () => {
+  const code = route.query.code
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      errorMessage.value = "This invitation link is invalid or has expired."
+    }
+  }
+})
+
 watch(
   user,
   (val) => {
@@ -111,7 +124,9 @@ const submit = async () => {
         </div>
 
         <div class="flex flex-col gap-1">
-          <label class="text-sm font-medium" for="confirm-password">Confirm Password</label>
+          <label class="text-sm font-medium" for="confirm-password"
+            >Confirm Password</label
+          >
           <Password
             id="confirm-password"
             v-model="confirmPassword"
