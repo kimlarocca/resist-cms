@@ -21,10 +21,5 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
     <Divider class="my-7" />
     <h2 v-if="website?.title" class="mb-8">{{ website?.title }}</h2>
     <GroupsManageAnnouncements :website-id="websiteId" />
-    <Divider class="my-7" />
-    <NuxtLink :to="`/groups/${websiteId}/dashboard`">
-      <i class="pi pi-arrow-left mr-2" />
-      Back to the Dashboard
-    </NuxtLink>
   </div>
 </template>
