@@ -3,24 +3,18 @@ definePageMeta({
   layout: "blank",
 })
 
-const supabase = useSupabaseClient()
-const route = useRoute()
+const user = useSupabaseUser()
 
-// @nuxtjs/supabase v2 defaults to PKCE flow.
-// Invite links arrive with ?code= which must be exchanged for a session.
-onMounted(async () => {
-  const code = route.query.code
-
-  if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(String(code))
-    if (error) {
-      console.error("Error exchanging invite code:", error)
+// Watch for the user to be authenticated, then redirect them
+watch(
+  user,
+  () => {
+    if (user.value) {
+      return navigateTo("/dashboard")
     }
-  }
-
-  // Redirect regardless — if no code, the session may already exist (e.g. retry)
-  window.location.href = "/dashboard"
-})
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
