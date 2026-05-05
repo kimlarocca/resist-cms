@@ -93,6 +93,11 @@ const fetchUserWebsites = async () => {
     if (error) throw error
 
     userWebsites.value = data?.map((item) => item.websites).filter(Boolean) || []
+
+    // Auto-redirect members who belong to exactly one group
+    if (currentUserProfile.value?.role === "member" && userWebsites.value.length === 1) {
+      return navigateTo(`/groups/${userWebsites.value[0].id}/dashboard`)
+    }
   } catch (error) {
     console.error("Error fetching user websites:", error)
   } finally {
