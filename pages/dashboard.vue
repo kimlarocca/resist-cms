@@ -11,14 +11,14 @@ const router = useRouter()
 // Complete profile dialog (shown to newly invited users)
 const setupDialogVisible = ref(false)
 const setupFullName = ref("")
+const setupPhone = ref("")
 const setupPassword = ref("")
 const setupConfirmPassword = ref("")
 const setupLoading = ref(false)
 const setupError = ref("")
 
 const checkIfNeedsSetup = () => {
-  if (user.value?.invited_at && !user.value?.user_metadata?.profile_complete) {
-    setupFullName.value = user.value.user_metadata?.full_name || ""
+  if (currentUserProfile.value && !currentUserProfile.value.onboarded) {
     setupDialogVisible.value = true
   }
 }
@@ -47,7 +47,11 @@ const submitSetup = async () => {
   if (currentUserProfile.value?.id) {
     await supabase
       .from("profiles")
-      .update({ full_name: setupFullName.value })
+      .update({
+        full_name: setupFullName.value,
+        phone: setupPhone.value || null,
+        onboarded: true,
+      })
       .eq("id", currentUserProfile.value.id)
   }
   setupLoading.value = false
@@ -122,6 +126,7 @@ watch(
   (newId) => {
     if (newId) {
       fetchUserWebsites()
+      checkIfNeedsSetup()
     }
   },
   { immediate: true }
@@ -130,7 +135,6 @@ watch(
 // Fetch user websites on mount
 onMounted(() => {
   fetchUserWebsites()
-  checkIfNeedsSetup()
 })
 </script>
 <template>
@@ -141,19 +145,21 @@ onMounted(() => {
       </Head>
     </Html>
     <h1 class="mb-6">Dashboard</h1>
-    <p class="mb-12">Welcome back, {{ currentUserProfile?.full_name }}!</p>
+    <p v-if="currentUserProfile?.full_name" class="mb-12">
+      Welcome back, {{ currentUserProfile?.full_name }}!
+    </p>
 
     <!-- Complete profile dialog for newly invited users -->
     <Dialog
       v-model:visible="setupDialogVisible"
       modal
-      header="Welcome! Set Up Your Account"
+      header="Please Set Up Your Account"
       :closable="false"
       :style="{ width: '32rem' }"
     >
       <p class="mb-4 text-gray-500">
-        You've been invited to join Resist CMS. Please set your name and create a
-        password to complete your account setup.
+        Welcome to Resist CMS! Please set your name and create a password to complete your
+        account setup.
       </p>
       <form @submit.prevent="submitSetup" class="flex flex-col gap-4">
         <div class="flex flex-col gap-1">
@@ -163,6 +169,18 @@ onMounted(() => {
             v-model="setupFullName"
             placeholder="Your full name"
             autocomplete="name"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium" for="setup-phone"
+            >Phone Number <span class="text-gray-400 font-normal">(optional)</span></label
+          >
+          <InputText
+            id="setup-phone"
+            v-model="setupPhone"
+            placeholder="Your phone number"
+            autocomplete="tel"
+            type="tel"
           />
         </div>
         <div class="flex flex-col gap-1">
@@ -278,32 +296,45 @@ onMounted(() => {
                   View Public Site <i class="pi pi-arrow-right text-xs ml-1" />
                 </a>
               </p>
-
-              <Divider class="darker" />
-              <h4>Admin Links</h4>
-              <p class="text-sm flex flex-col space-y-1 mt-4">
-                <NuxtLink :to="`/groups/${website.id}`" class="plain block">
-                  Settings
-                </NuxtLink>
-                <NuxtLink
-                  :to="`/groups/${website.id}/manage-content`"
-                  class="plain block"
-                >
-                  Content
-                </NuxtLink>
-                <NuxtLink
-                  :to="`/groups/${website.id}/manage-signup-form`"
-                  class="plain block"
-                >
-                  Signup Form
-                </NuxtLink>
-                <NuxtLink
-                  :to="`/groups/${website.id}/manage-form-submissions`"
-                  class="plain block"
-                >
-                  Form Submissions
+              <p>
+                <NuxtLink :to="`/groups/${website.id}/dashboard`" class="plain text-sm">
+                  View Team Only Site <i class="pi pi-arrow-right text-xs ml-1" />
                 </NuxtLink>
               </p>
+
+              <template
+                v-if="
+                  ['super_admin', 'group_admin', 'group_manager'].includes(
+                    currentUserProfile?.role
+                  )
+                "
+              >
+                <Divider class="darker" />
+                <h4>Admin Links</h4>
+                <p class="text-sm flex flex-col space-y-1 mt-4">
+                  <NuxtLink :to="`/groups/${website.id}`" class="plain block">
+                    Settings
+                  </NuxtLink>
+                  <NuxtLink
+                    :to="`/groups/${website.id}/manage-content`"
+                    class="plain block"
+                  >
+                    Content
+                  </NuxtLink>
+                  <NuxtLink
+                    :to="`/groups/${website.id}/manage-signup-form`"
+                    class="plain block"
+                  >
+                    Signup Form
+                  </NuxtLink>
+                  <NuxtLink
+                    :to="`/groups/${website.id}/manage-form-submissions`"
+                    class="plain block"
+                  >
+                    Form Submissions
+                  </NuxtLink>
+                </p>
+              </template>
             </div>
           </div>
         </div>
