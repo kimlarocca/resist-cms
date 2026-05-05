@@ -116,7 +116,7 @@ const fetchLinks = async () => {
     <div v-else-if="announcements.length === 0">
       <p class="text-sm text-gray-500">No announcements yet.</p>
     </div>
-    <div v-else class="flex flex-col gap-6">
+    <div v-else class="flex flex-col gap-6 mb-12">
       <div
         v-for="announcement in visibleAnnouncements"
         :key="announcement.id"
@@ -138,8 +138,6 @@ const fetchLinks = async () => {
         />
       </div>
     </div>
-
-    <Divider class="my-8" />
 
     <h3 class="mb-6">
       <i class="pi pi-external-link text-xl text-red mr-1" /> Key Links
