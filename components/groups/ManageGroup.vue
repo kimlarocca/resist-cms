@@ -346,7 +346,10 @@
       class="mb-4"
       @click="showAllSocial = !showAllSocial"
     />
-    <h3 class="text-lg font-bold mb-4">Privacy Policy</h3>
+    <h3 class="text-lg font-bold mt-8 mb-4">Team Message</h3>
+    <SimpleEditor id="team_message" v-model="teamMessage" rows="4" class="mb-4" />
+
+    <h3 class="text-lg font-bold mt-12 mb-4">Privacy Policy</h3>
     <SimpleEditor id="privacy_policy" v-model="privacyPolicy" rows="4" class="mb-4" />
 
     <h3 class="text-lg font-bold mt-12 mb-4">Terms &amp; Conditions</h3>
@@ -489,6 +492,7 @@ const substack = ref(null)
 const showAllSocial = ref(false)
 const privacyPolicy = ref(null)
 const terms = ref(null)
+const teamMessage = ref(null)
 const logo = ref(null)
 const slug = ref(null)
 const product = ref(null)
@@ -668,6 +672,7 @@ const fetchWebsite = async () => {
     substack.value = data.substack
     privacyPolicy.value = data.privacy_policy
     terms.value = data.terms
+    teamMessage.value = data.team_message
     logo.value = data.logo
     slug.value = data.slug
     product.value = data.product
@@ -718,6 +723,7 @@ const updateWebsite = async () => {
     substack: substack.value,
     privacy_policy: privacyPolicy.value,
     terms: terms.value,
+    team_message: teamMessage.value,
     logo: logo.value,
   }
 
