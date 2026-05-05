@@ -338,6 +338,12 @@ onMounted(() => {
                   >
                     Form Submissions
                   </NuxtLink>
+                  <NuxtLink
+                    :to="`/groups/${website.id}/manage-announcements`"
+                    class="plain block"
+                  >
+                    Announcements
+                  </NuxtLink>
                 </p>
               </template>
             </div>

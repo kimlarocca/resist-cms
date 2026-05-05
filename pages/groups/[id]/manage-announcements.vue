@@ -14,16 +14,17 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | {{ website?.title }}</Title>
+        <Title>Resist CMS | Manage Announcements</Title>
       </Head>
     </Html>
-    <h1 class="mb-6">{{ website?.title }}</h1>
+    <h1 class="mb-6">Manage Announcements</h1>
     <Divider class="my-7" />
-    <h2 class="mb-8">Team Member Portal</h2>
-    <div v-if="website?.team_message" class="rounded-xl bg-gray shadow-xl p-8 mb-8">
-      <h3 class="mb-4">Team Message</h3>
-      <div v-html="website?.team_message" />
-    </div>
-    <p>Our dashboard is under construction, please check back later.</p>
+    <h2 v-if="website?.title" class="mb-8">{{ website?.title }}</h2>
+    <GroupsManageAnnouncements :website-id="websiteId" />
+    <Divider class="my-7" />
+    <NuxtLink :to="`/groups/${websiteId}/dashboard`">
+      <i class="pi pi-arrow-left mr-2" />
+      Back to the Dashboard
+    </NuxtLink>
   </div>
 </template>
