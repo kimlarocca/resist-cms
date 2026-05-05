@@ -113,8 +113,8 @@ const fetchLinks = async () => {
       <i class="pi pi-comment text-2xl text-red mr-1" /> Recent Announcements
     </h3>
     <ProgressSpinner v-if="loadingAnnouncements" class="my-8" />
-    <div v-else-if="announcements.length === 0">
-      <p class="text-sm text-gray-500">No announcements yet.</p>
+    <div v-else-if="announcements.length === 0" class="mb-12">
+      <p class="text-gray-500">No announcements yet.</p>
     </div>
     <div v-else class="flex flex-col gap-6 mb-12">
       <div
@@ -144,10 +144,10 @@ const fetchLinks = async () => {
     </h3>
 
     <ProgressSpinner v-if="loadingLinks" class="my-8" />
-    <div v-else-if="links.length === 0">
-      <p class="text-sm text-gray-500">No links yet.</p>
+    <div v-else-if="links.length === 0" class="mb-12">
+      <p class="text-gray-500">No links yet.</p>
     </div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
       <a
         v-for="link in links"
         :key="link.id"
