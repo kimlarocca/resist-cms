@@ -72,7 +72,29 @@ const fetchAnnouncements = async () => {
 
 onMounted(() => {
   fetchAnnouncements()
+  fetchLinks()
 })
+
+const links = ref([])
+const loadingLinks = ref(true)
+
+const fetchLinks = async () => {
+  loadingLinks.value = true
+
+  const { data, error } = await supabase
+    .from("group_links")
+    .select("*")
+    .eq("website_id", websiteId.value)
+    .order("sort_order", { ascending: true })
+
+  if (error) {
+    console.error("Error fetching group links:", error)
+  } else {
+    links.value = data || []
+  }
+
+  loadingLinks.value = false
+}
 </script>
 
 <template>
@@ -88,7 +110,7 @@ onMounted(() => {
     <div v-if="website?.team_message" v-html="website?.team_message" class="mb-8" />
 
     <h3 class="mb-6">
-      <i class="pi pi-comment text-2xl text-red" /> Recent Announcements
+      <i class="pi pi-comment text-2xl text-red mr-1" /> Recent Announcements
     </h3>
     <ProgressSpinner v-if="loadingAnnouncements" class="my-8" />
     <div v-else-if="announcements.length === 0">
@@ -115,6 +137,30 @@ onMounted(() => {
           @click="showAllAnnouncements = !showAllAnnouncements"
         />
       </div>
+    </div>
+
+    <Divider class="my-8" />
+
+    <h3 class="mb-6">
+      <i class="pi pi-external-link text-xl text-red mr-1" /> Key Links
+    </h3>
+
+    <ProgressSpinner v-if="loadingLinks" class="my-8" />
+    <div v-else-if="links.length === 0">
+      <p class="text-sm text-gray-500">No links yet.</p>
+    </div>
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <a
+        v-for="link in links"
+        :key="link.id"
+        :href="link.url"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="rounded-xl bg-gray shadow-xl p-8 block hover:shadow-2xl transition-shadow no-underline"
+      >
+        <h4 class="mb-3">{{ link.title }}</h4>
+        <div v-if="link.description" v-html="link.description" class="text-black" />
+      </a>
     </div>
   </div>
 </template>

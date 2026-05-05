@@ -344,6 +344,12 @@ onMounted(() => {
                   >
                     Announcements
                   </NuxtLink>
+                  <NuxtLink
+                    :to="`/groups/${website.id}/manage-links`"
+                    class="plain block"
+                  >
+                    Links
+                  </NuxtLink>
                 </p>
               </template>
             </div>
