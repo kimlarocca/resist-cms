@@ -1,4 +1,5 @@
 <script setup>
+import { useCurrentUserProfile } from "~/composables/states"
 definePageMeta({
   middleware: "auth",
 })
@@ -6,6 +7,50 @@ definePageMeta({
 const route = useRoute()
 const supabase = useSupabaseClient()
 const websiteId = computed(() => route.params.id)
+const currentUserProfile = useCurrentUserProfile()
+
+// Permission helpers
+const myRole = computed(() => currentUserProfile.value?.role || "member")
+const isSuperAdmin = computed(() => myRole.value === "super_admin")
+const isGroupAdmin = computed(() => myRole.value === "group_admin")
+const isGroupManager = computed(() => myRole.value === "group_manager")
+
+// Can the current user edit THIS member's role?
+const canEditRole = (memberRole) => {
+  if (isSuperAdmin.value) return true
+  if (isGroupAdmin.value) return true
+  // Group managers cannot edit super_admin or group_admin
+  if (isGroupManager.value)
+    return memberRole !== "super_admin" && memberRole !== "group_admin"
+  return false
+}
+
+// Role options available to the current user when editing a member
+const roleOptionsForMember = (memberRole) => {
+  const all = [
+    { label: "Member", value: "member" },
+    { label: "Event Manager", value: "event_manager" },
+    { label: "Group Manager", value: "group_manager" },
+    { label: "Group Admin", value: "group_admin" },
+  ]
+  if (isSuperAdmin.value || isGroupAdmin.value) return all
+  // Group managers: cannot set group_admin, and current role must not be super_admin/group_admin
+  return all.filter((o) => o.value !== "group_admin")
+}
+
+// Can the current user remove/ban THIS member?
+const canRemoveMember = (memberRole) => {
+  if (isSuperAdmin.value) return true
+  if (isGroupAdmin.value)
+    return memberRole !== "super_admin" && memberRole !== "group_admin"
+  if (isGroupManager.value)
+    return (
+      memberRole !== "super_admin" &&
+      memberRole !== "group_admin" &&
+      memberRole !== "group_manager"
+    )
+  return false
+}
 
 const submissions = ref([])
 const loading = ref(true)
@@ -346,6 +391,7 @@ const updateMemberRole = async (userId, role) => {
 
 const memberRoleOptions = [
   { label: "Member", value: "member" },
+  { label: "Event Manager", value: "event_manager" },
   { label: "Group Manager", value: "group_manager" },
   { label: "Group Admin", value: "group_admin" },
 ]
@@ -590,9 +636,10 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
           <Column field="role" header="Role" sortable style="min-width: 12rem">
             <template #body="{ data }">
               <Select
+                v-if="canEditRole(data.role)"
                 :key="data.user_id"
                 :model-value="data.role"
-                :options="memberRoleOptions"
+                :options="roleOptionsForMember(data.role)"
                 option-label="label"
                 option-value="value"
                 @update:model-value="updateMemberRole(data.user_id, $event)"
@@ -611,6 +658,12 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
                   />
                 </template>
               </Select>
+              <Tag
+                v-else
+                :value="data.role.replace('_', ' ')"
+                :severity="memberRoleSeverity(data.role)"
+                class="capitalize"
+              />
             </template>
           </Column>
           <Column field="joined_at" header="Joined" sortable style="min-width: 10rem">
@@ -622,6 +675,7 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
             <template #body="{ data }">
               <div class="flex gap-2">
                 <Button
+                  v-if="canRemoveMember(data.role)"
                   icon="pi pi-trash"
                   size="small"
                   severity="danger"
@@ -630,6 +684,7 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
                   v-tooltip.top="'Remove from group'"
                 />
                 <Button
+                  v-if="canRemoveMember(data.role)"
                   icon="pi pi-ban"
                   size="small"
                   severity="danger"
