@@ -56,6 +56,8 @@ const submitSetup = async () => {
   }
   setupLoading.value = false
   setupDialogVisible.value = false
+  // Now that onboarding is complete, run the redirect check
+  fetchUserWebsites()
 }
 
 // User's websites/groups
@@ -94,8 +96,12 @@ const fetchUserWebsites = async () => {
 
     userWebsites.value = data?.map((item) => item.websites).filter(Boolean) || []
 
-    // Auto-redirect members who belong to exactly one group
-    if (currentUserProfile.value?.role === "member" && userWebsites.value.length === 1) {
+    // Auto-redirect members who belong to exactly one group (only if onboarding is complete)
+    if (
+      currentUserProfile.value?.role === "member" &&
+      userWebsites.value.length === 1 &&
+      currentUserProfile.value?.onboarded
+    ) {
       return navigateTo(`/groups/${userWebsites.value[0].id}/dashboard`)
     }
   } catch (error) {
