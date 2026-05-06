@@ -491,6 +491,18 @@ const csvEscape = (val) => {
   return '"' + str.replace(/"/g, '""') + '"'
 }
 
+const emailsCopied = ref(false)
+
+const copyEmails = async () => {
+  const emails = filteredMembers.value
+    .map((m) => m.email)
+    .filter(Boolean)
+    .join(", ")
+  await navigator.clipboard.writeText(emails)
+  emailsCopied.value = true
+  setTimeout(() => (emailsCopied.value = false), 2000)
+}
+
 const exportMembersCSV = () => {
   const rows = [["Email", "First Name", "Last Name"]]
 
@@ -567,7 +579,16 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
           label="Export CSV"
           icon="pi pi-download"
           size="small"
+          severity="secondary"
           @click="exportMembersCSV"
+        />
+        <Button
+          v-if="members.length > 0"
+          :label="emailsCopied ? 'Copied!' : 'Copy Emails'"
+          :icon="emailsCopied ? 'pi pi-check' : 'pi pi-copy'"
+          size="small"
+          severity="secondary"
+          @click="copyEmails"
         />
       </div>
       <div v-if="loadingMembers" class="flex justify-center py-8">
