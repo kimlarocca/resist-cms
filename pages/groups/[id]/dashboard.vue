@@ -244,105 +244,121 @@ const fetchLinks = async () => {
     <h2 class="mb-8">Team Member Portal</h2>
     <div v-if="website?.team_message" v-html="website?.team_message" class="mb-8" />
 
-    <h3 class="mb-6">
-      <i class="pi pi-calendar text-2xl text-red mr-1" /> Upcoming Events
-    </h3>
-    <ProgressSpinner v-if="loadingEvents" class="my-8" />
-    <div v-else-if="events.length === 0" class="mb-12">
-      <p class="text-gray-500">No upcoming events.</p>
-    </div>
-    <div v-else class="flex flex-col gap-6 mb-12">
-      <div
-        v-for="event in events"
-        :key="event.id"
-        class="rounded-xl bg-gray shadow-xl overflow-hidden flex"
-      >
-        <!-- Date badge -->
-        <div
-          class="flex flex-col items-center justify-center bg-red text-white px-5 py-4 min-w-20 text-center"
-        >
-          <span class="text-xs font-semibold tracking-widest uppercase">{{
-            formatEventMonth(event.date)
-          }}</span>
-          <span class="text-4xl font-bold leading-none">{{
-            formatEventDay(event.date)
-          }}</span>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+      <!-- Upcoming Events -->
+      <div>
+        <h3 class="mb-6">
+          <i class="pi pi-calendar text-2xl text-red mr-1" /> Upcoming Events
+        </h3>
+        <ProgressSpinner v-if="loadingEvents" class="my-8" />
+        <div v-else-if="events.length === 0">
+          <p class="text-gray-500">No upcoming events.</p>
         </div>
-        <!-- Event details -->
-        <div class="p-6 flex-1">
-          <h4 class="mb-2">{{ event.name }}</h4>
-          <div class="flex flex-col gap-1 text-sm text-gray-600 mb-3">
-            <div class="flex items-center gap-2">
-              <i class="pi pi-clock" />
-              <span>{{ formatEventTimeRange(event) }}</span>
+        <div v-else class="flex flex-col gap-4">
+          <div
+            v-for="event in events"
+            :key="event.id"
+            class="rounded-xl bg-gray shadow-xl overflow-hidden flex"
+          >
+            <!-- Date badge -->
+            <div
+              class="flex flex-col items-center justify-center bg-red text-white px-5 py-4 min-w-20 text-center"
+            >
+              <span class="text-xs font-semibold tracking-widest uppercase">{{
+                formatEventMonth(event.date)
+              }}</span>
+              <span class="text-4xl font-bold leading-none">{{
+                formatEventDay(event.date)
+              }}</span>
             </div>
-            <div v-if="event.group_event_locations" class="flex items-center gap-2">
-              <i class="pi pi-map-marker" />
-              <span
-                >{{ event.group_event_locations.name
-                }}<span v-if="event.group_event_locations.address"
-                  >, {{ event.group_event_locations.address }}</span
-                ></span
-              >
-            </div>
-            <div v-if="event.is_recurring" class="flex items-center gap-2">
-              <i class="pi pi-refresh" />
-              <span class="capitalize"
-                >{{ event.recurrence_pattern }} recurring<span
-                  v-if="event.recurrence_end_date"
+            <!-- Event details -->
+            <div class="p-6 flex-1">
+              <h4 class="mb-2">{{ event.name }}</h4>
+              <div class="flex flex-col gap-1 text-sm text-gray-600 mb-3">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-clock" />
+                  <span>{{ formatEventTimeRange(event) }}</span>
+                </div>
+                <div v-if="event.group_event_locations" class="flex items-center gap-2">
+                  <i class="pi pi-map-marker" />
+                  <span
+                    >{{ event.group_event_locations.name
+                    }}<span v-if="event.group_event_locations.address"
+                      >, {{ event.group_event_locations.address }}</span
+                    ></span
+                  >
+                </div>
+                <div v-if="event.is_recurring" class="flex items-center gap-2">
+                  <i class="pi pi-refresh" />
+                  <span class="capitalize"
+                    >{{ event.recurrence_pattern }} recurring<span
+                      v-if="event.recurrence_end_date"
+                    >
+                      until {{ formatEventDate(event.recurrence_end_date) }}</span
+                    ></span
+                  >
+                </div>
+              </div>
+              <div
+                v-if="event.description"
+                v-html="event.description"
+                class="text-sm mb-3"
+              />
+              <div v-if="event.group_event_locations?.parking_info">
+                <p
+                  class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1"
                 >
-                  until {{ formatEventDate(event.recurrence_end_date) }}</span
-                ></span
-              >
+                  Parking
+                </p>
+                <div v-html="event.group_event_locations.parking_info" class="text-sm" />
+              </div>
+              <div class="mt-4">
+                <Button
+                  label="Add to Calendar"
+                  icon="pi pi-calendar-plus"
+                  size="small"
+                  severity="secondary"
+                  @click="exportToICS(event)"
+                />
+              </div>
             </div>
           </div>
-          <div v-if="event.description" v-html="event.description" class="text-sm mb-3" />
-          <div v-if="event.group_event_locations?.parking_info">
-            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-              Parking
-            </p>
-            <div v-html="event.group_event_locations.parking_info" class="text-sm" />
+        </div>
+      </div>
+
+      <!-- Recent Announcements -->
+      <div>
+        <h3 class="mb-6">
+          <i class="pi pi-comment text-2xl text-red mr-1" /> Recent Announcements
+        </h3>
+        <ProgressSpinner v-if="loadingAnnouncements" class="my-8" />
+        <div v-else-if="announcements.length === 0">
+          <p class="text-gray-500">No announcements yet.</p>
+        </div>
+        <div v-else class="flex flex-col gap-6">
+          <div
+            v-for="announcement in visibleAnnouncements"
+            :key="announcement.id"
+            class="rounded-xl bg-gray shadow-xl p-8"
+          >
+            <h4 class="mb-3">{{ announcement.title }}</h4>
+            <div class="mb-3" v-html="announcement.message" />
+            <p class="text-sm text-gray-500">{{ formatPostedInfo(announcement) }}</p>
           </div>
-          <div class="mt-4">
+          <div v-if="announcements.length > 5">
             <Button
-              label="Add to Calendar"
-              icon="pi pi-calendar-plus"
-              size="small"
+              :label="
+                showAllAnnouncements
+                  ? 'Show Less'
+                  : `Show ${announcements.length - 5} More`
+              "
+              :icon="showAllAnnouncements ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
               severity="secondary"
-              @click="exportToICS(event)"
+              text
+              @click="showAllAnnouncements = !showAllAnnouncements"
             />
           </div>
         </div>
-      </div>
-    </div>
-
-    <h3 class="mb-6">
-      <i class="pi pi-comment text-2xl text-red mr-1" /> Recent Announcements
-    </h3>
-    <ProgressSpinner v-if="loadingAnnouncements" class="my-8" />
-    <div v-else-if="announcements.length === 0" class="mb-12">
-      <p class="text-gray-500">No announcements yet.</p>
-    </div>
-    <div v-else class="flex flex-col gap-6 mb-12">
-      <div
-        v-for="announcement in visibleAnnouncements"
-        :key="announcement.id"
-        class="rounded-xl bg-gray shadow-xl p-8"
-      >
-        <h4 class="mb-3">{{ announcement.title }}</h4>
-        <div class="mb-3" v-html="announcement.message" />
-        <p class="text-sm text-gray-500">{{ formatPostedInfo(announcement) }}</p>
-      </div>
-      <div v-if="announcements.length > 5">
-        <Button
-          :label="
-            showAllAnnouncements ? 'Show Less' : `Show ${announcements.length - 5} More`
-          "
-          :icon="showAllAnnouncements ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
-          severity="secondary"
-          text
-          @click="showAllAnnouncements = !showAllAnnouncements"
-        />
       </div>
     </div>
 

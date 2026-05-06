@@ -38,12 +38,6 @@
 
       <Column rowReorder style="width: 3rem" />
 
-      <Column field="sort_order" header="#" style="width: 4rem">
-        <template #body="{ data }">
-          {{ data.sort_order }}
-        </template>
-      </Column>
-
       <Column field="title" header="Title" style="min-width: 12rem">
         <template #body="{ data }">
           <strong>{{ data.title }}</strong>
