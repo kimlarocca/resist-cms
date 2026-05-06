@@ -20,6 +20,12 @@ const visibleAnnouncements = computed(() =>
   showAllAnnouncements.value ? announcements.value : announcements.value.slice(0, 5)
 )
 
+const showAllEvents = ref(false)
+
+const visibleEvents = computed(() =>
+  showAllEvents.value ? events.value : events.value.slice(0, 5)
+)
+
 const formatPostedInfo = (announcement) => {
   const date = announcement.created_at
     ? new Intl.DateTimeFormat("en-US", {
@@ -259,7 +265,7 @@ const fetchLinks = async () => {
         </div>
         <div v-else class="flex flex-col gap-4">
           <div
-            v-for="event in events"
+            v-for="event in visibleEvents"
             :key="event.id"
             class="rounded-xl bg-gray shadow-xl overflow-hidden flex"
           >
@@ -333,6 +339,15 @@ const fetchLinks = async () => {
                 />
               </div>
             </div>
+          </div>
+          <div v-if="events.length > 5">
+            <Button
+              :label="showAllEvents ? 'Show Less' : `Show ${events.length - 5} More`"
+              :icon="showAllEvents ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+              severity="secondary"
+              text
+              @click="showAllEvents = !showAllEvents"
+            />
           </div>
         </div>
       </div>
