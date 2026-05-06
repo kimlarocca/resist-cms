@@ -361,6 +361,52 @@ onMounted(() => {
   fetchMembers()
 })
 
+const csvEscape = (val) => {
+  if (val == null) return '""'
+  const str = String(val)
+  return '"' + str.replace(/"/g, '""') + '"'
+}
+
+const exportMembersCSV = () => {
+  const rows = [["Email", "First Name", "Last Name"]]
+
+  // Build a lookup map from submissions: email -> { firstName, lastName }
+  const submissionMap = {}
+  for (const s of submissions.value) {
+    if (s.email) {
+      submissionMap[s.email.toLowerCase()] = {
+        firstName: s.form_data?.["First Name"] || "",
+        lastName: s.form_data?.["Last Name"] || "",
+      }
+    }
+  }
+
+  for (const m of filteredMembers.value) {
+    const email = m.email || ""
+    const sub = submissionMap[email.toLowerCase()]
+    let firstName = sub?.firstName || ""
+    let lastName = sub?.lastName || ""
+
+    // Fallback: split full_name if no submission data
+    if (!firstName && !lastName && m.full_name) {
+      const parts = m.full_name.trim().split(/\s+/)
+      firstName = parts[0] || ""
+      lastName = parts.slice(1).join(" ") || ""
+    }
+
+    rows.push([email, firstName, lastName])
+  }
+
+  const csv = rows.map((r) => r.map(csvEscape).join(",")).join("\n")
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = `group-members.csv`
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
   getWebsiteData(websiteId.value)
 )
@@ -383,7 +429,17 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
 
     <!-- Members section -->
     <div class="mb-16">
-      <h3 class="mb-6">Group Members</h3>
+      <div class="flex items-center justify-between mb-6">
+        <h3>Group Members</h3>
+        <Button
+          v-if="members.length > 0"
+          label="Export CSV"
+          icon="pi pi-download"
+          severity="secondary"
+          size="small"
+          @click="exportMembersCSV"
+        />
+      </div>
       <div v-if="loadingMembers" class="flex justify-center py-8">
         <ProgressSpinner />
       </div>

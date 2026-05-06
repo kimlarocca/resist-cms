@@ -343,7 +343,7 @@ onMounted(() => {
                       Signup Form
                     </NuxtLink>
                     <NuxtLink
-                      :to="`/groups/${website.id}/manage-form-submissions`"
+                      :to="`/groups/${website.id}/manage-members`"
                       class="plain block"
                     >
                       Members
