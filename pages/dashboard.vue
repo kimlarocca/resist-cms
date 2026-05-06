@@ -316,7 +316,7 @@ onMounted(() => {
               >
                 <Divider class="darker" />
                 <h4>Admin Links</h4>
-                <p class="text-sm flex flex-col space-y-1 mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-1 mt-4 text-sm">
                   <NuxtLink :to="`/groups/${website.id}`" class="plain block">
                     Settings
                   </NuxtLink>
@@ -336,7 +336,7 @@ onMounted(() => {
                     :to="`/groups/${website.id}/manage-form-submissions`"
                     class="plain block"
                   >
-                    Form Submissions
+                    Members
                   </NuxtLink>
                   <NuxtLink
                     :to="`/groups/${website.id}/manage-announcements`"
@@ -356,7 +356,7 @@ onMounted(() => {
                   >
                     Events
                   </NuxtLink>
-                </p>
+                </div>
               </template>
             </div>
           </div>
