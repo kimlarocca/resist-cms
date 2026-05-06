@@ -244,12 +244,15 @@ const fetchLinks = async () => {
     <h2 class="mb-8">Team Member Portal</h2>
     <div v-if="website?.team_message" v-html="website?.team_message" class="mb-8" />
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
       <!-- Upcoming Events -->
       <div>
-        <h3 class="mb-6">
-          <i class="pi pi-calendar text-2xl text-red mr-1" /> Upcoming Events
-        </h3>
+        <div class="flex items-center justify-between mb-6">
+          <h3><i class="pi pi-calendar text-2xl text-red mr-1" /> Upcoming Events</h3>
+          <NuxtLink :to="`/groups/${websiteId}/calendar`" class="plain">
+            Calendar View <i class="pi pi-arrow-right ml-1" />
+          </NuxtLink>
+        </div>
         <ProgressSpinner v-if="loadingEvents" class="my-8" />
         <div v-else-if="events.length === 0">
           <p class="text-gray-500">No upcoming events.</p>
