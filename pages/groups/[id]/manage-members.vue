@@ -203,7 +203,85 @@ const clearFilters = () => {
   statusFilter.value = null
 }
 
-// Members
+// Direct invite (new member)
+const inviteNewDialogVisible = ref(false)
+const inviteNewForm = ref({ email: "", firstName: "", lastName: "" })
+const inviteNewLoading = ref(false)
+const inviteNewError = ref("")
+
+const openInviteNewDialog = () => {
+  inviteNewForm.value = { email: "", firstName: "", lastName: "" }
+  inviteNewError.value = ""
+  inviteNewDialogVisible.value = true
+}
+
+const sendDirectInvite = async () => {
+  inviteNewError.value = ""
+  const email = inviteNewForm.value.email.trim()
+  const firstName = inviteNewForm.value.firstName.trim()
+  const lastName = inviteNewForm.value.lastName.trim()
+
+  if (!email) {
+    inviteNewError.value = "Email is required."
+    return
+  }
+  if (!firstName) {
+    inviteNewError.value = "First name is required."
+    return
+  }
+  if (!lastName) {
+    inviteNewError.value = "Last name is required."
+    return
+  }
+
+  inviteNewLoading.value = true
+
+  // Insert submission record first
+  const { data: newSub, error: subError } = await supabase
+    .from("visibility-brigade-submissions")
+    .insert({
+      website_id: websiteId.value,
+      email,
+      status: "invited",
+      form_data: {
+        "First Name": firstName,
+        "Last Name": lastName,
+        Email: email,
+      },
+    })
+    .select()
+    .single()
+
+  if (subError) {
+    inviteNewError.value = subError.message || "Failed to create submission."
+    inviteNewLoading.value = false
+    return
+  }
+
+  // Send invite email
+  const { error: inviteError } = await useFetch("/api/invite-user", {
+    method: "POST",
+    body: { email, websiteId: websiteId.value, submissionId: newSub.id },
+  })
+
+  if (inviteError.value) {
+    inviteNewError.value =
+      inviteError.value?.data?.message || "Failed to send invitation."
+    // Roll back the submission
+    await supabase.from("visibility-brigade-submissions").delete().eq("id", newSub.id)
+    inviteNewLoading.value = false
+    return
+  }
+
+  // Add to local submissions list
+  submissions.value.unshift({
+    ...newSub,
+    full_name: [firstName, lastName].filter(Boolean).join(" ") || "",
+  })
+
+  inviteNewDialogVisible.value = false
+  inviteNewLoading.value = false
+}
 const members = ref([])
 const loadingMembers = ref(true)
 const memberSearch = ref("")
@@ -421,7 +499,14 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
     </Html>
     <h1>Member Management</h1>
     <Divider class="my-7" />
-    <h2 v-if="website?.title" class="mb-12">{{ website?.title }}</h2>
+    <div class="flex items-center justify-between mb-12">
+      <h2 v-if="website?.title">{{ website?.title }}</h2>
+      <Button
+        label="Invite New Member"
+        icon="pi pi-user-plus"
+        @click="openInviteNewDialog"
+      />
+    </div>
 
     <Message v-if="errorMessage" severity="error" class="mb-4">{{
       errorMessage
@@ -429,13 +514,12 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
 
     <!-- Members section -->
     <div class="mb-16">
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-4 mb-6">
         <h3>Group Members</h3>
         <Button
           v-if="members.length > 0"
           label="Export CSV"
           icon="pi pi-download"
-          severity="secondary"
           size="small"
           @click="exportMembersCSV"
         />
@@ -754,6 +838,65 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
           />
         </div>
       </div>
+    </Dialog>
+
+    <!-- Invite New Member Dialog -->
+    <Dialog
+      v-model:visible="inviteNewDialogVisible"
+      modal
+      header="Invite New Member"
+      :style="{ width: '32rem' }"
+    >
+      <div class="flex flex-col gap-4">
+        <p class="text-sm text-gray-500">
+          Enter the member's details below. They will receive an email invitation to
+          create an account and join this group.
+        </p>
+        <FloatLabel variant="on">
+          <InputText
+            id="invite-email"
+            v-model="inviteNewForm.email"
+            type="email"
+            class="w-full"
+          />
+          <label for="invite-email">Email <span class="text-red-500">*</span></label>
+        </FloatLabel>
+        <FloatLabel variant="on">
+          <InputText
+            id="invite-first-name"
+            v-model="inviteNewForm.firstName"
+            class="w-full"
+          />
+          <label for="invite-first-name"
+            >First Name <span class="text-red-500">*</span></label
+          >
+        </FloatLabel>
+        <FloatLabel variant="on">
+          <InputText
+            id="invite-last-name"
+            v-model="inviteNewForm.lastName"
+            class="w-full"
+          />
+          <label for="invite-last-name"
+            >Last Name <span class="text-red-500">*</span></label
+          >
+        </FloatLabel>
+        <Message v-if="inviteNewError" severity="error">{{ inviteNewError }}</Message>
+      </div>
+      <template #footer>
+        <Button
+          label="Cancel"
+          severity="secondary"
+          @click="inviteNewDialogVisible = false"
+          :disabled="inviteNewLoading"
+        />
+        <Button
+          label="Send Invitation"
+          icon="pi pi-envelope"
+          :loading="inviteNewLoading"
+          @click="sendDirectInvite"
+        />
+      </template>
     </Dialog>
 
     <!-- Remove Member Confirmation Dialog -->
