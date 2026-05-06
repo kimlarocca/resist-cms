@@ -284,7 +284,15 @@ const fetchLinks = async () => {
                   <span
                     >{{ event.group_event_locations.name
                     }}<span v-if="event.group_event_locations.address"
-                      >, {{ event.group_event_locations.address }}</span
+                      >,
+                      <a
+                        :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                          event.group_event_locations.address
+                        )}`"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >{{ event.group_event_locations.address }}</a
+                      ></span
                     ></span
                   >
                 </div>
