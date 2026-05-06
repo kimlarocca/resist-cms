@@ -350,6 +350,12 @@ onMounted(() => {
                   >
                     Links
                   </NuxtLink>
+                  <NuxtLink
+                    :to="`/groups/${website.id}/manage-events`"
+                    class="plain block"
+                  >
+                    Events
+                  </NuxtLink>
                 </p>
               </template>
             </div>
