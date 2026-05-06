@@ -22,7 +22,7 @@ const submissionToInvite = ref(null)
 const inviting = ref(false)
 const inviteError = ref("")
 
-const statusSortOrder = { pending: 0, invited: 1, active: 2, denied: 3 }
+const statusSortOrder = { pending: 0, invited: 1, active: 2, denied: 3, banned: 4 }
 
 const filteredSubmissions = computed(() => {
   return submissions.value
@@ -78,8 +78,8 @@ const fetchSubmissions = async () => {
 const statusOptions = [
   { label: "Pending", value: "pending" },
   { label: "Invited", value: "invited" },
-  { label: "Active", value: "active" },
   { label: "Denied", value: "denied" },
+  { label: "Banned", value: "banned" },
 ]
 
 const statusCounts = computed(() => {
@@ -89,6 +89,7 @@ const statusCounts = computed(() => {
     invited: 0,
     active: 0,
     denied: 0,
+    banned: 0,
   }
   for (const s of submissions.value) {
     const status = s.status || "pending"
@@ -100,6 +101,7 @@ const statusCounts = computed(() => {
 const statusSeverity = (status) => {
   if (status === "active") return "success"
   if (status === "denied") return "danger"
+  if (status === "banned") return "danger"
   if (status === "invited") return "info"
   return "warn"
 }
@@ -201,8 +203,162 @@ const clearFilters = () => {
   statusFilter.value = null
 }
 
+// Members
+const members = ref([])
+const loadingMembers = ref(true)
+const memberSearch = ref("")
+const memberRoleFilter = ref(null)
+
+const memberRoleCounts = computed(() => {
+  const counts = {
+    all: members.value.length,
+    member: 0,
+    event_manager: 0,
+    group_manager: 0,
+    group_admin: 0,
+  }
+  for (const m of members.value) {
+    const role = m.role || "member"
+    if (role in counts) counts[role]++
+  }
+  return counts
+})
+
+const filteredMembers = computed(() => {
+  const q = memberSearch.value.trim().toLowerCase()
+  return members.value.filter((m) => {
+    const matchesSearch =
+      !q || m.full_name?.toLowerCase().includes(q) || m.email?.toLowerCase().includes(q)
+    const matchesRole =
+      !memberRoleFilter.value || (m.role || "member") === memberRoleFilter.value
+    return matchesSearch && matchesRole
+  })
+})
+
+const memberRoleSeverity = (role) => {
+  if (role === "super_admin") return "danger"
+  if (role === "group_admin") return "warn"
+  if (role === "group_manager") return "info"
+  return "secondary"
+}
+
+const fetchMembers = async () => {
+  loadingMembers.value = true
+  try {
+    const data = await $fetch("/api/group-members", {
+      query: { websiteId: websiteId.value },
+    })
+    members.value = data || []
+  } catch (err) {
+    console.error("Error fetching members:", err)
+  } finally {
+    loadingMembers.value = false
+  }
+}
+
+const updateMemberRole = async (userId, role) => {
+  const { error } = await supabase.from("profiles").update({ role }).eq("id", userId)
+  if (error) {
+    console.error("Error updating member role:", error)
+  } else {
+    const match = members.value.find((m) => m.user_id === userId)
+    if (match) match.role = role
+  }
+}
+
+const memberRoleOptions = [
+  { label: "Member", value: "member" },
+  { label: "Group Manager", value: "group_manager" },
+  { label: "Group Admin", value: "group_admin" },
+]
+
+const memberToRemove = ref(null)
+const removeMemberDialogVisible = ref(false)
+const removingMember = ref(false)
+
+const memberToBan = ref(null)
+const banMemberDialogVisible = ref(false)
+const banningMember = ref(false)
+
+const confirmRemoveMember = (member) => {
+  memberToRemove.value = member
+  removeMemberDialogVisible.value = true
+}
+
+const confirmBanMember = (member) => {
+  memberToBan.value = member
+  banMemberDialogVisible.value = true
+}
+
+const removeMember = async () => {
+  removingMember.value = true
+  const { error } = await supabase
+    .from("websites_users")
+    .delete()
+    .eq("website_id", websiteId.value)
+    .eq("user_id", memberToRemove.value.user_id)
+  if (error) {
+    console.error("Error removing member:", error)
+  } else {
+    // Deny any form submissions from this member in this group
+    if (memberToRemove.value.email) {
+      const { error: subError } = await supabase
+        .from("visibility-brigade-submissions")
+        .update({ status: "denied" })
+        .eq("website_id", websiteId.value)
+        .eq("email", memberToRemove.value.email)
+      if (subError) {
+        console.error("Error updating submission status:", subError)
+      } else {
+        // Update local submissions state
+        submissions.value.forEach((s) => {
+          if (s.email === memberToRemove.value.email) s.status = "denied"
+        })
+      }
+    }
+    members.value = members.value.filter(
+      (m) => m.user_id !== memberToRemove.value.user_id
+    )
+    removeMemberDialogVisible.value = false
+    memberToRemove.value = null
+  }
+  removingMember.value = false
+}
+
+const banMember = async () => {
+  banningMember.value = true
+  const { error } = await supabase
+    .from("websites_users")
+    .delete()
+    .eq("website_id", websiteId.value)
+    .eq("user_id", memberToBan.value.user_id)
+  if (error) {
+    console.error("Error banning member:", error)
+  } else {
+    if (memberToBan.value.email) {
+      const { error: subError } = await supabase
+        .from("visibility-brigade-submissions")
+        .update({ status: "banned" })
+        .eq("website_id", websiteId.value)
+        .eq("email", memberToBan.value.email)
+      if (subError) {
+        console.error("Error updating submission status:", subError)
+      } else {
+        submissions.value.forEach((s) => {
+          if (s.email === memberToBan.value.email) s.status = "banned"
+        })
+      }
+    }
+    members.value = members.value.filter((m) => m.user_id !== memberToBan.value.user_id)
+    banMemberDialogVisible.value = false
+    memberToBan.value = null
+  }
+  banningMember.value = false
+}
+
 onMounted(() => {
   fetchSubmissions()
+  fetchMembers()
 })
 
 const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
@@ -214,10 +370,10 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Signup Form Submissions</Title>
+        <Title>Resist CMS | Member Management</Title>
       </Head>
     </Html>
-    <h1>Signup Form Submissions</h1>
+    <h1>Member Management</h1>
     <Divider class="my-7" />
     <h2 v-if="website?.title" class="mb-12">{{ website?.title }}</h2>
 
@@ -225,11 +381,134 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
       errorMessage
     }}</Message>
 
+    <!-- Members section -->
+    <div class="mb-16">
+      <h3 class="mb-6">Group Members</h3>
+      <div v-if="loadingMembers" class="flex justify-center py-8">
+        <ProgressSpinner />
+      </div>
+      <div v-else-if="members.length === 0">
+        <p class="text-gray-500">No members yet.</p>
+      </div>
+      <div v-else>
+        <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+          <IconField iconPosition="left" class="w-full">
+            <InputIcon class="pi pi-search" />
+            <InputText v-model="memberSearch" placeholder="Filter by name or email..." />
+          </IconField>
+          <div class="flex gap-2 shrink-0 flex-wrap">
+            <Button
+              :label="`All (${memberRoleCounts.all})`"
+              :severity="memberRoleFilter === null ? 'primary' : 'secondary'"
+              size="small"
+              @click="memberRoleFilter = null"
+            />
+            <Button
+              :label="`Member (${memberRoleCounts.member})`"
+              :severity="memberRoleFilter === 'member' ? 'primary' : 'secondary'"
+              size="small"
+              @click="memberRoleFilter = 'member'"
+            />
+            <Button
+              :label="`Event Manager (${memberRoleCounts.event_manager})`"
+              :severity="memberRoleFilter === 'event_manager' ? 'primary' : 'secondary'"
+              size="small"
+              @click="memberRoleFilter = 'event_manager'"
+            />
+            <Button
+              :label="`Group Manager (${memberRoleCounts.group_manager})`"
+              :severity="memberRoleFilter === 'group_manager' ? 'primary' : 'secondary'"
+              size="small"
+              @click="memberRoleFilter = 'group_manager'"
+            />
+            <Button
+              :label="`Group Admin (${memberRoleCounts.group_admin})`"
+              :severity="memberRoleFilter === 'group_admin' ? 'primary' : 'secondary'"
+              size="small"
+              @click="memberRoleFilter = 'group_admin'"
+            />
+          </div>
+        </div>
+        <DataTable
+          :value="filteredMembers"
+          :paginator="members.length > 25"
+          :rows="25"
+          stripedRows
+          class="p-datatable-sm"
+          emptyMessage="No members found."
+        >
+          <Column field="full_name" header="Name" sortable style="min-width: 12rem">
+            <template #body="{ data }">
+              {{ data.full_name || "—" }}
+            </template>
+          </Column>
+          <Column field="email" header="Email" sortable style="min-width: 14rem">
+            <template #body="{ data }">
+              {{ data.email || "—" }}
+            </template>
+          </Column>
+          <Column field="role" header="Role" sortable style="min-width: 12rem">
+            <template #body="{ data }">
+              <Select
+                :key="data.user_id"
+                :model-value="data.role"
+                :options="memberRoleOptions"
+                option-label="label"
+                option-value="value"
+                @update:model-value="updateMemberRole(data.user_id, $event)"
+                class="status-select"
+                :pt="{
+                  root: { class: 'border-0 shadow-none p-0 bg-transparent' },
+                  label: { class: 'p-0' },
+                  dropdown: { class: 'hidden' },
+                }"
+              >
+                <template #value="{ value }">
+                  <Tag
+                    :value="value.replace('_', ' ')"
+                    :severity="memberRoleSeverity(value)"
+                    class="capitalize cursor-pointer"
+                  />
+                </template>
+              </Select>
+            </template>
+          </Column>
+          <Column field="joined_at" header="Joined" sortable style="min-width: 10rem">
+            <template #body="{ data }">
+              {{ formatDate(data.joined_at) }}
+            </template>
+          </Column>
+          <Column header="" style="width: 8rem">
+            <template #body="{ data }">
+              <div class="flex gap-2">
+                <Button
+                  icon="pi pi-trash"
+                  size="small"
+                  severity="danger"
+                  text
+                  @click="confirmRemoveMember(data)"
+                  v-tooltip.top="'Remove from group'"
+                />
+                <Button
+                  icon="pi pi-ban"
+                  size="small"
+                  severity="danger"
+                  @click="confirmBanMember(data)"
+                  v-tooltip.top="'Ban from group'"
+                />
+              </div>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+    </div>
+
     <div v-if="loading" class="flex justify-center items-center py-8">
       <ProgressSpinner />
     </div>
 
     <div v-else>
+      <h3 class="mb-6">Signup Form Submissions</h3>
       <p v-if="submissions.length === 0">
         You have not had any Signup form submissions yet.
       </p>
@@ -239,7 +518,7 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
             <InputIcon class="pi pi-search"> </InputIcon>
             <InputText
               v-model="search"
-              placeholder="Filter members by name or email..."
+              placeholder="Filter submissions by name or email..."
             />
           </IconField>
           <div class="flex gap-2 shrink-0 flex-wrap">
@@ -272,6 +551,12 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
               :severity="statusFilter === 'denied' ? 'primary' : 'secondary'"
               size="small"
               @click="statusFilter = 'denied'"
+            />
+            <Button
+              :label="`Banned (${statusCounts.banned})`"
+              :severity="statusFilter === 'banned' ? 'primary' : 'secondary'"
+              size="small"
+              @click="statusFilter = 'banned'"
             />
           </div>
           <Button
@@ -413,6 +698,69 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
           />
         </div>
       </div>
+    </Dialog>
+
+    <!-- Remove Member Confirmation Dialog -->
+    <Dialog
+      v-model:visible="removeMemberDialogVisible"
+      modal
+      header="Remove Member"
+      :style="{ width: '28rem' }"
+    >
+      <div class="flex items-center gap-3">
+        <i class="pi pi-exclamation-triangle text-red-500" style="font-size: 2rem" />
+        <span>
+          Are you sure you want to remove
+          <strong>{{ memberToRemove?.full_name || memberToRemove?.email }}</strong> from
+          this group? This will not delete their account, but will prevent them from
+          accessing this group's dashboard and content.
+        </span>
+      </div>
+      <template #footer>
+        <Button
+          label="Cancel"
+          severity="secondary"
+          @click="removeMemberDialogVisible = false"
+          :disabled="removingMember"
+        />
+        <Button
+          label="Remove"
+          severity="danger"
+          :loading="removingMember"
+          @click="removeMember"
+        />
+      </template>
+    </Dialog>
+
+    <!-- Ban Member Confirmation Dialog -->
+    <Dialog
+      v-model:visible="banMemberDialogVisible"
+      modal
+      header="Ban Member"
+      :style="{ width: '28rem' }"
+    >
+      <div class="flex items-center gap-3">
+        <i class="pi pi-ban text-red-500" style="font-size: 2rem" />
+        <span>
+          Are you sure you want to ban
+          <strong>{{ memberToBan?.full_name || memberToBan?.email }}</strong> from this
+          group? They will be removed and their form submission will be marked as banned.
+        </span>
+      </div>
+      <template #footer>
+        <Button
+          label="Cancel"
+          severity="secondary"
+          @click="banMemberDialogVisible = false"
+          :disabled="banningMember"
+        />
+        <Button
+          label="Ban"
+          severity="danger"
+          :loading="banningMember"
+          @click="banMember"
+        />
+      </template>
     </Dialog>
 
     <!-- Invite Confirmation Dialog -->

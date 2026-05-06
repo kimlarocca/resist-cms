@@ -315,47 +315,52 @@ onMounted(() => {
 
               <template
                 v-if="
-                  ['super_admin', 'group_admin', 'group_manager'].includes(
-                    currentUserProfile?.role
-                  )
+                  [
+                    'super_admin',
+                    'group_admin',
+                    'group_manager',
+                    'event_manager',
+                  ].includes(currentUserProfile?.role)
                 "
               >
                 <Divider class="darker" />
                 <h4>Admin Links</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-1 mt-4 text-sm">
-                  <NuxtLink :to="`/groups/${website.id}`" class="plain block">
-                    Settings
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/groups/${website.id}/manage-content`"
-                    class="plain block"
-                  >
-                    Content
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/groups/${website.id}/manage-signup-form`"
-                    class="plain block"
-                  >
-                    Signup Form
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/groups/${website.id}/manage-form-submissions`"
-                    class="plain block"
-                  >
-                    Members
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/groups/${website.id}/manage-announcements`"
-                    class="plain block"
-                  >
-                    Announcements
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/groups/${website.id}/manage-links`"
-                    class="plain block"
-                  >
-                    Links
-                  </NuxtLink>
+                  <template v-if="currentUserProfile?.role !== 'event_manager'">
+                    <NuxtLink :to="`/groups/${website.id}`" class="plain block">
+                      Settings
+                    </NuxtLink>
+                    <NuxtLink
+                      :to="`/groups/${website.id}/manage-content`"
+                      class="plain block"
+                    >
+                      Content
+                    </NuxtLink>
+                    <NuxtLink
+                      :to="`/groups/${website.id}/manage-signup-form`"
+                      class="plain block"
+                    >
+                      Signup Form
+                    </NuxtLink>
+                    <NuxtLink
+                      :to="`/groups/${website.id}/manage-form-submissions`"
+                      class="plain block"
+                    >
+                      Members
+                    </NuxtLink>
+                    <NuxtLink
+                      :to="`/groups/${website.id}/manage-announcements`"
+                      class="plain block"
+                    >
+                      Announcements
+                    </NuxtLink>
+                    <NuxtLink
+                      :to="`/groups/${website.id}/manage-links`"
+                      class="plain block"
+                    >
+                      Links
+                    </NuxtLink>
+                  </template>
                   <NuxtLink
                     :to="`/groups/${website.id}/manage-events`"
                     class="plain block"
