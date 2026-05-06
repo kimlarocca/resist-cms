@@ -56,6 +56,11 @@ const submitSetup = async () => {
   }
   setupLoading.value = false
   setupDialogVisible.value = false
+  // Update in-memory profile so the redirect check sees onboarded: true
+  if (currentUserProfile.value) {
+    currentUserProfile.value.onboarded = true
+    currentUserProfile.value.full_name = setupFullName.value
+  }
   // Now that onboarding is complete, run the redirect check
   fetchUserWebsites()
 }
