@@ -102,8 +102,9 @@ const fetchUserWebsites = async () => {
     userWebsites.value = data?.map((item) => item.websites).filter(Boolean) || []
 
     // Auto-redirect members who belong to exactly one group (only if onboarding is complete)
+    const redirectRoles = ["member", "event_manager", "group_manager", "group_admin"]
     if (
-      currentUserProfile.value?.role === "member" &&
+      redirectRoles.includes(currentUserProfile.value?.role) &&
       userWebsites.value.length === 1 &&
       currentUserProfile.value?.onboarded
     ) {

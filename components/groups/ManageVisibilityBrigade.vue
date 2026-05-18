@@ -45,6 +45,16 @@
     </div>
 
     <div class="mb-4">
+      <label class="block text-sm font-medium mb-2">Hero Background Image (Mobile)</label>
+      <SupabaseImageUploader
+        v-model="heroImageMobile"
+        bucket="visibility_brigade"
+        :website-id="websiteId"
+        @update:modelValue="updateContent"
+      />
+    </div>
+
+    <div class="mb-4">
       <label class="block text-sm font-medium mb-2">Small Hero Image</label>
       <SupabaseImageUploader
         v-model="heroSubImage"
@@ -270,6 +280,7 @@ const isSuperAdmin = computed(() => {
 const heroHeadline = ref(null)
 const heroText = ref(null)
 const heroImage = ref(null)
+const heroImageMobile = ref(null)
 const heroSubImage = ref(null)
 const ctaText = ref(null)
 const ctaLink = ref(null)
@@ -311,6 +322,7 @@ const fetchContent = async () => {
     heroHeadline.value = data.hero_headline
     heroText.value = data.hero_text
     heroImage.value = data.hero_image
+    heroImageMobile.value = data.hero_image_mobile
     heroSubImage.value = data.hero_sub_image
     ctaText.value = data.cta_text
     ctaLink.value = data.cta_link
@@ -393,6 +405,7 @@ const updateContent = async () => {
     hero_headline: heroHeadline.value,
     hero_text: heroText.value,
     hero_image: heroImage.value,
+    hero_image_mobile: heroImageMobile.value,
     hero_sub_image: heroSubImage.value,
     cta_text: ctaText.value,
     cta_link: ctaLink.value,

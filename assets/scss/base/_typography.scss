@@ -14,15 +14,15 @@
     color: var(--text-color);
   }
 
+  .font-semibold p {
+    font-weight: 600;
+  }
+
   p {
     font-family: var(--font-family);
     font-weight: 400;
-    font-size: 14px;
-    line-height: 18px;
-    @screen lg {
       font-size: 16px;
       line-height: 20px;
-    }
   }
 
   h1,

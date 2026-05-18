@@ -8,15 +8,15 @@
       </Head>
     </Html>
     <VisibilityBrigadeVbHeader :website-id="props.websiteId" />
-    <section
-      class="hero inverse pt-32"
-      :style="{ backgroundImage: `url(${content?.hero_image || '/images/hero.jpg'})` }"
-    >
+    <section class="hero inverse pt-32" :style="heroStyle">
       <div class="p-6 h-full flex flex-col justify-between">
-        <h1 class="like-h1 text-white mb-12" v-html="content?.hero_headline" />
+        <h1
+          class="like-h1 text-white [-webkit-text-stroke:2px_black] mb-12"
+          v-html="content?.hero_headline"
+        />
         <div class="mb-12">
           <div
-            class="mb-6 text-xl sm:text-2xl font-semibold text-white"
+            class="mb-6 font-semibold text-white bg-black/80 p-2 w-fit"
             v-html="content?.hero_text"
           />
           <NuxtLink :to="ctaLink" class="plain">
@@ -123,6 +123,17 @@ const ctaLink = computed(() => {
   return content.value?.cta_link || "#"
 })
 
+const heroStyle = computed(() => {
+  const desktopBg = `url(${content.value?.hero_image || "/images/hero.jpg"})`
+  const mobileBg = content.value?.hero_image_mobile
+    ? `url(${content.value.hero_image_mobile})`
+    : desktopBg
+  return {
+    "--hero-bg": desktopBg,
+    "--hero-bg-mobile": mobileBg,
+  }
+})
+
 const embedSection = ref(null)
 
 // Handle embedding code with scripts
@@ -162,12 +173,8 @@ onMounted(() => {
 
 .visibility-brigade {
   p {
-    font-size: 16px;
-    line-height: 26px;
-    @screen md {
-      font-size: 18px;
-      line-height: 28px;
-    }
+    font-size: 18px;
+    line-height: 28px;
   }
 
   h1,
@@ -175,9 +182,9 @@ onMounted(() => {
     font-family: var(--font-family-header);
     font-size: 55px;
     line-height: 65px;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
-    text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.25);
+    text-shadow: 10px 2px 24px rgba(0, 0, 0, 1);
     width: 100%;
     max-width: 1000px;
     margin-top: 130px;
@@ -243,6 +250,7 @@ onMounted(() => {
   }
 
   .hero {
+    background-image: var(--hero-bg);
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
@@ -250,6 +258,13 @@ onMounted(() => {
     min-height: fit-content;
     p {
       max-width: 800px;
+    }
+  }
+
+  /* Use mobile hero image on small screens */
+  @media (max-width: 768px) {
+    .hero {
+      background-image: var(--hero-bg-mobile);
     }
   }
 
