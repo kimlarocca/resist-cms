@@ -1,11 +1,17 @@
 <template>
   <div v-if="profile && profile.length > 0">
-    <p class="text-sm mb-2">Username: {{ currentUser?.email }}</p>
-    <p class="text-sm mb-6">Website: {{ currentUserProfile?.website }}</p>
+    <p class="mb-3">Username: {{ currentUser?.email }}</p>
+    <supabase-reset-password class="mb-12" />
     <div class="mb-4">
       <FloatLabel variant="on">
         <InputText id="full_name" v-model="fullName" @change="updateProfile" />
         <label for="full_name">Full Name</label>
+      </FloatLabel>
+    </div>
+    <div class="mb-4">
+      <FloatLabel variant="on">
+        <InputText id="nickname" v-model="nickname" @change="updateProfile" />
+        <label for="nickname">Nickname</label>
       </FloatLabel>
     </div>
     <div class="mb-4">
@@ -46,6 +52,7 @@ const profile = ref([])
 const successMessage = ref(false)
 
 const fullName = ref(null)
+const nickname = ref(null)
 const phone = ref(null)
 
 // get the profile for the logged in user
@@ -57,6 +64,7 @@ let { data } = await supabase
 if (data) {
   profile.value = data
   fullName.value = data[0]?.full_name
+  nickname.value = data[0]?.nickname
   phone.value = data[0]?.phone
 }
 
@@ -68,6 +76,7 @@ const updateProfile = async () => {
       id: currentUser.value.sub,
       updated_at: new Date().toISOString(),
       full_name: fullName.value,
+      nickname: nickname.value,
       phone: phone.value,
     })
     .match({ id: currentUser.value.sub })
@@ -77,6 +86,7 @@ const updateProfile = async () => {
     successMessage.value = true
     // update the state
     currentUserProfile.value.full_name = fullName.value
+    currentUserProfile.value.nickname = nickname.value
     currentUserProfile.value.phone = phone.value
   }
 }

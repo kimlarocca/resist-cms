@@ -5,71 +5,30 @@
         <Title>Resist CMS | Account Settings</Title>
       </Head>
     </Html>
-    <div class="grid grid-cols-4 md:gap-8">
-      <div class="hidden md:flex col-span-1">
-        <nav class="bg-gray w-full h-fit rounded-xl p-4">
-          <p>
-            <nuxt-link
-              to="#profile"
-              class="plain text-red"
-              :class="hash === '#profile' ? 'active' : ''"
-            >
-              <i class="pi pi-cog mr-2" /> Profile
-            </nuxt-link>
-          </p>
-          <Divider class="darker my-3" />
-          <p>
-            <nuxt-link
-              to="#password"
-              class="plain text-red"
-              :class="hash === '#password' ? 'active' : ''"
-            >
-              <i class="pi pi-lock mr-2" /> Change Password
-            </nuxt-link>
-          </p>
-          <Divider class="darker my-3" />
-          <p>
-            <nuxt-link
-              to="#delete"
-              class="plain text-red"
-              :class="hash === '#delete' ? 'active' : ''"
-            >
-              <i class="pi pi-trash mr-2" /> Delete Account
-            </nuxt-link>
-          </p>
-        </nav>
-      </div>
-      <div class="col-span-4 md:col-span-3">
-        <h1 class="mb-8">Account Settings</h1>
-        <div id="profile">
-          <h3 class="mb-4">Profile</h3>
-          <supabase-upload-image :image="avatarImage || ''" class="mb-6" />
-          <manage-user-profile />
-        </div>
-        <Divider class="my-16" />
-        <div id="password">
-          <supabase-reset-password />
-        </div>
-        <Divider class="my-16" />
-        <div id="delete">
-          <h3 class="mb-4">Delete Account</h3>
-          <p>
-            Please <a href="mailto:help@resistcms.com">contact us</a> if you wish to
-            delete your account.
-          </p>
-        </div>
-        <div class="changes-saved-toast">
-          <Message
-            v-if="successMessage"
-            class="mb-4"
-            severity="success"
-            :closable="false"
-            :sticky="false"
-          >
-            Your changes have been saved.
-          </Message>
-        </div>
-      </div>
+    <h1 class="mb-8">Account Settings</h1>
+    <div id="profile">
+      <h3 class="mb-4">Your Profile</h3>
+      <manage-user-profile />
+      <supabase-upload-image :image="avatarImage || ''" class="mb-6" />
+    </div>
+    <Divider class="my-16" />
+    <div id="delete">
+      <h3 class="mb-4">Delete Account</h3>
+      <p>
+        Please <a href="mailto:delete@resistcms.com">contact us</a> if you wish to delete
+        your account.
+      </p>
+    </div>
+    <div class="changes-saved-toast">
+      <Message
+        v-if="successMessage"
+        class="mb-4"
+        severity="success"
+        :closable="false"
+        :sticky="false"
+      >
+        Your changes have been saved.
+      </Message>
     </div>
   </div>
 </template>

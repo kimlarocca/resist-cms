@@ -1,24 +1,30 @@
 <template>
   <div>
-    <form class="password-reset" @submit.prevent="resetPassword">
-      <h3 class="mb-6">Update Your Password</h3>
-      <p class="mb-2">
-        Email Address: <strong>{{ currentUser.email }}</strong>
-      </p>
+    <Button v-if="!showForm" @click="showForm = true" class="uppercase font-semibold">
+      Change Password
+    </Button>
+    <form v-else class="password-reset" @submit.prevent="resetPassword">
       <input
-        v-if="!successMessage"
-        v-model="password"
+        v-model="currentPassword"
+        type="password"
+        placeholder="Current Password"
+        required
+        class="mb-3"
+      />
+      <input
+        v-model="newPassword"
         type="password"
         placeholder="New Password"
         required
         class="mb-3"
       />
-      <Button v-if="!successMessage" :loading="pending" type="submit">
-        Update Password
-      </Button>
+      <div class="flex gap-3 align-items-center">
+        <Button :loading="pending" type="submit">Update Password</Button>
+        <Button severity="secondary" type="button" @click="cancel">Cancel</Button>
+      </div>
       <template v-if="errorMessage">
         <Message :sticky="true" class="mt-4" severity="error">
-          Sorry, there was an error updating your password: {{ errorMessage }}
+          {{ errorMessage }}
         </Message>
       </template>
       <template v-if="successMessage">
@@ -40,27 +46,50 @@
 const currentUser = useSupabaseUser()
 const client = useSupabaseClient()
 
-const password = ref("")
+const showForm = ref(false)
+const currentPassword = ref("")
+const newPassword = ref("")
 const errorMessage = ref("")
 const successMessage = ref(null)
 const pending = ref(false)
 
+const cancel = () => {
+  showForm.value = false
+  currentPassword.value = ""
+  newPassword.value = ""
+  errorMessage.value = ""
+  successMessage.value = null
+}
+
 const resetPassword = async () => {
+  errorMessage.value = ""
   pending.value = true
-  const { error } = await client.auth.updateUser({
+
+  // Verify current password by re-authenticating
+  const { error: authError } = await client.auth.signInWithPassword({
     email: currentUser.value.email,
-    password: password.value,
+    password: currentPassword.value,
+  })
+  if (authError) {
+    pending.value = false
+    errorMessage.value = "Current password is incorrect."
+    return
+  }
+
+  const { error } = await client.auth.updateUser({
+    password: newPassword.value,
   })
   pending.value = false
   if (error) {
-    console.log(error)
     if (error.toString().includes("8 characters")) {
-      errorMessage.value = "Password should be at least 8 characters."
+      errorMessage.value = "New password should be at least 8 characters."
     } else {
-      errorMessage.value = error
+      errorMessage.value = "Sorry, there was an error updating your password."
     }
   } else {
     successMessage.value = "Success! Your password has been updated."
+    currentPassword.value = ""
+    newPassword.value = ""
   }
 }
 </script>
