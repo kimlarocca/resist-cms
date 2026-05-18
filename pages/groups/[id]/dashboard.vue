@@ -7,6 +7,7 @@ import { useCurrentUserProfile } from "~/composables/states"
 
 const route = useRoute()
 const supabase = useSupabaseClient()
+const currentUserProfile = useCurrentUserProfile()
 const websiteId = computed(() => route.params.id)
 const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
   getWebsiteData(websiteId.value)
@@ -249,6 +250,27 @@ const fetchLinks = async () => {
     <Divider class="my-7" />
     <h2 class="mb-8">Team Member Portal</h2>
     <div v-if="website?.team_message" v-html="website?.team_message" class="mb-8" />
+
+    <div
+      v-if="['super_admin', 'group_admin', 'group_manager', 'event_manager'].includes(currentUserProfile?.role)"
+      class="relative rounded-xl bg-gray shadow-xl p-8 mb-12"
+    >
+      <Tag
+        value="Admin Links"
+        class="absolute top-0 left-8 transform -translate-y-1/2 w-fit"
+      />
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
+        <template v-if="currentUserProfile?.role !== 'event_manager'">
+          <NuxtLink :to="`/groups/${websiteId}`" class="plain block">Settings</NuxtLink>
+          <NuxtLink :to="`/groups/${websiteId}/manage-content`" class="plain block">Content</NuxtLink>
+          <NuxtLink :to="`/groups/${websiteId}/manage-signup-form`" class="plain block">Signup Form</NuxtLink>
+          <NuxtLink :to="`/groups/${websiteId}/manage-members`" class="plain block">Members</NuxtLink>
+          <NuxtLink :to="`/groups/${websiteId}/manage-announcements`" class="plain block">Announcements</NuxtLink>
+          <NuxtLink :to="`/groups/${websiteId}/manage-links`" class="plain block">Links</NuxtLink>
+        </template>
+        <NuxtLink :to="`/groups/${websiteId}/manage-events`" class="plain block">Events</NuxtLink>
+      </div>
+    </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
       <!-- Upcoming Events -->
