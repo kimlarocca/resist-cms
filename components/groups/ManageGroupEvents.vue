@@ -123,6 +123,7 @@
               timeOnly
               class="w-full"
               hourFormat="12"
+              :stepMinute="15"
             />
           </div>
           <div class="flex flex-col gap-2">
@@ -135,7 +136,10 @@
               timeOnly
               class="w-full"
               hourFormat="12"
+              :stepMinute="15"
+              @update:modelValue="endTimeError = ''"
             />
+            <small v-if="endTimeError" class="text-red-500">{{ endTimeError }}</small>
           </div>
         </div>
 
@@ -425,11 +429,23 @@ const recurrenceOptions = [
   { label: "Annually", value: "annually" },
 ]
 
+const defaultStartTime = () => {
+  const d = new Date()
+  d.setHours(17, 0, 0, 0)
+  return d
+}
+
+const defaultEndTime = () => {
+  const d = new Date()
+  d.setHours(18, 0, 0, 0)
+  return d
+}
+
 const emptyEventForm = () => ({
   name: "",
   date: null,
-  start_time: null,
-  end_time: null,
+  start_time: defaultStartTime(),
+  end_time: defaultEndTime(),
   location_id: null,
   description: "",
   is_recurring: false,
@@ -442,6 +458,7 @@ const locationForm = ref({ name: "", address: "", parking_info: "" })
 
 const nameError = ref("")
 const locationError = ref("")
+const endTimeError = ref("")
 
 // ---- Computed ----
 const locationOptions = computed(() =>
@@ -526,6 +543,7 @@ const openCreateEventDialog = () => {
   recurrenceEndError.value = ""
   nameError.value = ""
   locationError.value = ""
+  endTimeError.value = ""
   eventDialogVisible.value = true
 }
 
@@ -547,6 +565,7 @@ const openEditEventDialog = (event) => {
   recurrenceEndError.value = ""
   nameError.value = ""
   locationError.value = ""
+  endTimeError.value = ""
   eventDialogVisible.value = true
 }
 
@@ -603,6 +622,7 @@ const validateRecurrence = () => {
 const saveEvent = async () => {
   nameError.value = ""
   locationError.value = ""
+  endTimeError.value = ""
 
   let valid = true
   if (!eventForm.value.name.trim()) {
@@ -614,6 +634,13 @@ const saveEvent = async () => {
     valid = false
   }
   if (!eventForm.value.date || !eventForm.value.start_time) valid = false
+  if (eventForm.value.start_time && eventForm.value.end_time) {
+    const toMs = (v) => (v instanceof Date ? v : parseTimeToDate(v)).getTime()
+    if (toMs(eventForm.value.end_time) <= toMs(eventForm.value.start_time)) {
+      endTimeError.value = "End time must be after start time."
+      valid = false
+    }
+  }
   if (!validateRecurrence()) valid = false
   if (!valid) return
 
