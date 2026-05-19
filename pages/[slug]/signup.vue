@@ -19,7 +19,7 @@
           </h1>
         </div>
       </section>
-      <section class="p-6 py-16" id="form">
+      <section class="p-6 py-16 max-w-2xl" id="form">
         <div class="mb-12">
           <div v-if="content?.signup_form_text" v-html="content?.signup_form_text" />
           <p v-else>Please fill out the form below to join the resistance.</p>
@@ -149,29 +149,11 @@ const { data: websiteData } = await useAsyncData(
 
   .hero {
     background-repeat: no-repeat;
-    background-position: center center;
+    background-position: center top;
     background-size: cover;
     min-height: fit-content;
     p {
       max-width: 800px;
-    }
-  }
-
-  .about-us {
-    width: 100%;
-    text-align: right;
-    margin-top: 2rem;
-    @screen lg {
-      margin-top: -8rem;
-    }
-    img {
-      width: 70%;
-      margin: 0 2rem 0 auto;
-      @screen lg {
-        width: auto;
-        max-height: 20rem;
-        margin: 0 4rem 0 auto;
-      }
     }
   }
 }

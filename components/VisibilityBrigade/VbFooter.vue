@@ -88,9 +88,7 @@ const privacyUrl = computed(() =>
       <p class="small">
         Copyright © {{ currentYear }} {{ companyName }}. All Rights Reserved.
         <span v-if="termsUrl || privacyUrl" class="ml-4">
-          <NuxtLink v-if="termsUrl" :to="termsUrl" class="mr-4"
-            >Terms of Service</NuxtLink
-          >
+          <NuxtLink v-if="termsUrl" :to="termsUrl" class="mr-4">Terms</NuxtLink>
           <NuxtLink v-if="privacyUrl" :to="privacyUrl">Privacy Policy</NuxtLink>
         </span>
       </p>

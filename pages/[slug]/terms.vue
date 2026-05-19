@@ -2,14 +2,14 @@
   <div v-if="website" class="visibility-brigade">
     <Html lang="en">
       <Head>
-        <Title>{{ website?.title }} | Terms of Service</Title>
+        <Title>{{ website?.title }} | Terms</Title>
       </Head>
     </Html>
     <VisibilityBrigadeVbHeader :website-id="website?.id" />
     <section class="p-6 py-16 pt-32">
-      <h1 class="mb-8">Terms of Service</h1>
+      <h1 class="mb-8">Terms</h1>
       <div v-if="website?.terms" v-html="website.terms" class="prose" />
-      <p v-else class="text-gray-500">No terms of service available.</p>
+      <p v-else class="text-gray-500">No terms available.</p>
     </section>
   </div>
   <VisibilityBrigadeVbFooter :website-id="website?.id" />
