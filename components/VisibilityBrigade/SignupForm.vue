@@ -163,7 +163,6 @@ const submitting = ref(false)
 const submitted = ref(false)
 const errorMessage = ref("")
 const turnstileToken = ref("")
-const websiteEmail = ref(null)
 const websiteTitle = ref(null)
 
 const hasValidationErrors = computed(() => Object.keys(errors.value).length > 0)
@@ -290,12 +289,12 @@ const submitForm = async () => {
 
     submitted.value = true
 
-    // Send notification email to website owner (best-effort, don't block on failure)
-    if (emailValue && websiteEmail.value) {
+    // Send notification email to group admins/managers with allow_notifications (best-effort)
+    if (emailValue) {
       $fetch("/api/send-submission-notification", {
         method: "POST",
         body: {
-          toEmail: websiteEmail.value,
+          websiteId: props.websiteId,
           websiteTitle: websiteTitle.value || "your group",
           submitterEmail: emailValue,
           formData,
@@ -313,14 +312,13 @@ const submitForm = async () => {
 onMounted(() => {
   fetchFields()
 
-  // Fetch website contact email and title for notification
+  // Fetch website title for notification
   supabase
     .from("websites")
-    .select("email, title")
+    .select("title")
     .eq("id", props.websiteId)
     .single()
     .then(({ data }) => {
-      websiteEmail.value = data?.email || null
       websiteTitle.value = data?.title || null
     })
 })

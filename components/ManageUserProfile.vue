@@ -25,6 +25,15 @@
         <label for="phone">Phone Number</label>
       </FloatLabel>
     </div>
+    <div class="flex items-center gap-3 mb-8">
+      <Checkbox
+        id="allow_notifications"
+        v-model="allowNotifications"
+        :binary="true"
+        @change="updateProfile"
+      />
+      <label for="allow_notifications" class="text-sm">Allow email notifications</label>
+    </div>
     <!-- <div class="mb-4">
       <Button label="Save Changes" @click="updateProfile" />
     </div> -->
@@ -54,6 +63,7 @@ const successMessage = ref(false)
 const fullName = ref(null)
 const nickname = ref(null)
 const phone = ref(null)
+const allowNotifications = ref(false)
 
 // get the profile for the logged in user
 let { data } = await supabase
@@ -66,6 +76,7 @@ if (data) {
   fullName.value = data[0]?.full_name
   nickname.value = data[0]?.nickname
   phone.value = data[0]?.phone
+  allowNotifications.value = data[0]?.allow_notifications ?? false
 }
 
 const updateProfile = async () => {
@@ -78,6 +89,7 @@ const updateProfile = async () => {
       full_name: fullName.value,
       nickname: nickname.value,
       phone: phone.value,
+      allow_notifications: allowNotifications.value,
     })
     .match({ id: currentUser.value.sub })
   if (error) {
@@ -88,6 +100,7 @@ const updateProfile = async () => {
     currentUserProfile.value.full_name = fullName.value
     currentUserProfile.value.nickname = nickname.value
     currentUserProfile.value.phone = phone.value
+    currentUserProfile.value.allow_notifications = allowNotifications.value
   }
 }
 </script>

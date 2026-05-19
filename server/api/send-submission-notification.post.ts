@@ -1,13 +1,59 @@
+import { createClient } from "@supabase/supabase-js"
 import { Resend } from "resend"
 
 export default defineEventHandler(async (event) => {
-    const { toEmail, websiteTitle, submitterEmail, formData } = await readBody(event)
+    const { websiteId, websiteTitle, submitterEmail, formData } = await readBody(event)
 
-    if (!toEmail || !submitterEmail || !formData) {
+    if (!websiteId || !submitterEmail || !formData) {
         throw createError({ statusCode: 400, message: "Missing required fields." })
     }
 
     const config = useRuntimeConfig()
+
+    if (!config.supabaseServiceKey) {
+        throw createError({ statusCode: 500, message: "Server misconfiguration: missing service key." })
+    }
+
+    const supabaseAdmin = createClient(
+        config.public.supabaseUrl,
+        config.supabaseServiceKey
+    )
+
+    // Find group_admin and group_manager members with allow_notifications = true
+    const { data: members, error: membersError } = await supabaseAdmin
+        .from("websites_users")
+        .select(`
+            user_id,
+            profiles:user_id (
+                role,
+                allow_notifications
+            )
+        `)
+        .eq("website_id", websiteId)
+
+    if (membersError) {
+        console.error("Error fetching members for notification:", membersError)
+        return { sent: false }
+    }
+
+    const eligibleMembers = (members || []).filter((m: any) =>
+        ["group_admin", "group_manager"].includes(m.profiles?.role) &&
+        m.profiles?.allow_notifications === true
+    )
+
+    if (eligibleMembers.length === 0) return { sent: false }
+
+    // Resolve auth emails for eligible members
+    const recipients: string[] = []
+    for (const member of eligibleMembers) {
+        const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(member.user_id)
+        if (authUser?.user?.email) {
+            recipients.push(authUser.user.email)
+        }
+    }
+
+    if (recipients.length === 0) return { sent: false }
+
     const resend = new Resend(config.resendApiKey)
 
     const rows = Object.entries(formData)
@@ -40,17 +86,17 @@ export default defineEventHandler(async (event) => {
     </div>
   `
 
-    const { error } = await resend.emails.send({
-        from: "Resist CMS <noreply@resistcms.com>",
-        to: toEmail,
-        subject: `New signup form submission — ${websiteTitle}`,
-        html,
-    })
-
-    if (error) {
-        console.error("Error sending email:", error)
-        throw createError({ statusCode: 500, message: "Failed to send notification email." })
+    for (const toEmail of recipients) {
+        const { error } = await resend.emails.send({
+            from: "Resist CMS <noreply@resistcms.com>",
+            to: toEmail,
+            subject: `New signup form submission — ${websiteTitle}`,
+            html,
+        })
+        if (error) {
+            console.error("Error sending notification to", toEmail, error)
+        }
     }
 
-    return { sent: true }
+    return { sent: true, count: recipients.length }
 })
