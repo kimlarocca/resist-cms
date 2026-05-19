@@ -108,7 +108,7 @@ const fetchUserWebsites = async () => {
       userWebsites.value.length === 1 &&
       currentUserProfile.value?.onboarded
     ) {
-      return navigateTo(`/groups/${userWebsites.value[0].id}/dashboard`)
+      return navigateTo(`/groups/${userWebsites.value[0].id}/portal`)
     }
 
     // Fetch cross-group announcements if member of 2+ groups
@@ -401,8 +401,8 @@ onMounted(() => {
                 </a>
               </p>
               <p>
-                <NuxtLink :to="`/groups/${website.id}/dashboard`" class="plain text-sm">
-                  View Team Only Site <i class="pi pi-arrow-right text-xs ml-1" />
+                <NuxtLink :to="`/groups/${website.id}/portal`" class="plain text-sm">
+                  Team Member Portal <i class="pi pi-arrow-right text-xs ml-1" />
                 </NuxtLink>
               </p>
 
@@ -435,7 +435,11 @@ onMounted(() => {
 
       <!-- Announcements column -->
       <div>
-        <AnnouncementsFeed :announcements="allAnnouncements" :loading="loadingAllAnnouncements" :page-size="10" />
+        <AnnouncementsFeed
+          :announcements="allAnnouncements"
+          :loading="loadingAllAnnouncements"
+          :page-size="10"
+        />
       </div>
     </div>
   </div>

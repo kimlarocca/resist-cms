@@ -116,7 +116,7 @@ const fetchLinks = async () => {
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | {{ website?.title }}</Title>
+        <Title>Resist CMS | {{ website?.title }} | Team Member Portal</Title>
       </Head>
     </Html>
     <h1 class="mb-6">{{ website?.title }}</h1>

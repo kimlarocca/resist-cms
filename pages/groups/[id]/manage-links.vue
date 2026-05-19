@@ -18,14 +18,14 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
       </Head>
     </Html>
     <h1 class="mb-4">Manage Links</h1>
-    <NuxtLink :to="`/groups/${websiteId}/dashboard`" class="plain text-sm">
+    <NuxtLink :to="`/groups/${websiteId}/portal`" class="plain text-sm">
       <i class="pi pi-arrow-left mr-1" />Back to Team Site
     </NuxtLink>
     <Divider class="my-7" />
     <h2 v-if="website?.title" class="mb-8">{{ website?.title }}</h2>
     <GroupsManageGroupLinks :website-id="websiteId" />
     <Divider class="my-7" />
-    <NuxtLink :to="`/groups/${websiteId}/dashboard`">
+    <NuxtLink :to="`/groups/${websiteId}/portal`">
       <i class="pi pi-arrow-left mr-2" />
       Back to the Dashboard
     </NuxtLink>

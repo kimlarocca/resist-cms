@@ -408,7 +408,7 @@ const exportToICS = (event) => {
     </div>
 
     <Divider class="my-7" />
-    <NuxtLink :to="`/groups/${websiteId}/dashboard`">
+    <NuxtLink :to="`/groups/${websiteId}/portal`">
       <i class="pi pi-arrow-left mr-2" />Back to Dashboard
     </NuxtLink>
   </div>
