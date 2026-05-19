@@ -227,11 +227,6 @@
         @click="updateContent"
         :disabled="!!ctaLinkError"
       />
-      <div class="mt-6">
-        <NuxtLink to="/dashboard">
-          <i class="pi pi-arrow-left mr-2" />Back to the Dashboard
-        </NuxtLink>
-      </div>
     </div>
 
     <div class="changes-saved-toast">

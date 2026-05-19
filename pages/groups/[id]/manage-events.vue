@@ -27,7 +27,10 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
       <Message severity="error">You do not have permission to view this page.</Message>
     </div>
     <template v-else>
-      <h1 class="mb-6">Manage Events</h1>
+      <h1 class="mb-4">Manage Events</h1>
+      <NuxtLink :to="`/groups/${websiteId}/dashboard`" class="plain text-sm">
+        <i class="pi pi-arrow-left mr-1" />Back to Team Site
+      </NuxtLink>
       <Divider class="my-7" />
       <h2 v-if="website?.title" class="mb-8">{{ website?.title }}</h2>
       <GroupsManageGroupEvents :website-id="websiteId" />

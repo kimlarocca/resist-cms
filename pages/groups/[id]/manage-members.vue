@@ -555,7 +555,10 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
         <Title>Resist CMS | Member Management</Title>
       </Head>
     </Html>
-    <h1>Member Management</h1>
+    <h1 class="mb-4">Member Management</h1>
+    <NuxtLink :to="`/groups/${websiteId}/dashboard`" class="plain text-sm">
+      <i class="pi pi-arrow-left mr-1" />Back to Team Site
+    </NuxtLink>
     <Divider class="my-7" />
     <div class="flex items-center justify-between mb-12">
       <h2 v-if="website?.title">{{ website?.title }}</h2>

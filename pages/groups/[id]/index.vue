@@ -18,7 +18,10 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
         <Title>Resist CMS | Group Settings</Title>
       </Head>
     </Html>
-    <h1 class="mb-6">Manage Your Group Settings</h1>
+    <h1 class="mb-4">Manage Your Group Settings</h1>
+    <NuxtLink :to="`/groups/${websiteId}/dashboard`" class="plain text-sm">
+      <i class="pi pi-arrow-left mr-1" />Back to Team Site
+    </NuxtLink>
     <Divider class="my-7" />
     <h2 v-if="website?.title" class="mb-12">{{ website?.title }}</h2>
     <GroupsManageGroup :website-id="websiteId" />

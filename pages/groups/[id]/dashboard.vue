@@ -192,37 +192,10 @@ const fetchLinks = async () => {
 
       <!-- Recent Announcements -->
       <div>
-        <h3 class="mb-6">
-          <i class="pi pi-comment text-2xl text-red mr-1" /> Recent Announcements
-        </h3>
-        <ProgressSpinner v-if="loadingAnnouncements" class="my-8" />
-        <div v-else-if="announcements.length === 0">
-          <p class="text-gray-500">No announcements yet.</p>
-        </div>
-        <div v-else class="flex flex-col gap-6">
-          <div
-            v-for="announcement in visibleAnnouncements"
-            :key="announcement.id"
-            class="rounded-xl bg-gray shadow-xl p-8"
-          >
-            <h4 class="mb-2">{{ announcement.title }}</h4>
-            <p class="text-sm text-gray-500 mb-3">{{ formatPostedInfo(announcement) }}</p>
-            <div v-html="announcement.message" />
-          </div>
-          <div v-if="announcements.length > 5">
-            <Button
-              :label="
-                showAllAnnouncements
-                  ? 'Show Less'
-                  : `Show ${announcements.length - 5} More`
-              "
-              :icon="showAllAnnouncements ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
-              severity="secondary"
-              text
-              @click="showAllAnnouncements = !showAllAnnouncements"
-            />
-          </div>
-        </div>
+        <AnnouncementsFeed
+          :announcements="announcements"
+          :loading="loadingAnnouncements"
+        />
       </div>
     </div>
 
