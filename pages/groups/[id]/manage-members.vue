@@ -61,7 +61,7 @@ const submissionToDelete = ref(null)
 const deleteDialogVisible = ref(false)
 const deleting = ref(false)
 const search = ref("")
-const statusFilter = ref(null)
+const statusFilter = ref("pending")
 const inviteDialogVisible = ref(false)
 const submissionToInvite = ref(null)
 const inviting = ref(false)
@@ -327,6 +327,185 @@ const sendDirectInvite = async () => {
   inviteNewDialogVisible.value = false
   inviteNewLoading.value = false
 }
+// ---- Bulk Invite ----
+const bulkInviteDialogVisible = ref(false)
+const bulkInviteMode = ref("paste") // 'paste' | 'csv'
+const bulkPasteText = ref("")
+const bulkInviteRows = ref([]) // [{ email, firstName, lastName }]
+const bulkInviteParsed = ref(false)
+const bulkInviteLoading = ref(false)
+const bulkInviteResults = ref(null) // { sent, failed }
+const bulkParseError = ref("")
+const csvFileInput = ref(null)
+
+const openBulkInviteDialog = () => {
+  bulkInviteMode.value = "paste"
+  bulkPasteText.value = ""
+  bulkInviteRows.value = []
+  bulkInviteParsed.value = false
+  bulkInviteLoading.value = false
+  bulkInviteResults.value = null
+  bulkParseError.value = ""
+  bulkInviteDialogVisible.value = true
+}
+
+const parseCSVLine = (line) => {
+  const result = []
+  let current = ""
+  let inQuotes = false
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i]
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"'
+        i++
+      } else {
+        inQuotes = !inQuotes
+      }
+    } else if (ch === "," && !inQuotes) {
+      result.push(current.trim())
+      current = ""
+    } else {
+      current += ch
+    }
+  }
+  result.push(current.trim())
+  return result
+}
+
+const parsePasteList = () => {
+  bulkParseError.value = ""
+  const lines = bulkPasteText.value
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+  const rows = []
+  for (const line of lines) {
+    const parts = line.split(",").map((p) => p.trim())
+    const email = parts[0] || ""
+    if (!email.includes("@")) {
+      bulkParseError.value = `Invalid email: "${email}"`
+      return
+    }
+    rows.push({ email, firstName: parts[1] || "", lastName: parts[2] || "" })
+  }
+  if (rows.length === 0) {
+    bulkParseError.value = "No valid rows found."
+    return
+  }
+  bulkInviteRows.value = rows
+  bulkInviteParsed.value = true
+}
+
+const onCSVFile = (event) => {
+  bulkParseError.value = ""
+  const file = event.target.files[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const lines = String(e.target.result)
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean)
+    if (lines.length < 2) {
+      bulkParseError.value = "CSV must have a header row and at least one data row."
+      return
+    }
+    const headers = parseCSVLine(lines[0]).map((h) => h.toLowerCase())
+    const emailIdx = headers.findIndex((h) => h === "email")
+    const firstIdx = headers.findIndex((h) =>
+      ["first name", "first_name", "firstname"].includes(h)
+    )
+    const lastIdx = headers.findIndex((h) =>
+      ["last name", "last_name", "lastname"].includes(h)
+    )
+    if (emailIdx === -1) {
+      bulkParseError.value = 'CSV must have an "Email" column.'
+      return
+    }
+    const rows = []
+    for (let i = 1; i < lines.length; i++) {
+      const parts = parseCSVLine(lines[i])
+      const email = parts[emailIdx] || ""
+      if (!email || !email.includes("@")) continue
+      rows.push({
+        email,
+        firstName: firstIdx !== -1 ? parts[firstIdx] || "" : "",
+        lastName: lastIdx !== -1 ? parts[lastIdx] || "" : "",
+      })
+    }
+    if (rows.length === 0) {
+      bulkParseError.value = "No valid rows found in CSV."
+      return
+    }
+    bulkInviteRows.value = rows
+    bulkInviteParsed.value = true
+  }
+  reader.readAsText(file)
+}
+
+const resetToPaste = () => {
+  bulkInviteMode.value = "paste"
+  bulkInviteParsed.value = false
+  bulkInviteRows.value = []
+  bulkParseError.value = ""
+}
+
+const resetToCSV = () => {
+  bulkInviteMode.value = "csv"
+  bulkInviteParsed.value = false
+  bulkInviteRows.value = []
+  bulkParseError.value = ""
+}
+
+const removeRow = (idx) => {
+  bulkInviteRows.value.splice(idx, 1)
+  if (bulkInviteRows.value.length === 0) bulkInviteParsed.value = false
+}
+
+const sendBulkInvites = async () => {
+  bulkInviteLoading.value = true
+  let sent = 0
+  let failed = 0
+  for (const row of bulkInviteRows.value) {
+    try {
+      const { data: newSub, error: subError } = await supabase
+        .from("visibility-brigade-submissions")
+        .insert({
+          website_id: websiteId.value,
+          email: row.email,
+          status: "invited",
+          form_data: {
+            "First Name": row.firstName,
+            "Last Name": row.lastName,
+            Email: row.email,
+          },
+        })
+        .select()
+        .single()
+      if (subError) throw subError
+
+      await $fetch("/api/invite-user", {
+        method: "POST",
+        body: { email: row.email, websiteId: websiteId.value, submissionId: newSub.id },
+      })
+
+      submissions.value.unshift({
+        ...newSub,
+        full_name: [row.firstName, row.lastName].filter(Boolean).join(" "),
+      })
+      sent++
+    } catch (e) {
+      console.error("Bulk invite error for", row.email, e)
+      // Roll back submission if it was created
+      failed++
+    }
+  }
+  bulkInviteResults.value = { sent, failed }
+  bulkInviteLoading.value = false
+}
+
+// ---- Members ----
 const members = ref([])
 const loadingMembers = ref(true)
 const memberSearch = ref("")
@@ -562,11 +741,20 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
     <Divider class="my-7" />
     <div class="flex items-center justify-between mb-12">
       <h2 v-if="website?.title">{{ website?.title }}</h2>
-      <Button
-        label="Invite New Member"
-        icon="pi pi-user-plus"
-        @click="openInviteNewDialog"
-      />
+      <div>
+        <Button
+          label="Invite Member"
+          icon="pi pi-user-plus"
+          @click="openInviteNewDialog"
+          class="mr-2"
+        />
+        <Button
+          label="Bulk Invite"
+          icon="pi pi-users"
+          severity="secondary"
+          @click="openBulkInviteDialog"
+        />
+      </div>
     </div>
 
     <Message v-if="errorMessage" severity="error" class="mb-4">{{
@@ -917,6 +1105,165 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
           />
         </div>
       </div>
+    </Dialog>
+
+    <!-- Bulk Invite Dialog -->
+    <Dialog
+      v-model:visible="bulkInviteDialogVisible"
+      modal
+      header="Bulk Invite Members"
+      :style="{ width: '52rem', maxWidth: '95vw' }"
+      :closable="!bulkInviteLoading"
+    >
+      <!-- Results summary -->
+      <div v-if="bulkInviteResults" class="flex flex-col gap-4">
+        <Message
+          :severity="bulkInviteResults.failed === 0 ? 'success' : 'warn'"
+          :closable="false"
+        >
+          <span v-if="bulkInviteResults.sent > 0">
+            {{ bulkInviteResults.sent }} invitation{{
+              bulkInviteResults.sent !== 1 ? "s" : ""
+            }}
+            sent successfully.
+          </span>
+          <span v-if="bulkInviteResults.failed > 0">
+            {{ bulkInviteResults.failed }} failed — check the console for details.
+          </span>
+        </Message>
+      </div>
+
+      <!-- Input phase -->
+      <div v-else class="flex flex-col gap-4">
+        <!-- Mode toggle -->
+        <div class="flex gap-2">
+          <Button
+            label="Paste List"
+            icon="pi pi-list"
+            :severity="bulkInviteMode === 'paste' ? 'primary' : 'secondary'"
+            size="small"
+            @click="resetToPaste"
+          />
+          <Button
+            label="Import CSV"
+            icon="pi pi-upload"
+            :severity="bulkInviteMode === 'csv' ? 'primary' : 'secondary'"
+            size="small"
+            @click="resetToCSV"
+          />
+        </div>
+
+        <!-- Paste mode -->
+        <template v-if="bulkInviteMode === 'paste' && !bulkInviteParsed">
+          <p class="text-sm text-gray-500">
+            Enter one person per line in the format:
+            <code class="bg-gray-100 px-1 rounded">email, First Name, Last Name</code>
+          </p>
+          <Textarea
+            v-model="bulkPasteText"
+            rows="8"
+            class="w-full font-mono text-sm"
+            placeholder="jane@example.com, Jane, Doe&#10;john@example.com, John, Smith"
+          />
+          <Message v-if="bulkParseError" severity="error" :closable="false">{{
+            bulkParseError
+          }}</Message>
+        </template>
+
+        <!-- CSV mode -->
+        <template v-if="bulkInviteMode === 'csv' && !bulkInviteParsed">
+          <p class="text-sm text-gray-500">
+            Upload a CSV file with columns:
+            <code class="bg-gray-100 px-1 rounded">Email</code>,
+            <code class="bg-gray-100 px-1 rounded">First Name</code>,
+            <code class="bg-gray-100 px-1 rounded">Last Name</code>. You can use the
+            <strong>Export CSV</strong> format from this page as a template.
+          </p>
+          <div>
+            <input
+              ref="csvFileInput"
+              type="file"
+              accept=".csv,text/csv"
+              class="hidden"
+              @change="onCSVFile"
+            />
+            <Button
+              label="Choose CSV File"
+              icon="pi pi-folder-open"
+              severity="secondary"
+              @click="csvFileInput.click()"
+            />
+          </div>
+          <Message v-if="bulkParseError" severity="error" :closable="false">{{
+            bulkParseError
+          }}</Message>
+        </template>
+
+        <!-- Preview table -->
+        <template v-if="bulkInviteParsed">
+          <p class="text-sm text-gray-600 font-medium">
+            {{ bulkInviteRows.length }}
+            {{ bulkInviteRows.length === 1 ? "person" : "people" }} ready to invite:
+          </p>
+          <DataTable
+            :value="bulkInviteRows"
+            class="p-datatable-sm"
+            stripedRows
+            scrollable
+            scrollHeight="280px"
+          >
+            <Column field="email" header="Email" style="min-width: 14rem" />
+            <Column field="firstName" header="First Name" style="min-width: 9rem" />
+            <Column field="lastName" header="Last Name" style="min-width: 9rem" />
+            <Column style="width: 4rem">
+              <template #body="{ index }">
+                <Button
+                  icon="pi pi-times"
+                  size="small"
+                  text
+                  severity="danger"
+                  v-tooltip.top="'Remove'"
+                  @click="removeRow(index)"
+                />
+              </template>
+            </Column>
+          </DataTable>
+        </template>
+      </div>
+
+      <template #footer>
+        <template v-if="bulkInviteResults">
+          <Button
+            label="Close"
+            severity="secondary"
+            @click="bulkInviteDialogVisible = false"
+          />
+        </template>
+        <template v-else>
+          <Button
+            label="Cancel"
+            severity="secondary"
+            :disabled="bulkInviteLoading"
+            @click="bulkInviteDialogVisible = false"
+          />
+          <Button
+            v-if="!bulkInviteParsed && bulkInviteMode === 'paste'"
+            label="Parse List"
+            icon="pi pi-check"
+            @click="parsePasteList"
+          />
+          <Button
+            v-if="bulkInviteParsed"
+            :label="`Send ${bulkInviteRows.length} Invitation${
+              bulkInviteRows.length !== 1 ? 's' : ''
+            }`"
+            icon="pi pi-envelope"
+            :loading="bulkInviteLoading"
+            :disabled="bulkInviteRows.length === 0"
+            @click="sendBulkInvites"
+          />
+        </template>
+      </template>
     </Dialog>
 
     <!-- Invite New Member Dialog -->

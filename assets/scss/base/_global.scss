@@ -141,6 +141,7 @@ a {
     border: 2px solid var(--red) !important;
     border-radius: 0.5rem !important;
     transition: var(--transition) !important;
+    padding: .5rem 1rem !important;
     &:hover {
         opacity: var(--opacity-on-hover) !important;
     }
