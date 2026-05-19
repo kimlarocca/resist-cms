@@ -188,22 +188,63 @@ const toggleGroups = async (user) => {
 const electionsDialogVisible = ref(false)
 const electionsUser = ref(null)
 const userElections = ref([])
+const allRacesInDialog = ref([])
 const loadingElections = ref(false)
+const selectedElectionToAssign = ref(null)
+const assigningElection = ref(false)
+
+const availableRacesForAssign = computed(() =>
+  allRacesInDialog.value.filter((r) => r.admin_id !== electionsUser.value?.user_id)
+)
 
 const toggleElections = async (user) => {
   electionsUser.value = user
   userElections.value = []
+  allRacesInDialog.value = []
+  selectedElectionToAssign.value = null
   loadingElections.value = true
   electionsDialogVisible.value = true
   const { data, error } = await supabase
     .from("races")
-    .select("id, name, type, state, election_date")
-    .eq("admin_id", user.user_id)
-    .order("election_date", { ascending: false })
+    .select("id, name, type, state, election_date, admin_id")
+    .order("name")
   if (!error) {
-    userElections.value = data || []
+    allRacesInDialog.value = data || []
+    userElections.value = (data || []).filter((r) => r.admin_id === user.user_id)
   }
   loadingElections.value = false
+}
+
+const assignElection = async () => {
+  if (!selectedElectionToAssign.value || !electionsUser.value) return
+  assigningElection.value = true
+  const { error } = await supabase
+    .from("races")
+    .update({ admin_id: electionsUser.value.user_id })
+    .eq("id", selectedElectionToAssign.value)
+  if (!error) {
+    const race = allRacesInDialog.value.find(
+      (r) => r.id === selectedElectionToAssign.value
+    )
+    if (race) {
+      race.admin_id = electionsUser.value.user_id
+      userElections.value = [...userElections.value, race]
+    }
+    selectedElectionToAssign.value = null
+  }
+  assigningElection.value = false
+}
+
+const removeFromElection = async (raceId) => {
+  const { error } = await supabase
+    .from("races")
+    .update({ admin_id: null })
+    .eq("id", raceId)
+  if (!error) {
+    const race = allRacesInDialog.value.find((r) => r.id === raceId)
+    if (race) race.admin_id = null
+    userElections.value = userElections.value.filter((r) => r.id !== raceId)
+  }
 }
 
 // CSV export
@@ -423,26 +464,58 @@ onMounted(fetchUsers)
         v-model:visible="electionsDialogVisible"
         modal
         :header="`Elections for ${electionsUser?.full_name || electionsUser?.email}`"
-        :style="{ width: '34rem' }"
+        :style="{ width: '36rem' }"
       >
         <ProgressSpinner v-if="loadingElections" class="my-4" />
-        <p v-else-if="userElections.length === 0" class="text-gray-500 text-sm">
-          Not an admin of any elections.
-        </p>
-        <div v-else class="flex flex-col gap-2">
-          <div
-            v-for="e in userElections"
-            :key="e.id"
-            class="flex items-center justify-between rounded-lg bg-gray px-4 py-3"
-          >
-            <div>
-              <p class="font-medium text-sm">{{ e.name }}</p>
-              <p class="text-xs text-gray-500">
-                {{ [e.type, e.state].filter(Boolean).join(" · ") }}
-                <span v-if="e.election_date"> · {{ formatDate(e.election_date) }} </span>
-              </p>
+        <div v-else>
+          <p v-if="userElections.length === 0" class="text-gray-500 text-sm mb-4">
+            Not an admin of any elections.
+          </p>
+          <div v-else class="flex flex-col gap-2 mb-4">
+            <div
+              v-for="e in userElections"
+              :key="e.id"
+              class="flex items-center justify-between rounded-lg bg-gray px-4 py-3"
+            >
+              <div>
+                <p class="font-medium text-sm">{{ e.name }}</p>
+                <p class="text-xs text-gray-500">
+                  {{ [e.type, e.state].filter(Boolean).join(" · ") }}
+                  <span v-if="e.election_date">
+                    · {{ formatDate(e.election_date) }}
+                  </span>
+                </p>
+              </div>
+              <Button
+                icon="pi pi-times"
+                size="small"
+                text
+                severity="danger"
+                v-tooltip.top="'Remove from election'"
+                @click="removeFromElection(e.id)"
+              />
             </div>
-            <NuxtLink :to="`/elections`" class="plain text-xs">View</NuxtLink>
+          </div>
+
+          <Divider />
+          <p class="text-sm font-medium mb-2">Assign to an election</p>
+          <div class="flex gap-2">
+            <Select
+              v-model="selectedElectionToAssign"
+              :options="availableRacesForAssign"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Choose an election..."
+              showClear
+              class="flex-1"
+            />
+            <Button
+              label="Assign"
+              icon="pi pi-check"
+              :disabled="!selectedElectionToAssign"
+              :loading="assigningElection"
+              @click="assignElection"
+            />
           </div>
         </div>
         <template #footer>
