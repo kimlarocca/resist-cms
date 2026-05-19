@@ -5,8 +5,6 @@
         <Title>Resist | Logout</Title>
       </Head>
     </Html>
-    <Logo class="mb-3 ml-1" />
-    <hr class="w-44 ml-0 mb-8" />
     <h1 class="mb-6">You have been logged out</h1>
     <p><a href="/">Click here</a> to return to the sign in page.</p>
   </div>

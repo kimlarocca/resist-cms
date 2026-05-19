@@ -4,7 +4,7 @@
       <NuxtPage />
     </div>
     <div class="bg-blue pt-4 pl-4 flex justify-end items-end">
-      <img src="/images/blank-hero.jpg" alt="Resist CMS" />
+      <img src="/images/blank-hero.jpg" alt="protestors with a Resist banner" />
     </div>
   </main>
 </template>
