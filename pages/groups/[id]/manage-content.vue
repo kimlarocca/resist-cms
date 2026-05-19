@@ -91,7 +91,7 @@ onMounted(() => {
         </a>
       </p>
 
-      <p v-if="website.slug" class="mb-4">
+      <p v-else-if="website.slug" class="mb-4">
         <a
           :href="`https://resistcms.com/${website.slug}`"
           target="_blank"
