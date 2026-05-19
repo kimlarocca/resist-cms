@@ -116,13 +116,11 @@ const fetchLinks = async () => {
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | {{ website?.title }} | Team Member Portal</Title>
+        <Title>Resist CMS | {{ website?.title }} Team Member Portal</Title>
       </Head>
     </Html>
-    <h1 class="mb-6">{{ website?.title }}</h1>
-    <Divider class="my-7" />
-    <h2 class="mb-8">Team Member Portal</h2>
-    <div v-if="website?.team_message" v-html="website?.team_message" class="mb-8" />
+    <h1 class="mb-6">{{ website?.title }} Team Member Portal</h1>
+    <div v-if="website?.team_message" v-html="website?.team_message" class="mb-12" />
 
     <div
       v-if="
@@ -204,10 +202,17 @@ const fetchLinks = async () => {
     </h3>
 
     <ProgressSpinner v-if="loadingLinks" class="my-8" />
-    <div v-else-if="links.length === 0" class="mb-12">
-      <p class="text-gray-500">No links yet.</p>
-    </div>
     <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      <a
+        v-if="website?.slug"
+        :href="`https://resistcms.com/${website.slug}`"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="plain rounded-xl bg-gray shadow-xl p-8 block hover:shadow-2xl transition-shadow no-underline"
+      >
+        <h4 class="mb-3">View Public Site</h4>
+        <p class="text-black text-sm">resistcms.com/{{ website.slug }}</p>
+      </a>
       <a
         v-for="link in links"
         :key="link.id"
