@@ -333,6 +333,9 @@ onMounted(() => {
         class="absolute top-0 left-8 transform -translate-y-1/2 w-fit mx-auto"
       />
       <div class="flex items-center gap-4">
+        <NuxtLink to="/users" class="plain block">
+          <Button label="Manage Users" class="white" />
+        </NuxtLink>
         <NuxtLink to="/groups" class="plain block">
           <Button label="Manage Groups" class="white" />
         </NuxtLink>
