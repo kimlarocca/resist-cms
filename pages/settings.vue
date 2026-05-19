@@ -2,7 +2,7 @@
   <div v-if="profile && profile.length > 0" class="settings container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Account Settings</Title>
+        <Title>Account Settings</Title>
       </Head>
     </Html>
     <h1 class="mb-8">Account Settings</h1>

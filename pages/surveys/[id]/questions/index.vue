@@ -15,7 +15,7 @@ const isSuperAdmin = computed(() => currentUserProfile.value?.role === "super_ad
   <div class="container p-4" :key="`survey-questions-${surveyId}`">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Manage Survey Questions</Title>
+        <Title>Manage Survey Questions</Title>
       </Head>
     </Html>
     <h1 class="mb-6">Manage Survey Questions</h1>

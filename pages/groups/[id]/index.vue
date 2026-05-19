@@ -15,7 +15,7 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Group Settings</Title>
+        <Title>Group Settings</Title>
       </Head>
     </Html>
     <h1 class="mb-4">Manage Your Group Settings</h1>

@@ -2,7 +2,7 @@
   <div class="p-4 text-center">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Magic Link</Title>
+        <Title>Magic Link</Title>
       </Head>
     </Html>
     <Logo class="mb-3 ml-1" />

@@ -35,7 +35,7 @@ onMounted(async () => {
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Confirming…</Title>
+        <Title>Confirming…</Title>
       </Head>
     </Html>
     <Logo class="mb-3 ml-1" />

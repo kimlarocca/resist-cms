@@ -15,7 +15,7 @@ const currentUserProfile = useCurrentUserProfile()
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Manage Survey Choices</Title>
+        <Title>Manage Survey Choices</Title>
       </Head>
     </Html>
     <h1 class="mb-6">Manage Survey Choices</h1>

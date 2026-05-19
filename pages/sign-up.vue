@@ -2,7 +2,7 @@
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Sign Up</Title>
+        <Title>Sign Up</Title>
       </Head>
     </Html>
     <Logo class="mb-3 ml-1" />

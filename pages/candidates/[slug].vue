@@ -40,7 +40,7 @@ watch(slug, () => {
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Manage Candidates</Title>
+        <Title>Manage Candidates</Title>
       </Head>
     </Html>
 

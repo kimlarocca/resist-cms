@@ -20,7 +20,7 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Manage Events</Title>
+        <Title>Manage Events</Title>
       </Head>
     </Html>
     <div v-if="!hasAccess">

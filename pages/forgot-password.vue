@@ -2,7 +2,7 @@
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Forgot Password</Title>
+        <Title>Forgot Password</Title>
       </Head>
     </Html>
     <h1 class="mb-6">Forgot your password?</h1>

@@ -11,7 +11,7 @@ const isSuperAdmin = computed(() => currentUserProfile.value?.role === "super_ad
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Manage Survey Categories</Title>
+        <Title>Manage Survey Categories</Title>
       </Head>
     </Html>
     <h1>Manage Survey Categories</h1>

@@ -223,7 +223,7 @@ const exportToICS = (event) => {
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Group Calendar</Title>
+        <Title>Group Calendar</Title>
       </Head>
     </Html>
 

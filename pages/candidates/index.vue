@@ -35,7 +35,7 @@ watch(
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | My Candidates</Title>
+        <Title>My Candidates</Title>
       </Head>
     </Html>
 

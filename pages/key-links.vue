@@ -51,7 +51,7 @@ watch(
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Manage Key Links</Title>
+        <Title>Manage Key Links</Title>
       </Head>
     </Html>
 

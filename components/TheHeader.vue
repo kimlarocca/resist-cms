@@ -1,5 +1,6 @@
 <script setup>
 const currentUserProfile = useCurrentUserProfile()
+const { hostname } = useRequestURL()
 </script>
 
 <template>
@@ -7,7 +8,7 @@ const currentUserProfile = useCurrentUserProfile()
     <div class="container p-4 flex justify-between items-center">
       <NuxtLink to="/dashboard" class="plain">
         <img
-          v-if="currentUserProfile && currentUserProfile.role === 'election_manager'"
+          v-if="hostname === 'login.votebyvalues.com'"
           src="/images/vbv-logo.png"
           alt="Vote by values logo"
           class="w-36"

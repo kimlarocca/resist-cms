@@ -731,7 +731,7 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Member Management</Title>
+        <Title>Member Management</Title>
       </Head>
     </Html>
     <h1 class="mb-4">Member Management</h1>

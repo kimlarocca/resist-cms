@@ -21,7 +21,7 @@ watch(
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>Resist CMS | Accept Invitation</Title>
+        <Title>Accept Invitation</Title>
       </Head>
     </Html>
     <Logo class="mb-3 ml-1" />
