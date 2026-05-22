@@ -772,10 +772,10 @@ const fetchAssignedUsers = async () => {
       .select(
         `
         user_id,
+        role,
         profiles:user_id (
           id,
-          full_name,
-          role
+          full_name
         )
       `
       )
@@ -787,7 +787,7 @@ const fetchAssignedUsers = async () => {
       data?.map((item) => ({
         id: item.profiles.id,
         full_name: item.profiles.full_name,
-        role: item.profiles.role,
+        role: item.role,
       })) || []
   } catch (error) {
     console.error("Error fetching assigned users:", error)

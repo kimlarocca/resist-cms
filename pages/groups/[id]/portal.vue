@@ -3,12 +3,13 @@ definePageMeta({
   middleware: "auth",
 })
 
-import { useCurrentUserProfile } from "~/composables/states"
+import { useCurrentUserProfile, useGroupRole } from "~/composables/states"
 
 const route = useRoute()
 const supabase = useSupabaseClient()
 const currentUserProfile = useCurrentUserProfile()
 const websiteId = computed(() => route.params.id)
+const groupRole = useGroupRole(websiteId)
 const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
   getWebsiteData(websiteId.value)
 )
@@ -125,7 +126,7 @@ const fetchLinks = async () => {
     <div
       v-if="
         ['super_admin', 'group_admin', 'group_manager', 'event_manager'].includes(
-          currentUserProfile?.role
+          groupRole
         )
       "
       class="relative rounded-xl bg-gray shadow-xl p-8 mb-12"
@@ -137,8 +138,8 @@ const fetchLinks = async () => {
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
         <template
           v-if="
-            currentUserProfile?.role !== 'event_manager' &&
-            currentUserProfile?.role !== 'member'
+            groupRole !== 'event_manager' &&
+            groupRole !== 'member'
           "
         >
           <NuxtLink :to="`/groups/${websiteId}`" class="plain flex items-center"

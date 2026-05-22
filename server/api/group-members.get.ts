@@ -26,10 +26,10 @@ export default defineEventHandler(async (event) => {
       id,
       created_at,
       user_id,
+      role,
       profiles:user_id (
         id,
-        full_name,
-        role
+        full_name
       )
     `)
     .eq("website_id", websiteId)
@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
     user_id: wu.user_id,
     joined_at: wu.created_at,
     full_name: (wu.profiles as any)?.full_name || null,
-    role: (wu.profiles as any)?.role || "member",
+    role: wu.role || "member",
     email: emailMap[wu.user_id] || null,
   }))
 })

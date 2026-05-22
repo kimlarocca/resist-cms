@@ -34,4 +34,4 @@ https://dash.cloudflare.com/41f61a73d75ea48112b464ceefec0c9e/turnstile
 
 ### Resend Email API
 
-https://resend.com/domains/9be3e9c6-61f9-47b5-a672-40dd03aa8e4c
+https://resend.com/api-keys

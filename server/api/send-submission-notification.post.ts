@@ -24,8 +24,8 @@ export default defineEventHandler(async (event) => {
         .from("websites_users")
         .select(`
             user_id,
+            role,
             profiles:user_id (
-                role,
                 allow_notifications
             )
         `)
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const eligibleMembers = (members || []).filter((m: any) =>
-        ["group_admin", "group_manager"].includes(m.profiles?.role) &&
+        ["group_admin", "group_manager"].includes(m.role) &&
         m.profiles?.allow_notifications === true
     )
 

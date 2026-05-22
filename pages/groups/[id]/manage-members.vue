@@ -1,5 +1,5 @@
 <script setup>
-import { useCurrentUserProfile } from "~/composables/states"
+import { useCurrentUserProfile, useCurrentUserGroupRoles } from "~/composables/states"
 definePageMeta({
   middleware: "auth",
 })
@@ -8,9 +8,14 @@ const route = useRoute()
 const supabase = useSupabaseClient()
 const websiteId = computed(() => route.params.id)
 const currentUserProfile = useCurrentUserProfile()
+const currentUserGroupRoles = useCurrentUserGroupRoles()
 
-// Permission helpers
-const myRole = computed(() => currentUserProfile.value?.role || "member")
+// Permission helpers — use per-group role, with super_admin override
+const myRole = computed(() => {
+  const globalRole = currentUserProfile.value?.role
+  if (globalRole === 'super_admin') return 'super_admin'
+  return currentUserGroupRoles.value?.[websiteId.value] || 'member'
+})
 const isSuperAdmin = computed(() => myRole.value === "super_admin")
 const isGroupAdmin = computed(() => myRole.value === "group_admin")
 const isGroupManager = computed(() => myRole.value === "group_manager")
@@ -559,7 +564,11 @@ const fetchMembers = async () => {
 }
 
 const updateMemberRole = async (userId, role) => {
-  const { error } = await supabase.from("profiles").update({ role }).eq("id", userId)
+  const { error } = await supabase
+    .from("websites_users")
+    .update({ role })
+    .eq("website_id", websiteId.value)
+    .eq("user_id", userId)
   if (error) {
     console.error("Error updating member role:", error)
   } else {

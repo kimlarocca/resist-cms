@@ -32,9 +32,6 @@ const raceAdminMap = ref({}) // { raceId: userId }
 
 const allRoles = [
   { label: "Member", value: "member" },
-  { label: "Event Manager", value: "event_manager" },
-  { label: "Group Manager", value: "group_manager" },
-  { label: "Group Admin", value: "group_admin" },
   { label: "Election Manager", value: "election_manager" },
   { label: "Super Admin", value: "super_admin" },
 ]

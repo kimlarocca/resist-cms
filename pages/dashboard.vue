@@ -1,9 +1,10 @@
 <script setup>
-import { useCurrentUserProfile } from "~/composables/states"
+import { useCurrentUserProfile, useCurrentUserGroupRoles } from "~/composables/states"
 definePageMeta({
   middleware: "auth",
 })
 const currentUserProfile = useCurrentUserProfile()
+const currentUserGroupRoles = useCurrentUserGroupRoles()
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const router = useRouter()
@@ -101,10 +102,11 @@ const fetchUserWebsites = async () => {
 
     userWebsites.value = data?.map((item) => item.websites).filter(Boolean) || []
 
-    // Auto-redirect members who belong to exactly one group (only if onboarding is complete)
-    const redirectRoles = ["member", "event_manager", "group_manager", "group_admin"]
+    // Auto-redirect non-global-role users who belong to exactly one group
+    const globalRole = currentUserProfile.value?.role
     if (
-      redirectRoles.includes(currentUserProfile.value?.role) &&
+      globalRole !== 'super_admin' &&
+      globalRole !== 'election_manager' &&
       userWebsites.value.length === 1 &&
       currentUserProfile.value?.onboarded
     ) {
@@ -416,7 +418,7 @@ onMounted(() => {
                     'group_admin',
                     'group_manager',
                     'event_manager',
-                  ].includes(currentUserProfile?.role)
+                  ].includes(currentUserProfile?.role === 'super_admin' ? 'super_admin' : currentUserGroupRoles?.[website.id])
                 "
               >
               </template>

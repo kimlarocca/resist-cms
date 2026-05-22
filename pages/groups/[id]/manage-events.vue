@@ -1,5 +1,5 @@
 <script setup>
-import { useCurrentUserProfile } from "~/composables/states"
+import { useCurrentUserProfile, useGroupRole } from "~/composables/states"
 definePageMeta({
   middleware: "auth",
 })
@@ -7,9 +7,10 @@ definePageMeta({
 const route = useRoute()
 const websiteId = computed(() => route.params.id)
 const currentUserProfile = useCurrentUserProfile()
+const groupRole = useGroupRole(websiteId)
 
 const allowedRoles = ["super_admin", "group_admin", "event_manager"]
-const hasAccess = computed(() => allowedRoles.includes(currentUserProfile.value?.role))
+const hasAccess = computed(() => allowedRoles.includes(groupRole.value))
 
 const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
   getWebsiteData(websiteId.value)
