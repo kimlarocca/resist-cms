@@ -347,6 +347,9 @@ onMounted(() => {
         <NuxtLink to="/surveys/categories" class="plain block">
           <Button label="Manage Survey Categories" class="white" />
         </NuxtLink>
+        <NuxtLink to="/news-cards" class="plain block">
+          <Button label="Manage News Cards" class="white" />
+        </NuxtLink>
       </div>
     </div>
 
