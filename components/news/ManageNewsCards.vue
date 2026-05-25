@@ -42,12 +42,17 @@
       </Column>
       <Column field="title" header="Title" sortable style="min-width: 14rem">
         <template #body="{ data }">
-          <strong>{{ data.title || '(no title)' }}</strong>
+          {{ data.title || "(no title)" }}
         </template>
       </Column>
       <Column field="url" header="URL" sortable style="min-width: 14rem">
         <template #body="{ data }">
-          <a :href="data.url" target="_blank" rel="noopener" class="text-blue-600 hover:underline text-sm">
+          <a
+            :href="data.url"
+            target="_blank"
+            rel="noopener"
+            class="text-blue-600 hover:underline text-sm"
+          >
             {{ truncateUrl(data.url) }}
           </a>
         </template>
@@ -94,7 +99,9 @@
       </Column>
 
       <template #empty>
-        <div class="text-center py-8">No news cards found. Click "Add News Card" to create one.</div>
+        <div class="text-center py-8">
+          No news cards found. Click "Add News Card" to create one.
+        </div>
       </template>
     </DataTable>
 
@@ -125,7 +132,10 @@
               :disabled="!form.url.trim()"
             />
           </div>
-          <small class="text-gray-500">Enter a URL and click Fetch to auto-fill title, description, and image from Open Graph tags.</small>
+          <small class="text-gray-500"
+            >Enter a URL and click Fetch to auto-fill title, description, and image from
+            Open Graph tags.</small
+          >
         </div>
 
         <!-- OG preview -->
@@ -136,8 +146,16 @@
         <!-- Title -->
         <div class="flex flex-col gap-2">
           <label for="nc-title" class="font-semibold">Title</label>
-          <InputText id="nc-title" v-model="form.title" placeholder="Title" class="w-full" />
-          <small v-if="form.og_title && form.title !== form.og_title" class="text-gray-400">
+          <InputText
+            id="nc-title"
+            v-model="form.title"
+            placeholder="Title"
+            class="w-full"
+          />
+          <small
+            v-if="form.og_title && form.title !== form.og_title"
+            class="text-gray-400"
+          >
             OG title: {{ form.og_title }}
           </small>
         </div>
@@ -145,8 +163,17 @@
         <!-- Description -->
         <div class="flex flex-col gap-2">
           <label for="nc-description" class="font-semibold">Description</label>
-          <Textarea id="nc-description" v-model="form.description" rows="3" placeholder="Description" class="w-full" />
-          <small v-if="form.og_description && form.description !== form.og_description" class="text-gray-400">
+          <Textarea
+            id="nc-description"
+            v-model="form.description"
+            rows="3"
+            placeholder="Description"
+            class="w-full"
+          />
+          <small
+            v-if="form.og_description && form.description !== form.og_description"
+            class="text-gray-400"
+          >
             OG description: {{ form.og_description }}
           </small>
         </div>
@@ -156,14 +183,25 @@
           <label class="font-semibold">Image</label>
 
           <div v-if="form.image_url" class="mb-2">
-            <img :src="form.image_url" alt="News card image" class="max-h-48 rounded border border-surface-200 object-contain" />
+            <img
+              :src="form.image_url"
+              alt="News card image"
+              class="max-h-48 rounded border border-surface-200 object-contain"
+            />
           </div>
 
           <TabView>
             <TabPanel header="Image URL">
               <div class="flex flex-col gap-2 pt-2">
-                <InputText v-model="form.image_url" placeholder="https://..." class="w-full" />
-                <small v-if="form.og_image_url && form.image_url !== form.og_image_url" class="text-gray-400">
+                <InputText
+                  v-model="form.image_url"
+                  placeholder="https://..."
+                  class="w-full"
+                />
+                <small
+                  v-if="form.og_image_url && form.image_url !== form.og_image_url"
+                  class="text-gray-400"
+                >
                   OG image: {{ form.og_image_url }}
                 </small>
               </div>
@@ -183,7 +221,9 @@
         <!-- Domain selection -->
         <div class="flex flex-col gap-2">
           <label class="font-semibold">Sites</label>
-          <small class="text-gray-500">Select which sites this news card should appear on.</small>
+          <small class="text-gray-500"
+            >Select which sites this news card should appear on.</small
+          >
 
           <div class="flex items-center gap-2 mb-2">
             <Checkbox
@@ -195,15 +235,23 @@
             <label for="select-all-domains">Select All</label>
           </div>
 
-          <div class="flex flex-wrap gap-3 max-h-48 overflow-y-auto p-2 border border-surface-200 rounded">
-            <div v-for="domain in domains" :key="domain.id" class="flex items-center gap-2">
+          <div
+            class="flex flex-wrap gap-3 max-h-48 overflow-y-auto p-2 border border-surface-200 rounded"
+          >
+            <div
+              v-for="domain in domains"
+              :key="domain.id"
+              class="flex items-center gap-2"
+            >
               <Checkbox
                 v-model="form.selectedDomainIds"
                 :inputId="'domain-' + domain.id"
                 :value="domain.id"
                 @change="updateSelectAll"
               />
-              <label :for="'domain-' + domain.id" class="text-sm">{{ domain.domain }}</label>
+              <label :for="'domain-' + domain.id" class="text-sm">{{
+                domain.domain
+              }}</label>
             </div>
             <div v-if="domains.length === 0" class="text-gray-400 text-sm py-2">
               No domains yet. Add one below.
@@ -212,8 +260,19 @@
 
           <!-- Add / Delete domains inline -->
           <div class="flex gap-2 mt-2">
-            <InputText v-model="newDomain" placeholder="Add domain (e.g. example.com)" class="flex-1" />
-            <Button label="Add" icon="pi pi-plus" size="small" @click="addDomain" :disabled="!newDomain.trim()" :loading="addingDomain" />
+            <InputText
+              v-model="newDomain"
+              placeholder="Add domain (e.g. example.com)"
+              class="flex-1"
+            />
+            <Button
+              label="Add"
+              icon="pi pi-plus"
+              size="small"
+              @click="addDomain"
+              :disabled="!newDomain.trim()"
+              :loading="addingDomain"
+            />
           </div>
 
           <!-- Domain chips with delete -->
@@ -261,13 +320,22 @@
         <i class="pi pi-exclamation-triangle text-red-500" style="font-size: 2rem" />
         <span>
           Are you sure you want to delete
-          <strong>{{ cardToDelete?.title || cardToDelete?.url }}</strong>?
-          This cannot be undone.
+          <strong>{{ cardToDelete?.title || cardToDelete?.url }}</strong
+          >? This cannot be undone.
         </span>
       </div>
       <template #footer>
-        <Button label="Cancel" severity="secondary" @click="deleteDialogVisible = false" />
-        <Button label="Delete" severity="danger" @click="deleteNewsCard" :loading="deleting" />
+        <Button
+          label="Cancel"
+          severity="secondary"
+          @click="deleteDialogVisible = false"
+        />
+        <Button
+          label="Delete"
+          severity="danger"
+          @click="deleteNewsCard"
+          :loading="deleting"
+        />
       </template>
     </Dialog>
 
@@ -281,13 +349,22 @@
       <div class="flex items-center gap-3">
         <i class="pi pi-exclamation-triangle text-red-500" style="font-size: 2rem" />
         <span>
-          Are you sure you want to delete <strong>{{ domainToDelete?.domain }}</strong>?
-          It will be removed from all news cards.
+          Are you sure you want to delete <strong>{{ domainToDelete?.domain }}</strong
+          >? It will be removed from all news cards.
         </span>
       </div>
       <template #footer>
-        <Button label="Cancel" severity="secondary" @click="deleteDomainDialogVisible = false" />
-        <Button label="Delete" severity="danger" @click="deleteDomain" :loading="deletingDomain" />
+        <Button
+          label="Cancel"
+          severity="secondary"
+          @click="deleteDomainDialogVisible = false"
+        />
+        <Button
+          label="Delete"
+          severity="danger"
+          @click="deleteDomain"
+          :loading="deletingDomain"
+        />
       </template>
     </Dialog>
   </div>
