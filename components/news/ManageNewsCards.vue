@@ -8,8 +8,16 @@
       {{ successMessage }}
     </Message>
 
-    <div class="grid grid-cols-2 items-center gap-4 mb-6">
+    <div class="grid grid-cols-3 items-center gap-4 mb-6">
       <InputText v-model="filters.global.value" placeholder="Search news cards..." />
+      <Select
+        v-model="filterDomainId"
+        :options="domainFilterOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Filter by domain"
+        class="w-full"
+      />
       <div class="text-right">
         <Button label="Add News Card" icon="pi pi-plus" @click="openCreateDialog" />
       </div>
@@ -19,7 +27,7 @@
 
     <DataTable
       v-else
-      :value="newsCards"
+      :value="filteredNewsCards"
       stripedRows
       paginator
       :rows="25"
@@ -401,6 +409,21 @@ const domainToDelete = ref(null)
 // Domain add
 const newDomain = ref("")
 const selectAllDomains = ref(false)
+
+// Domain filter
+const filterDomainId = ref(null)
+
+const domainFilterOptions = computed(() => [
+  { label: "All Domains", value: null },
+  ...domains.value.map((d) => ({ label: d.domain, value: d.id })),
+])
+
+const filteredNewsCards = computed(() => {
+  if (!filterDomainId.value) return newsCards.value
+  return newsCards.value.filter((card) =>
+    card.domains?.some((d) => d.id === filterDomainId.value)
+  )
+})
 
 // Filters
 const filters = ref({
