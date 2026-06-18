@@ -331,6 +331,7 @@ const sendDirectInvite = async () => {
 
   inviteNewDialogVisible.value = false
   inviteNewLoading.value = false
+  fetchPendingInvites()
 }
 // ---- Bulk Invite ----
 const bulkInviteDialogVisible = ref(false)
@@ -508,6 +509,7 @@ const sendBulkInvites = async () => {
   }
   bulkInviteResults.value = { sent, failed }
   bulkInviteLoading.value = false
+  await fetchPendingInvites()
 }
 
 // ---- Members ----
@@ -668,9 +670,59 @@ const banMember = async () => {
   banningMember.value = false
 }
 
+// ---- Pending Invitations (existing users invited to group) ----
+const pendingInvites = ref([])
+const loadingPendingInvites = ref(false)
+const resendingInviteId = ref(null)
+const revokingInviteId = ref(null)
+
+const fetchPendingInvites = async () => {
+  loadingPendingInvites.value = true
+  try {
+    const data = await $fetch("/api/group-invites", {
+      query: { websiteId: websiteId.value },
+    })
+    pendingInvites.value = data || []
+  } catch (err) {
+    console.error("Error fetching pending invites:", err)
+  } finally {
+    loadingPendingInvites.value = false
+  }
+}
+
+const resendInvite = async (invite) => {
+  resendingInviteId.value = invite.id
+  try {
+    await $fetch("/api/invite-group-member", {
+      method: "POST",
+      body: { userId: invite.user_id, websiteId: websiteId.value },
+    })
+  } catch (err) {
+    console.error("Error resending invite:", err)
+  } finally {
+    resendingInviteId.value = null
+  }
+}
+
+const revokeInvite = async (invite) => {
+  revokingInviteId.value = invite.id
+  try {
+    await supabase
+      .from("websites_users")
+      .delete()
+      .eq("id", invite.id)
+    pendingInvites.value = pendingInvites.value.filter((i) => i.id !== invite.id)
+  } catch (err) {
+    console.error("Error revoking invite:", err)
+  } finally {
+    revokingInviteId.value = null
+  }
+}
+
 onMounted(() => {
   fetchSubmissions()
   fetchMembers()
+  fetchPendingInvites()
 })
 
 const csvEscape = (val) => {
@@ -917,6 +969,55 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
           </Column>
         </DataTable>
       </div>
+    </div>
+
+    <!-- Pending Invitations (existing users invited to the group) -->
+    <div class="mb-16">
+      <h3 class="mb-6">Pending Invitations</h3>
+      <div v-if="loadingPendingInvites" class="flex justify-center py-4">
+        <ProgressSpinner />
+      </div>
+      <p v-else-if="pendingInvites.length === 0" class="text-gray-500">
+        No pending invitations.
+      </p>
+      <DataTable
+        v-else
+        :value="pendingInvites"
+        stripedRows
+        class="p-datatable-sm"
+        emptyMessage="No pending invitations."
+      >
+        <Column field="email" header="Email" style="min-width: 14rem" />
+        <Column field="invited_at" header="Invited" style="min-width: 10rem">
+          <template #body="{ data }">
+            {{ formatDate(data.invited_at) }}
+          </template>
+        </Column>
+        <Column header="" style="width: 10rem">
+          <template #body="{ data }">
+            <div class="flex gap-2">
+              <Button
+                icon="pi pi-refresh"
+                label="Resend"
+                size="small"
+                severity="info"
+                :loading="resendingInviteId === data.id"
+                @click="resendInvite(data)"
+                v-tooltip.top="'Resend invitation email'"
+              />
+              <Button
+                icon="pi pi-times"
+                size="small"
+                severity="danger"
+                text
+                :loading="revokingInviteId === data.id"
+                @click="revokeInvite(data)"
+                v-tooltip.top="'Revoke invitation'"
+              />
+            </div>
+          </template>
+        </Column>
+      </DataTable>
     </div>
 
     <div v-if="loading" class="flex justify-center items-center py-8">

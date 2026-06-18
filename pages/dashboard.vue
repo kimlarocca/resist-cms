@@ -68,6 +68,7 @@ const submitSetup = async () => {
 
 // User's websites/groups
 const userWebsites = ref([])
+const pendingInvitations = ref([])
 const loadingWebsites = ref(true)
 
 // Fetch websites user has permission to manage
@@ -85,6 +86,7 @@ const fetchUserWebsites = async () => {
       .select(
         `
         website_id,
+        status,
         websites:website_id (
           id,
           title,
@@ -100,13 +102,23 @@ const fetchUserWebsites = async () => {
 
     if (error) throw error
 
-    userWebsites.value = data?.map((item) => item.websites).filter(Boolean) || []
+    const rows = data || []
+    // Only show active (accepted) memberships in My Groups
+    userWebsites.value = rows
+      .filter((r) => (r.status || "member") === "member")
+      .map((item) => item.websites)
+      .filter(Boolean)
+    // Pending invitations
+    pendingInvitations.value = rows
+      .filter((r) => r.status === "invited")
+      .map((item) => ({ ...item.websites, websiteId: item.website_id }))
+      .filter(Boolean)
 
     // Auto-redirect non-global-role users who belong to exactly one group
     const globalRole = currentUserProfile.value?.role
     if (
-      globalRole !== 'super_admin' &&
-      globalRole !== 'election_manager' &&
+      globalRole !== "super_admin" &&
+      globalRole !== "election_manager" &&
       userWebsites.value.length === 1 &&
       currentUserProfile.value?.onboarded
     ) {
@@ -141,6 +153,40 @@ const manageSignupForm = (websiteId) => {
 // Navigate to manage form submissions
 const manageFormSubmissions = (websiteId) => {
   router.push(`/groups/${websiteId}/manage-form-submissions`)
+}
+
+// Accept pending group invitation
+const acceptingInviteId = ref(null)
+const acceptInviteError = ref("")
+
+const acceptGroupInvitation = async (invite) => {
+  acceptingInviteId.value = invite.websiteId
+  acceptInviteError.value = ""
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    if (!session?.access_token) {
+      throw new Error("Not authenticated.")
+    }
+
+    await $fetch("/api/accept-group-invite", {
+      method: "POST",
+      body: { websiteId: invite.websiteId },
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    })
+    // Refresh both lists
+    await fetchUserWebsites()
+  } catch (error) {
+    console.error("Error accepting invitation:", error)
+    acceptInviteError.value =
+      error?.data?.message || "Failed to accept invitation. Please try again."
+  } finally {
+    acceptingInviteId.value = null
+  }
 }
 
 // Cross-group announcements feed (shown when member of 2+ groups)
@@ -378,6 +424,31 @@ onMounted(() => {
       </div>
     </div>
 
+    <!-- Pending Group Invitations -->
+    <div v-if="pendingInvitations.length > 0" class="mb-12">
+      <h2 class="mb-4">Pending Group Invitations</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div
+          v-for="invite in pendingInvitations"
+          :key="invite.id"
+          class="flex flex-col rounded-xl bg-gray shadow-xl p-8"
+        >
+          <Tag value="Invited" severity="warn" class="mb-4 w-fit" />
+          <h3 class="mb-3">{{ invite.title || "Untitled" }}</h3>
+          <p class="text-sm text-gray-500 mb-4">
+            You've been invited to join this group. Accept the invitation to gain access.
+          </p>
+          <Button
+            label="Accept Invitation"
+            icon="pi pi-check"
+            size="small"
+            :loading="acceptingInviteId === invite.websiteId"
+            @click="acceptGroupInvitation(invite)"
+          />
+        </div>
+      </div>
+    </div>
+
     <!-- My Groups/Websites -->
     <div v-if="userWebsites.length > 0 || loadingWebsites">
       <div v-if="loadingWebsites" class="flex justify-center py-8">
@@ -421,7 +492,11 @@ onMounted(() => {
                     'group_admin',
                     'group_manager',
                     'event_manager',
-                  ].includes(currentUserProfile?.role === 'super_admin' ? 'super_admin' : currentUserGroupRoles?.[website.id])
+                  ].includes(
+                    currentUserProfile?.role === 'super_admin'
+                      ? 'super_admin'
+                      : currentUserGroupRoles?.[website.id]
+                  )
                 "
               >
               </template>

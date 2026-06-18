@@ -27,12 +27,14 @@ export default defineEventHandler(async (event) => {
       created_at,
       user_id,
       role,
+      status,
       profiles:user_id (
         id,
         full_name
       )
     `)
     .eq("website_id", websiteId)
+    .eq("status", "member")
 
   if (wuError) {
     throw createError({ statusCode: 500, message: wuError.message })
@@ -59,6 +61,7 @@ export default defineEventHandler(async (event) => {
     joined_at: wu.created_at,
     full_name: (wu.profiles as any)?.full_name || null,
     role: wu.role || "member",
+    status: (wu as any).status || "member",
     email: emailMap[wu.user_id] || null,
   }))
 })

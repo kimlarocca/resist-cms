@@ -22,7 +22,7 @@
       </Message>
 
       <div class="mb-4">
-        <label class="block text-sm font-medium mb-2">Add User to Website</label>
+        <label class="block text-sm font-medium mb-2">Invite Existing User to Website</label>
         <div class="flex gap-2">
           <Select
             v-model="selectedUser"
@@ -35,8 +35,8 @@
             :loading="loadingProfiles"
           />
           <Button
-            icon="pi pi-plus"
-            label="Add"
+            icon="pi pi-envelope"
+            label="Invite"
             @click="addUserToWebsite"
             :disabled="!selectedUser || addingUser"
             :loading="addingUser"
@@ -57,6 +57,14 @@
               <Tag
                 :value="data.role"
                 :severity="data.role === 'super_admin' ? 'danger' : 'info'"
+              />
+            </template>
+          </Column>
+          <Column field="status" header="Status">
+            <template #body="{ data }">
+              <Tag
+                :value="data.status === 'invited' ? 'Invited' : 'Member'"
+                :severity="data.status === 'invited' ? 'warn' : 'success'"
               />
             </template>
           </Column>
@@ -773,6 +781,7 @@ const fetchAssignedUsers = async () => {
         `
         user_id,
         role,
+        status,
         profiles:user_id (
           id,
           full_name
@@ -788,6 +797,7 @@ const fetchAssignedUsers = async () => {
         id: item.profiles.id,
         full_name: item.profiles.full_name,
         role: item.role,
+        status: item.status || 'member',
       })) || []
   } catch (error) {
     console.error("Error fetching assigned users:", error)
@@ -816,7 +826,7 @@ const fetchAllProfiles = async () => {
   }
 }
 
-// Add user to website
+// Invite existing user to website
 const addUserToWebsite = async () => {
   if (!selectedUser.value || !effectiveWebsiteId.value) return
 
@@ -824,12 +834,10 @@ const addUserToWebsite = async () => {
   userManagementError.value = ""
 
   try {
-    const { error } = await supabase.from("websites_users").insert({
-      website_id: effectiveWebsiteId.value,
-      user_id: selectedUser.value,
+    await $fetch("/api/invite-group-member", {
+      method: "POST",
+      body: { userId: selectedUser.value, websiteId: effectiveWebsiteId.value },
     })
-
-    if (error) throw error
 
     successMessage.value = true
     setTimeout(() => {
@@ -839,9 +847,9 @@ const addUserToWebsite = async () => {
     selectedUser.value = null
     await fetchAssignedUsers()
   } catch (error) {
-    console.error("Error adding user to website:", error)
+    console.error("Error inviting user to website:", error)
     userManagementError.value =
-      error.message || "Failed to add user. They may already have access."
+      error.data?.message || error.message || "Failed to invite user. They may already have access."
   } finally {
     addingUser.value = false
   }
