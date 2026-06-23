@@ -9,10 +9,11 @@
           id="currentPassword"
           v-model="currentPassword"
           toggleMask
-          type="password"
+          :feedback="false"
           placeholder="Current Password"
           required
           class="mb-3 w-96"
+          :inputProps="{ autocomplete: 'current-password' }"
         />
         <label for="currentPassword">Current Password</label>
       </FloatLabel>
@@ -21,10 +22,10 @@
           id="newPassword"
           v-model="newPassword"
           toggleMask
-          type="password"
           placeholder="New Password"
           required
           class="mb-3 w-96"
+          :inputProps="{ autocomplete: 'new-password' }"
         />
         <label for="newPassword">New Password</label>
       </FloatLabel>
