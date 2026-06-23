@@ -3,21 +3,31 @@
     <Button v-if="!showForm" @click="showForm = true" class="uppercase font-semibold">
       Change Password
     </Button>
-    <form v-else class="password-reset" @submit.prevent="resetPassword">
-      <input
-        v-model="currentPassword"
-        type="password"
-        placeholder="Current Password"
-        required
-        class="mb-3"
-      />
-      <input
-        v-model="newPassword"
-        type="password"
-        placeholder="New Password"
-        required
-        class="mb-3"
-      />
+    <form v-else class="password-reset mt-8" @submit.prevent="resetPassword">
+      <FloatLabel variant="on" class="mb-4">
+        <Password
+          id="currentPassword"
+          v-model="currentPassword"
+          toggleMask
+          type="password"
+          placeholder="Current Password"
+          required
+          class="mb-3 w-96"
+        />
+        <label for="currentPassword">Current Password</label>
+      </FloatLabel>
+      <FloatLabel variant="on" class="mb-4">
+        <Password
+          id="newPassword"
+          v-model="newPassword"
+          toggleMask
+          type="password"
+          placeholder="New Password"
+          required
+          class="mb-3 w-96"
+        />
+        <label for="newPassword">New Password</label>
+      </FloatLabel>
       <div class="flex gap-3 align-items-center">
         <Button :loading="pending" type="submit">Update Password</Button>
         <Button severity="secondary" type="button" @click="cancel">Cancel</Button>
