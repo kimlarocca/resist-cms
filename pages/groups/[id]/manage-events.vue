@@ -30,7 +30,7 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
     <template v-else>
       <h1 class="mb-4">Manage Events</h1>
       <NuxtLink :to="`/groups/${websiteId}/portal`" class="plain text-sm">
-        <i class="pi pi-arrow-left mr-1" />Back to Team Site
+        <i class="pi pi-arrow-left mr-1" />Back to Group Site
       </NuxtLink>
       <Divider class="my-7" />
       <h2 v-if="website?.title" class="mb-8">{{ website?.title }}</h2>

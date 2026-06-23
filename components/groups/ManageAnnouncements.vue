@@ -2,9 +2,9 @@
   <div>
     <div class="flex items-center justify-between gap-6 mb-6">
       <p>
-        Announcements are visible to all team members on the Team Only Site and on the
+        Announcements are visible to all group members on the Group Site and on the
         Dashboard. Use announcements to share important updates, reminders, and
-        information with your team.
+        information with your group.
       </p>
       <Button
         label="New Announcement"

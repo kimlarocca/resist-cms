@@ -13,8 +13,8 @@ const currentUserGroupRoles = useCurrentUserGroupRoles()
 // Permission helpers — use per-group role, with super_admin override
 const myRole = computed(() => {
   const globalRole = currentUserProfile.value?.role
-  if (globalRole === 'super_admin') return 'super_admin'
-  return currentUserGroupRoles.value?.[websiteId.value] || 'member'
+  if (globalRole === "super_admin") return "super_admin"
+  return currentUserGroupRoles.value?.[websiteId.value] || "member"
 })
 const isSuperAdmin = computed(() => myRole.value === "super_admin")
 const isGroupAdmin = computed(() => myRole.value === "group_admin")
@@ -707,10 +707,7 @@ const resendInvite = async (invite) => {
 const revokeInvite = async (invite) => {
   revokingInviteId.value = invite.id
   try {
-    await supabase
-      .from("websites_users")
-      .delete()
-      .eq("id", invite.id)
+    await supabase.from("websites_users").delete().eq("id", invite.id)
     pendingInvites.value = pendingInvites.value.filter((i) => i.id !== invite.id)
   } catch (err) {
     console.error("Error revoking invite:", err)
@@ -797,7 +794,7 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
     </Html>
     <h1 class="mb-4">Member Management</h1>
     <NuxtLink :to="`/groups/${websiteId}/portal`" class="plain text-sm">
-      <i class="pi pi-arrow-left mr-1" />Back to Team Site
+      <i class="pi pi-arrow-left mr-1" />Back to Group Site
     </NuxtLink>
     <Divider class="my-7" />
     <div class="flex items-center justify-between mb-12">

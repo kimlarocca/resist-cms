@@ -2,9 +2,9 @@
   <div>
     <div class="flex items-center justify-between mb-6">
       <p>
-        Group Links appear on the Team Only Site. Use them to share important resources
-        like group chats, document libraries, meeting notes, or other external resources
-        your team needs quick access to.
+        Group Links appear on the Group Site. Use them to share important resources like
+        group chats, document libraries, meeting notes, or other external resources your
+        group needs quick access to.
       </p>
       <Button
         label="Add Link"

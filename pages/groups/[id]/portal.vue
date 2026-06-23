@@ -117,10 +117,10 @@ const fetchLinks = async () => {
   <div class="container p-4">
     <Html lang="en">
       <Head>
-        <Title>{{ website?.title }} Team Member Portal</Title>
+        <Title>{{ website?.title }} Group Site</Title>
       </Head>
     </Html>
-    <h1 class="mb-6">{{ website?.title }} Team Member Portal</h1>
+    <h1 class="mb-6">{{ website?.title }} Group Site</h1>
     <div v-if="website?.team_message" v-html="website?.team_message" class="mb-12" />
 
     <div
@@ -136,12 +136,7 @@ const fetchLinks = async () => {
         class="absolute top-0 left-8 transform -translate-y-1/2 w-fit"
       />
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
-        <template
-          v-if="
-            groupRole !== 'event_manager' &&
-            groupRole !== 'member'
-          "
-        >
+        <template v-if="groupRole !== 'event_manager' && groupRole !== 'member'">
           <NuxtLink :to="`/groups/${websiteId}`" class="plain flex items-center"
             ><i class="pi pi-cog mr-1" />Settings</NuxtLink
           >

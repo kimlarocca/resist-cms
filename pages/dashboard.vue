@@ -481,7 +481,7 @@ onMounted(() => {
               </p>
               <p>
                 <NuxtLink :to="`/groups/${website.id}/portal`" class="plain text-sm">
-                  Team Member Portal <i class="pi pi-arrow-right text-xs ml-1" />
+                  Group Site <i class="pi pi-arrow-right text-xs ml-1" />
                 </NuxtLink>
               </p>
 

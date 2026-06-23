@@ -22,7 +22,9 @@
       </Message>
 
       <div class="mb-4">
-        <label class="block text-sm font-medium mb-2">Invite Existing User to Website</label>
+        <label class="block text-sm font-medium mb-2"
+          >Invite Existing User to Website</label
+        >
         <div class="flex gap-2">
           <Select
             v-model="selectedUser"
@@ -354,7 +356,7 @@
       class="mb-4"
       @click="showAllSocial = !showAllSocial"
     />
-    <h3 class="text-lg font-bold mt-8 mb-4">Team Message</h3>
+    <h3 class="text-lg font-bold mt-8 mb-4">Group Message</h3>
     <SimpleEditor id="team_message" v-model="teamMessage" rows="4" class="mb-4" />
 
     <h3 class="text-lg font-bold mt-12 mb-4">Privacy Policy</h3>
@@ -797,7 +799,7 @@ const fetchAssignedUsers = async () => {
         id: item.profiles.id,
         full_name: item.profiles.full_name,
         role: item.role,
-        status: item.status || 'member',
+        status: item.status || "member",
       })) || []
   } catch (error) {
     console.error("Error fetching assigned users:", error)
@@ -849,7 +851,9 @@ const addUserToWebsite = async () => {
   } catch (error) {
     console.error("Error inviting user to website:", error)
     userManagementError.value =
-      error.data?.message || error.message || "Failed to invite user. They may already have access."
+      error.data?.message ||
+      error.message ||
+      "Failed to invite user. They may already have access."
   } finally {
     addingUser.value = false
   }
