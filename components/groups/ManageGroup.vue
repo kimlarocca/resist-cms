@@ -127,18 +127,22 @@
 
     <div class="mb-8">
       <FloatLabel variant="on">
-        <InputText
-          id="slug"
-          v-model="slug"
-          @blur="validateSlug"
-          :class="{ 'p-invalid': slugError }"
-        />
-        <label for="slug"> Website Slug</label>
+        <InputGroup>
+          <InputGroupAddon>resistcms.com/</InputGroupAddon>
+          <InputText
+            id="slug"
+            v-model="slug"
+            @blur="validateSlug"
+            :class="{ 'p-invalid': slugError }"
+          />
+        </InputGroup>
+        <label for="slug"> Public Website Address</label>
       </FloatLabel>
       <small v-if="slugError" class="text-red-500 block mt-2">{{ slugError }}</small>
       <Message severity="info" icon="pi pi-info-circle" class="mt-2">
-        The slug is the custom part of your website's address. For example, a slug of
-        my-group makes your site live at <strong>resistcms.com/my-group</strong>.
+        Set the custom part of your group's public website address here. For example, if
+        you enter "my-group" it makes your site live at
+        <strong>resistcms.com/my-group</strong>.
       </Message>
     </div>
 
