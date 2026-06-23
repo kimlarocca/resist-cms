@@ -499,6 +499,65 @@ onMounted(() => {
                   )
                 "
               >
+                <div class="mt-4 pt-4 border-t border-gray-300">
+                  <p
+                    class="text-xs text-gray-400 mb-2 uppercase font-semibold tracking-wide"
+                  >
+                    Admin Links
+                  </p>
+                  <div class="grid grid-cols-2 gap-2 text-sm">
+                    <template
+                      v-if="
+                        (currentUserProfile?.role === 'super_admin'
+                          ? 'super_admin'
+                          : currentUserGroupRoles?.[website.id]) !== 'event_manager'
+                      "
+                    >
+                      <NuxtLink
+                        :to="`/groups/${website.id}`"
+                        class="plain flex items-center"
+                      >
+                        <i class="pi pi-cog mr-1" />Settings
+                      </NuxtLink>
+                      <NuxtLink
+                        :to="`/groups/${website.id}/manage-content`"
+                        class="plain flex items-center"
+                      >
+                        <i class="pi pi-pencil mr-1" />Content
+                      </NuxtLink>
+                      <NuxtLink
+                        :to="`/groups/${website.id}/manage-signup-form`"
+                        class="plain flex items-center"
+                      >
+                        <i class="pi pi-clipboard mr-1" />Signup Form
+                      </NuxtLink>
+                      <NuxtLink
+                        :to="`/groups/${website.id}/manage-members`"
+                        class="plain flex items-center"
+                      >
+                        <i class="pi pi-users mr-1" />Members
+                      </NuxtLink>
+                      <NuxtLink
+                        :to="`/groups/${website.id}/manage-announcements`"
+                        class="plain flex items-center"
+                      >
+                        <i class="pi pi-megaphone mr-1" />Announcements
+                      </NuxtLink>
+                      <NuxtLink
+                        :to="`/groups/${website.id}/manage-links`"
+                        class="plain flex items-center"
+                      >
+                        <i class="pi pi-link mr-1" />Links
+                      </NuxtLink>
+                    </template>
+                    <NuxtLink
+                      :to="`/groups/${website.id}/manage-events`"
+                      class="plain flex items-center"
+                    >
+                      <i class="pi pi-calendar mr-1" />Events
+                    </NuxtLink>
+                  </div>
+                </div>
               </template>
             </div>
           </div>
