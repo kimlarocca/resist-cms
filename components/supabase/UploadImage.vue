@@ -31,7 +31,7 @@
         />
         <Button v-if="imageUrl" @click="deleteImage" icon="pi pi-trash" />
       </div>
-      <p v-if="!imageUrl" class="small mt-3">
+      <p class="small mt-3">
         <em>
           Image files must be less than 1MB in size, and should ideally be a square.<br />jpg,
           png, webp, and gif files are accepted.
