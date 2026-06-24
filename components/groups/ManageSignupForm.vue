@@ -30,16 +30,26 @@
 
     <!-- Form Questions Management -->
     <div v-else>
-      <div class="mb-12">
-        <h3 class="mb-4">Form Heading</h3>
-        <p class="mb-4">
-          This is the main heading displayed at the top of your signup form.
-        </p>
-        <InputText
-          v-model="signupFormH1Text"
-          @blur="saveIntroTextManually"
-          class="w-full"
-        />
+      <div class="flex justify-between mb-12">
+        <div>
+          <h3 class="mb-4">Form Heading</h3>
+          <p class="mb-4">
+            This is the main heading displayed at the top of your signup form.
+          </p>
+          <InputText
+            v-model="signupFormH1Text"
+            @blur="saveIntroTextManually"
+            class="w-full"
+          />
+        </div>
+        <div>
+          <Button
+            label="Preview Form"
+            icon="pi pi-eye"
+            severity="secondary"
+            @click="previewVisible = true"
+          />
+        </div>
       </div>
 
       <div class="mb-12">
@@ -60,22 +70,15 @@
       <h3 class="mb-4">Form Questions</h3>
       <div class="flex justify-between items-center mb-6">
         <p class="text-gray-600">
-          Drag the ≡ handle to reorder rows, or edit the sort order number directly.
+          Decide what questions are included in the Signup Form by Adding New Questions,
+          Setting Visible, Required, and Sort Order.
         </p>
-        <div class="flex gap-2">
-          <Button
-            label="Preview Form"
-            icon="pi pi-eye"
-            severity="secondary"
-            @click="previewVisible = true"
-          />
-          <Button label="Add New Question" icon="pi pi-plus" @click="openDialog()" />
-        </div>
+        <Button label="Add New Question" icon="pi pi-plus" @click="openDialog()" />
       </div>
 
       <DataTable
-        :value="questions"
-        :paginator="questions.length > 25"
+        :value="visibleQuestions"
+        :paginator="visibleQuestions.length > 25"
         :rows="25"
         :rowsPerPageOptions="[25, 50]"
         stripedRows
@@ -170,6 +173,78 @@
           </div>
         </template>
       </DataTable>
+
+      <!-- Additional (Hidden) Questions -->
+      <div v-if="hiddenQuestions.length > 0" class="mt-12">
+        <h3 class="mb-4">Additional Questions</h3>
+        <p class="text-gray-600 mb-6">
+          To add any of these questions to your form, toggle the Visible checkbox.
+        </p>
+        <DataTable
+          :value="hiddenQuestions"
+          :paginator="hiddenQuestions.length > 25"
+          :rows="25"
+          :rowsPerPageOptions="[25, 50]"
+          stripedRows
+          class="p-datatable-sm"
+        >
+          <Column field="label" header="Question" style="min-width: 20rem">
+            <template #body="{ data }">
+              <div>
+                <strong>{{ data.label }}</strong>
+                <div class="text-xs text-gray-500 mt-1">
+                  Type: {{ fieldTypeLabels[data.field_type] || data.field_type }}
+                  <span v-if="data.placeholder" class="ml-2">
+                    | Placeholder: "{{ data.placeholder }}"
+                  </span>
+                  <span v-if="data.options">
+                    | Options: {{ formatOptions(data.options) }}
+                  </span>
+                </div>
+              </div>
+            </template>
+          </Column>
+
+          <Column field="visible" header="Visible" style="width: 7rem">
+            <template #body="{ data }">
+              <ToggleSwitch
+                v-model="data.visible"
+                @update:modelValue="updateQuestion(data)"
+              />
+            </template>
+          </Column>
+
+          <Column field="required" header="Required" style="width: 7rem">
+            <template #body="{ data }">
+              <ToggleSwitch
+                v-model="data.required"
+                @update:modelValue="updateQuestion(data)"
+              />
+            </template>
+          </Column>
+
+          <Column style="width: 8rem">
+            <template #body="{ data }">
+              <div class="flex gap-2">
+                <Button
+                  icon="pi pi-pencil"
+                  severity="info"
+                  size="small"
+                  @click="openDialog(data)"
+                  v-tooltip.top="'Edit'"
+                />
+                <Button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  size="small"
+                  @click="confirmDelete(data)"
+                  v-tooltip.top="'Delete'"
+                />
+              </div>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
     </div>
 
     <!-- Create/Edit Dialog -->
@@ -226,7 +301,7 @@
           <Textarea
             id="options"
             v-model="formData.optionsText"
-            rows="4"
+            rows="3"
             placeholder="Yes&#10;No&#10;Other"
           />
           <small class="text-gray-500">
@@ -323,6 +398,8 @@ const props = defineProps({
 const client = useSupabaseClient()
 
 const questions = ref([])
+const visibleQuestions = computed(() => questions.value.filter((q) => q.visible))
+const hiddenQuestions = computed(() => questions.value.filter((q) => !q.visible))
 const loading = ref(true)
 const saving = ref(false)
 const deleting = ref(false)
@@ -341,23 +418,22 @@ const editingQuestion = ref(null)
 const questionToDelete = ref(null)
 
 const fieldTypeOptions = [
-  { label: "Text Input", value: "text" },
+  { label: "Text (1 Line)", value: "text" },
+  { label: "Text (Multi-Line)", value: "textarea" },
   { label: "Email", value: "email" },
-  { label: "Phone", value: "phone" },
-  { label: "Textarea", value: "textarea" },
-  { label: "Checkbox", value: "checkbox" },
+  { label: "Checkbox (Single)", value: "checkbox" },
+  { label: "Checkbox (Multiple)", value: "checkboxes" },
   { label: "Radio Buttons", value: "radio" },
-  { label: "Checkboxes (multiple)", value: "checkboxes" },
 ]
 
 const fieldTypeLabels = {
-  text: "Text Input",
+  text: "Text (1 Line)",
+  phone: "Text (1 Line)",
   email: "Email",
-  phone: "Phone",
-  textarea: "Textarea",
-  checkbox: "Checkbox",
+  textarea: "Text (Multi-Line)",
+  checkbox: "Checkbox (Single)",
+  checkboxes: "Checkbox (Multiple)",
   radio: "Radio Buttons",
-  checkboxes: "Checkboxes",
 }
 
 const formData = ref({
@@ -376,7 +452,7 @@ const showOptionsField = computed(() =>
 )
 
 const showDefaultValueField = computed(() =>
-  ["text", "email", "phone", "radio"].includes(formData.value.field_type)
+  ["text", "email", "radio"].includes(formData.value.field_type)
 )
 
 const isProtectedField = (data) =>
@@ -422,7 +498,7 @@ const getDefaultQuestions = () => [
   },
   {
     label: "Phone",
-    field_type: "phone",
+    field_type: "text",
     placeholder: null,
     options: null,
     default_value: null,
@@ -462,6 +538,16 @@ const getDefaultQuestions = () => [
     sort_order: 7,
   },
   {
+    label: "Please list any contacts you have in the group.",
+    field_type: "text",
+    placeholder: "This helps us ensure no trolls & bots are added.",
+    options: null,
+    default_value: null,
+    required: false,
+    visible: true,
+    sort_order: 8,
+  },
+  {
     label:
       "Do you agree to our group rules, listed or linked in the introduction to the form?",
     field_type: "checkbox",
@@ -470,125 +556,7 @@ const getDefaultQuestions = () => [
     default_value: "false",
     required: true,
     visible: true,
-    sort_order: 8,
-  },
-  {
-    label: "Please list any contacts you have in the group.",
-    field_type: "text",
-    placeholder: "This helps us ensure no trolls & bots are added.",
-    options: null,
-    default_value: null,
-    required: false,
-    visible: true,
     sort_order: 9,
-  },
-  {
-    label:
-      "The Visibility Brigade is a non-violent, informal volunteer group in which we all participate with an understanding that our own actions are our personal responsibility, and we accept our own personal liability. Do you understand and accept this?",
-    field_type: "checkbox",
-    placeholder: null,
-    options: null,
-    default_value: "false",
-    required: true,
-    visible: true,
-    sort_order: 10,
-  },
-  {
-    label: "Emergency Contact Name",
-    field_type: "text",
-    placeholder: null,
-    options: null,
-    default_value: null,
-    required: false,
-    visible: true,
-    sort_order: 11,
-  },
-  {
-    label: "Emergency Contact Phone",
-    field_type: "text",
-    placeholder: null,
-    options: null,
-    default_value: null,
-    required: false,
-    visible: true,
-    sort_order: 12,
-  },
-  {
-    label: "Emergency Contact Info",
-    field_type: "text",
-    placeholder: null,
-    options: null,
-    default_value: null,
-    required: false,
-    visible: true,
-    sort_order: 13,
-  },
-  {
-    label: "What issues facing our area and country are most important to you?",
-    field_type: "textarea",
-    placeholder: null,
-    options: null,
-    default_value: null,
-    required: false,
-    visible: true,
-    sort_order: 14,
-  },
-  {
-    label: "In what town/city do you currently live?",
-    field_type: "text",
-    placeholder: null,
-    options: null,
-    default_value: null,
-    required: false,
-    visible: true,
-    sort_order: 15,
-  },
-  {
-    label: "Would you like to join our Email list?",
-    field_type: "radio",
-    placeholder: null,
-    options: ["Yes", "No"],
-    default_value: "Yes",
-    required: false,
-    visible: true,
-    sort_order: 16,
-  },
-  {
-    label:
-      "Would you like to join our Signal group(s) for encrypted end-to-end messaging?",
-    field_type: "radio",
-    placeholder: null,
-    options: ["Yes", "No"],
-    default_value: "Yes",
-    required: false,
-    visible: true,
-    sort_order: 17,
-  },
-  {
-    label: "Where did you hear about us?",
-    field_type: "checkboxes",
-    placeholder: null,
-    options: [
-      "A friend",
-      "Facebook",
-      "Instagram",
-      "From another political action group",
-      "Other",
-    ],
-    default_value: null,
-    required: false,
-    visible: true,
-    sort_order: 18,
-  },
-  {
-    label: "Interested in starting your own location? Where?",
-    field_type: "text",
-    placeholder: "We'll help wherever we can.",
-    options: null,
-    default_value: null,
-    required: false,
-    visible: true,
-    sort_order: 19,
   },
 ]
 
@@ -864,8 +832,9 @@ const fetchSignupFormText = async () => {
       .single()
 
     if (error) throw error
-    signupFormText.value = data?.signup_form_text || ""
-    signupFormH1Text.value = data?.signup_form_h1_text || ""
+    signupFormText.value =
+      data?.signup_form_text || "Please fill out the form below to join the resistance."
+    signupFormH1Text.value = data?.signup_form_h1_text || "Join The Resistance"
   } catch (error) {
     console.error("Error fetching signup form text:", error)
   }
