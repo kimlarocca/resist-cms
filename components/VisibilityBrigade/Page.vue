@@ -14,7 +14,7 @@
           class="like-h1 text-white [-webkit-text-stroke:2px_black] mb-12"
           v-html="content?.hero_headline"
         />
-        <div class="mb-12">
+        <div class="mb-12 lg:max-w-[60%]">
           <div
             class="mb-6 font-semibold text-white bg-black/80 p-2 w-fit"
             v-html="content?.hero_text"
