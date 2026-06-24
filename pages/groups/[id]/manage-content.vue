@@ -79,12 +79,8 @@ onMounted(() => {
     </div>
 
     <div v-else-if="website">
-      <h1 class="mb-4">Manage Your Group's Content</h1>
-      <NuxtLink :to="`/groups/${websiteId}/portal`" class="plain text-sm">
-        <i class="pi pi-arrow-left mr-1 text-xs" />Back to Group Site
-      </NuxtLink>
-      <Divider class="my-7" />
-      <h2 v-if="website?.title" class="mb-4">{{ website?.title }}</h2>
+      <NuxtLink v-if="website?.title" :to="`/groups/${websiteId}/portal`" class="like-h3 plain flex items-center mb-4"><i class="pi pi-arrow-left mr-2" />{{ website?.title }}</NuxtLink>
+      <h1 class="mb-12">Manage Your Group's Content</h1>
       <p v-if="website.url" class="mb-4">
         <a :href="website.url" target="_blank" class="text-blue-600 hover:underline">
           {{ website.url }}

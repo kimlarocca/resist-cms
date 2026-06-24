@@ -792,13 +792,9 @@ const { data: website } = await useAsyncData(`website-${websiteId.value}`, () =>
         <Title>Member Management</Title>
       </Head>
     </Html>
-    <h1 class="mb-4">Member Management</h1>
-    <NuxtLink :to="`/groups/${websiteId}/portal`" class="plain text-sm">
-      <i class="pi pi-arrow-left mr-1" />Back to Group Site
-    </NuxtLink>
-    <Divider class="my-7" />
-    <div class="flex items-center justify-between mb-12">
-      <h2 v-if="website?.title">{{ website?.title }}</h2>
+    <NuxtLink v-if="website?.title" :to="`/groups/${websiteId}/portal`" class="like-h3 plain flex items-center mb-4"><i class="pi pi-arrow-left mr-2" />{{ website?.title }}</NuxtLink>
+    <h1 class="mb-12">Member Management</h1>
+    <div class="flex items-center justify-end mb-12">
       <div>
         <Button
           label="Invite Member"
