@@ -13,6 +13,7 @@ export default defineNuxtConfig({
         lang: 'en',
       },
       meta: [
+        { name: 'robots', content: 'noindex, nofollow' },
         { name: 'description', content: 'Content management for the resistance!' },
         { name: 'msapplication-TileColor', content: '#0a84ff' },
         { name: 'theme-color', content: '#0a84ff' }
