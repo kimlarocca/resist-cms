@@ -261,16 +261,26 @@
         <Column field="address" header="Address">
           <template #body="{ data }">{{ data.address || "—" }}</template>
         </Column>
-        <Column style="width: 5rem">
+        <Column style="width: 8rem">
           <template #body="{ data }">
-            <Button
-              icon="pi pi-trash"
-              size="small"
-              text
-              severity="danger"
-              v-tooltip.top="'Delete Location'"
-              @click="confirmDeleteLocation(data)"
-            />
+            <div class="flex gap-2">
+              <Button
+                icon="pi pi-pencil"
+                size="small"
+                text
+                severity="info"
+                v-tooltip.top="'Edit Location'"
+                @click="openEditLocationDialog(data)"
+              />
+              <Button
+                icon="pi pi-trash"
+                size="small"
+                text
+                severity="danger"
+                v-tooltip.top="'Delete Location'"
+                @click="confirmDeleteLocation(data)"
+              />
+            </div>
           </template>
         </Column>
       </DataTable>
@@ -283,10 +293,10 @@
       </template>
     </Dialog>
 
-    <!-- Add Location Dialog -->
+    <!-- Add/Edit Location Dialog -->
     <Dialog
       v-model:visible="locationDialogVisible"
-      header="Add Location"
+      :header="editingLocation ? 'Edit Location' : 'Add Location'"
       :modal="true"
       :style="{ width: '480px' }"
     >
@@ -321,7 +331,7 @@
           @click="locationDialogVisible = false"
         />
         <Button
-          label="Add"
+          :label="editingLocation ? 'Save Changes' : 'Add'"
           icon="pi pi-check"
           @click="saveLocation"
           :loading="savingLocation"
@@ -418,6 +428,7 @@ const manageLocationsDialogVisible = ref(false)
 const deleteEventDialogVisible = ref(false)
 const deleteLocationDialogVisible = ref(false)
 const editingEvent = ref(null)
+const editingLocation = ref(null)
 const eventToDelete = ref(null)
 const locationToDelete = ref(null)
 const recurrenceEndError = ref("")
@@ -717,7 +728,18 @@ const deleteEvent = async () => {
 
 // ---- Location CRUD ----
 const openLocationDialog = () => {
+  editingLocation.value = null
   locationForm.value = { name: "", address: "", parking_info: "" }
+  locationDialogVisible.value = true
+}
+
+const openEditLocationDialog = (location) => {
+  editingLocation.value = location
+  locationForm.value = {
+    name: location.name || "",
+    address: location.address || "",
+    parking_info: location.parking_info || "",
+  }
   locationDialogVisible.value = true
 }
 
@@ -725,17 +747,29 @@ const saveLocation = async () => {
   if (!locationForm.value.address.trim()) return
   savingLocation.value = true
   try {
-    const { error } = await supabase.from("group_event_locations").insert({
-      website_id: props.websiteId,
-      name: locationForm.value.name,
-      address: locationForm.value.address || null,
-      parking_info: locationForm.value.parking_info || null,
-    })
-    if (error) throw error
+    if (editingLocation.value) {
+      const { error } = await supabase
+        .from("group_event_locations")
+        .update({
+          name: locationForm.value.name,
+          address: locationForm.value.address || null,
+          parking_info: locationForm.value.parking_info || null,
+        })
+        .eq("id", editingLocation.value.id)
+      if (error) throw error
+    } else {
+      const { error } = await supabase.from("group_event_locations").insert({
+        website_id: props.websiteId,
+        name: locationForm.value.name,
+        address: locationForm.value.address || null,
+        parking_info: locationForm.value.parking_info || null,
+      })
+      if (error) throw error
+    }
     locationDialogVisible.value = false
     await fetchLocations()
   } catch (error) {
-    errorMessage.value = error.message || "Failed to add location."
+    errorMessage.value = error.message || "Failed to save location."
   } finally {
     savingLocation.value = false
   }

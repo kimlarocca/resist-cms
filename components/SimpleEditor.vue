@@ -32,10 +32,19 @@
         @click="setLink"
         :class="{ 'is-active': editor.isActive('link') }"
         type="button"
-        v-tooltip.bottom="'Link'"
+        v-tooltip.bottom="'Text Link'"
         aria-label="link"
       >
         <i class="pi pi-link"></i>
+      </button>
+      <button
+        @click="setButtonLink"
+        :class="{ 'is-active': editor.isActive('link', { class: 'btn' }) }"
+        type="button"
+        v-tooltip.bottom="'Button Link'"
+        aria-label="button link"
+      >
+        <span class="btn-icon">Btn</span>
       </button>
       <button
         @click="editor.chain().focus().toggleBulletList().run()"
@@ -66,6 +75,22 @@ import StarterKit from "@tiptap/starter-kit"
 import Link from "@tiptap/extension-link"
 import Underline from "@tiptap/extension-underline"
 
+const CustomLink = Link.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      class: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("class"),
+        renderHTML: (attributes) => {
+          if (!attributes.class) return {}
+          return { class: attributes.class }
+        },
+      },
+    }
+  },
+})
+
 const props = defineProps({
   modelValue: {
     type: String,
@@ -88,7 +113,7 @@ const editor = useEditor({
   extensions: [
     StarterKit,
     Underline,
-    Link.configure({
+    CustomLink.configure({
       openOnClick: false,
       HTMLAttributes: {
         target: "_blank",
@@ -113,9 +138,7 @@ const setLink = () => {
   const previousUrl = editor.value.getAttributes("link").href
   const url = window.prompt("URL", previousUrl)
 
-  if (url === null) {
-    return
-  }
+  if (url === null) return
 
   if (url === "") {
     editor.value.chain().focus().extendMarkRange("link").unsetLink().run()
@@ -123,6 +146,41 @@ const setLink = () => {
   }
 
   editor.value.chain().focus().extendMarkRange("link").setLink({ href: url }).run()
+}
+
+const setButtonLink = () => {
+  const previousUrl = editor.value.getAttributes("link").href
+  const url = window.prompt("URL", previousUrl)
+
+  if (url === null) return
+
+  if (url === "") {
+    editor.value.chain().focus().extendMarkRange("link").unsetLink().run()
+    return
+  }
+
+  const { from, to } = editor.value.state.selection
+  const hasSelection = from !== to
+
+  if (!hasSelection) {
+    const label = window.prompt("Button Label", "Click Here")
+    if (!label) return
+    editor.value
+      .chain()
+      .focus()
+      .insertContent(
+        `<a href="${url}" class="btn" target="_blank" rel="noopener noreferrer">${label}</a>`
+      )
+      .run()
+    return
+  }
+
+  editor.value
+    .chain()
+    .focus()
+    .extendMarkRange("link")
+    .setLink({ href: url, class: "btn" })
+    .run()
 }
 
 watch(
@@ -185,6 +243,15 @@ onBeforeUnmount(() => {
         font-size: 14px;
         display: inline-block;
       }
+
+      .btn-icon {
+        font-size: 11px;
+        font-weight: 700;
+        border: 1.5px solid currentColor;
+        border-radius: 3px;
+        padding: 0 3px;
+        line-height: 16px;
+      }
     }
   }
 }
@@ -215,6 +282,20 @@ onBeforeUnmount(() => {
     color: var(--p-primary-color);
     text-decoration: underline;
     cursor: pointer;
+
+    &.btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background: var(--p-primary-color);
+      color: white !important;
+      text-decoration: none !important;
+      border-radius: 4px;
+      font-weight: 600;
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
   }
 
   strong {

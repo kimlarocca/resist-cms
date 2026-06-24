@@ -69,3 +69,19 @@ const formatPostedInfo = (announcement) => {
   return parts.join(" ")
 }
 </script>
+
+<style scoped>
+:deep(a.btn) {
+  display: inline-block;
+  padding: 8px 16px;
+  background: var(--p-primary-color);
+  color: white !important;
+  text-decoration: none !important;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+:deep(a.btn:hover) {
+  opacity: 0.85;
+}
+</style>
